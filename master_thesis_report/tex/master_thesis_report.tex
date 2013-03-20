@@ -1,0 +1,209 @@
+%% LyX 2.0.3 created this file.  For more info, see http://www.lyx.org/.
+%% Do not edit unless you really know what you are doing.
+\documentclass[a4paper,10pt, times]{article}
+\renewcommand{\rmdefault}{cmr}
+\renewcommand{\sfdefault}{cmss}
+\renewcommand{\ttdefault}{cmtt}
+\renewcommand{\familydefault}{\sfdefault}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{geometry}
+\geometry{verbose,tmargin=2cm,bmargin=2cm,lmargin=3.5cm,rmargin=2cm}
+
+\makeatletter
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% User specified LaTeX commands.\usepackage[toc]{glossaries}
+%\usepackage[estonian]{babel}
+\usepackage[russian,estonian,english]{babel}
+\usepackage{datetime}
+
+
+\usepackage{textcomp} % Used for syntax highlighting. 
+\usepackage{listings}
+\usepackage{color}
+\usepackage{palatino} 
+\usepackage{setspace}
+\usepackage{needspace} % line skipping
+
+% images
+\usepackage{graphicx}
+\usepackage{wrapfig}
+
+
+%\usepackage[printonlyused,withpage]{acronym}
+
+
+\usepackage[bookmarks=true,
+bookmarksnumbered=true,
+bookmarksopen=false,
+backref=page,
+,colorlinks=true]{hyperref}
+%\hypersetup{backref=true}
+%\usepackage{backref}
+%\usepackage{hyperref}
+%\usepackage[colorlinks,bookmarks=false]{hyperref}
+\usepackage{url}
+
+% bibliography to table of contents
+%\usepackage[nottoc,numbib]{tocbibind}
+
+
+%\bibliography{references.bib}
+% urls in bibliography
+%\usepackage{natbib}
+%\usepackage{babelbib}
+
+% \usepackage[
+%     backend=biber,
+%     style=ieee,
+%     sortlocale=de_DE,
+%     natbib=true,
+%     url=false, 
+%     doi=true,
+%     eprint=false,
+%     backref=true
+% ]{biblatex}
+%\usepackage[style=ieee]{biblatex}
+%\addbibresource{references.bib}
+
+
+
+\usepackage{float}
+
+% first paragraph indent
+%\usepackage{indentfirst}
+\usepackage{longtable}
+
+
+
+%\input{macros/tables.tex}
+%\usepackage{../resource/python}
+
+\usepackage[acronym,footnote,toc]{glossaries}
+
+
+\makeglossaries
+
+%\newcommand{\estDate}[3]{\begin{otherlanguage}{estonian}\formatdate{#1}{#2}{#3} \end{otherlanguage}}
+
+%\newcommand{\estToday}{\begin{otherlanguage}{estonian}\today \end{otherlanguage}}
+
+%%
+%% eestikeelsed kuupa"evad
+%%
+\def\@kuuaasta{\ifcase\the\month\or
+  jaanuar\or veebruar\or märts\or aprill\or mai\or juuni\or
+  juuli\or august\or september\or oktoober\or november\or detsember\fi
+  \space \number\the\year}
+
+\def\@aasta{\the\year}
+
+
+\newcommand{\estDate}[3]{%
+\begin{otherlanguage}{estonian}
+#1.~
+\ifcase #2 \relax
+\or jaanuar
+\or veebruar
+\or märts
+\or aprill
+\or mai
+\or juuni
+\or juuli
+\or august
+\or september
+\or oktoober
+\or november
+\or detsemberhttp://staff.ttu.ee/~alahe/ .
+\fi
+~ #3 .~a.
+ \end{otherlanguage}}
+
+\newcommand{\estToday}{\estDate{\the\day}{\the\month}{\the\year}}
+
+
+%\input{macros/languages.tex}
+
+%  some renamings
+\AtBeginDocument{
+% estonian language
+%\renewcommand{\prefacename}{Sissejuhatus}
+%\renewcommand{\abstractname}{Kokkuvõte}
+%\renewcommand{\contentsname}{Sisukord}
+%\renewcommand{\listfigurename}{Joonised}
+%\renewcommand{\listtablename}{Tabelid}
+%\renewcommand{\refname}{Viited}
+%\renewcommand{\bibname}{Kirjandus}
+%\renewcommand{\indexname}{Indeks}
+%\renewcommand{\figurename}{Joonis}
+%\renewcommand{\tablename}{Tabel}
+%\renewcommand{\partname}{Osa}
+%\renewcommand{\chaptername}{Peatükk}
+%\renewcommand{\appendixname}{Lisa}
+%\renewcommand{\enclname}{Lisa(d)}
+%\renewcommand{\ccname}{Koopia(d)}
+%\renewcommand{\headtoname}{Kellele}
+%\renewcommand{\pagename}{Lk.}
+%\renewcommand{\seename}{vt.}
+%\renewcommand{\alsoname}{vt. ka}
+%
+% russian language
+%
+%\renewcommand{\prefacename}{Предисловие}
+%\renewcommand{\abstractname}{Аннотация}
+%\renewcommand{\contentsname}{Оглавление}
+%\renewcommand{\listfigurename}{Список рисунков}
+%\renewcommand{\listtablename}{Список таблиц}
+%\renewcommand{\refname}{Литература}
+%\renewcommand{\bibname}{Литература}
+%\renewcommand{\indexname}{Предметный указатель}
+%\renewcommand{\figurename}{Рис.}
+%\renewcommand{\tablename}{Таблица}
+%\renewcommand{\partname}{Часть}
+%\renewcommand{\chaptername}{Глава}
+%\renewcommand{\appendixname}{Приложение}
+%\renewcommand{\enclname}{вкл.}
+%\renewcommand{\ccname}{исх.}
+%%\renewcommand{\headtoname}{вх.}
+%\renewcommand{\pagename}{стр.}
+%\renewcommand{\seename}{см.}
+%\renewcommand{\alsoname}{см. также}
+%
+%
+%\renewcommand{\contentsname}{Оглавление}
+%
+%\frenchspacing
+%\setlength{\parskip}{20pt  plus 1pt minus 1pt}
+\setlength{\parindent}{1cm}
+}
+
+\makeatother
+
+\begin{document}
+
+	\input{acronyms.tex}
+	
+	\input{titlepage.tex}		
+	\input{author_declaration.tex}
+	
+	\printglossaries
+	
+	\input{annotation_eng.tex}
+	\input{annotation_est.tex}
+	
+	\pdfbookmark{\contentsname}{contents}
+	\tableofcontents
+	
+	
+	\input{intro.tex}
+	
+	\newpage
+	\listoffigures
+	\newpage
+	\listoftables
+	
+	
+	\bibliographystyle{ieeetr}
+	\bibliography{../resource/references}
+	
+
+\end{document}
