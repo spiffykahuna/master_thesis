@@ -25,4 +25,4 @@ pdflatex -interaction=scrollmode --src-specials "$1".tex
 cp "$1".pdf ../out/
 
 echo 'OUTPUT_FOLDER:'
-ls ../out/
+ls -lash ../out/
