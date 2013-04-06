@@ -1,0 +1,104 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<history>
+   <processor signature="arm-none-eabi-gcc 4.6.3 i686-w64-mingw32 -mcpu=cortex-m3 -mthumb -Wall -ffunction-sections -g -O0 -entry=main -c -DSTM32F103VB -DSTM32F10X_MD -DUSE_STM3210B_EVAL -DUSE_STDPERIPH_DRIVER -D__ASSEMBLY__ -I..\..\..\..\..\Users\Kasutaja\Desktop\master_thesis -I..\..\..\..\..\Users\Kasutaja\Desktop\master_thesis\master_thesis -I..\..\..\..\..\Users\Kasutaja\Desktop\master_thesis\master_thesis\stm32_coffee_proxy\stm_lib\inc -I..\..\..\..\..\Users\Kasutaja\Desktop\master_thesis\master_thesis\stm32_coffee_proxy\cmsis_boot -I..\..\..\..\..\Users\Kasutaja\Desktop\master_thesis\master_thesis\stm32_coffee_proxy\FreeRTOS\Source\include -I..\..\..\..\..\Users\Kasutaja\Desktop\master_thesis\master_thesis\stm32_coffee_proxy\cmsis -I..\..\..\..\..\Users\Kasutaja\Desktop\master_thesis\master_thesis\stm32_coffee_proxy\STM32_Eval\Common -I..\..\..\..\..\Users\Kasutaja\Desktop\master_thesis\master_thesis\stm32_coffee_proxy\stm_lib -I..\..\..\..\..\Users\Kasutaja\Desktop\master_thesis\master_thesis\stm32_coffee_proxy\STM32_Eval\STM3210C_EVAL -I..\..\..\..\..\Users\Kasutaja\Desktop\master_thesis\master_thesis\stm32_coffee_proxy\FreeRTOS\Source\portable\GCC\ARM_CM3 -I..\..\..\..\..\Users\Kasutaja\Desktop\master_thesis\master_thesis\stm32_coffee_proxy\STM32_Eval\STM3210E_EVAL -I..\..\..\..\..\Users\Kasutaja\Desktop\master_thesis\master_thesis\stm32_coffee_proxy\FreeRTOS\Source -I..\..\..\..\..\Users\Kasutaja\Desktop\master_thesis\master_thesis\stm32_coffee_proxy -I..\..\..\..\..\Users\Kasutaja\Desktop\master_thesis\master_thesis\stm32_coffee_proxy\STM32_Eval -I..\..\..\..\..\Users\Kasutaja\Desktop\master_thesis\master_thesis\stm32_coffee_proxy\FreeRTOS -I..\..\..\..\..\Users\Kasutaja\Desktop\master_thesis\master_thesis\stm32_coffee_proxy\STM32_Eval\STM32100E_EVAL -I..\..\..\..\..\Users\Kasutaja\Desktop\master_thesis\master_thesis\stm32_coffee_proxy\STM32_Eval\STM32100B_EVAL -I..\..\..\..\..\Users\Kasutaja\Desktop\master_thesis\master_thesis\stm32_coffee_proxy\FreeRTOS\Source\portable\GCC -I..\..\..\..\..\Users\Kasutaja\Desktop\master_thesis\master_thesis\stm32_coffee_proxy\FreeRTOS\Source\portable -I..\..\..\..\..\Users\Kasutaja\Desktop\master_thesis\master_thesis\stm32_coffee_proxy\STM32_Eval\STM3210B_EVAL">
+      <target file="stm3210e_eval.o" lastModified="13ddea06dec">
+         <source file="..\..\..\STM32_Eval\STM3210E_EVAL\stm3210e_eval.c" lastModified="13dd6d09a2d"/>
+      </target>
+      <target file="stm32f10x_spi.o" lastModified="13ddea0a748">
+         <source file="..\..\..\stm_lib\src\stm32f10x_spi.c" lastModified="13dd6519521"/>
+      </target>
+      <target file="stm3210c_eval.o" lastModified="13ddea0812c">
+         <source file="..\..\..\STM32_Eval\STM3210C_EVAL\stm3210c_eval.c" lastModified="13dd6491b8d"/>
+      </target>
+      <target file="fonts.o" lastModified="13ddea08d6c">
+         <source file="..\..\..\STM32_Eval\Common\fonts.c" lastModified="13dd6491a40"/>
+      </target>
+      <target file="stm3210e_eval_lcd.o" lastModified="13ddea07f96">
+         <source file="..\..\..\STM32_Eval\STM3210E_EVAL\stm3210e_eval_lcd.c" lastModified="13dd6491bfe"/>
+      </target>
+      <target file="stm3210b_eval_lcd.o" lastModified="13ddea0ae28">
+         <source file="..\..\..\STM32_Eval\STM3210B_EVAL\stm3210b_eval_lcd.c" lastModified="13dd6491b58"/>
+      </target>
+      <target file="tasks.o" lastModified="13ddea08b48">
+         <source file="..\..\..\FreeRTOS\Source\tasks.c" lastModified="13cf2a587c0"/>
+      </target>
+      <target file="stm32f10x_rcc.o" lastModified="13ddea0869f">
+         <source file="..\..\..\stm_lib\src\stm32f10x_rcc.c" lastModified="13dd648ee1b"/>
+      </target>
+      <target file="core_cm3.o" lastModified="13ddea070c0">
+         <source file="..\..\..\cmsis\core_cm3.c" lastModified="13ddc73ef31"/>
+      </target>
+      <target file="stm32100e_eval.o" lastModified="13ddea07711">
+         <source file="..\..\..\STM32_Eval\STM32100E_EVAL\stm32100e_eval.c" lastModified="13dd6491ab4"/>
+      </target>
+      <target file="croutine.o" lastModified="13ddea09da9">
+         <source file="..\..\..\FreeRTOS\Source\croutine.c" lastModified="13cf29f55d0"/>
+      </target>
+      <target file="printf.o" lastModified="13ddea083a2">
+         <source file="..\..\..\stdio\printf.c" lastModified="13ddc6d6a8d"/>
+      </target>
+      <target file="stm32f10x_i2c.o" lastModified="13ddea0a9b8">
+         <source file="..\..\..\stm_lib\src\stm32f10x_i2c.c" lastModified="13dd651a2f3"/>
+      </target>
+      <target file="misc.o" lastModified="13ddea0a3ba">
+         <source file="..\..\..\stm_lib\src\misc.c" lastModified="13dd66e11f4"/>
+      </target>
+      <target file="heap_2.o" lastModified="13ddea0aff7">
+         <source file="..\..\..\FreeRTOS\Source\portable\MemMang\heap_2.c" lastModified="13cf2a57050"/>
+      </target>
+      <target file="stm32100e_eval_lcd.o" lastModified="13ddea0a1fb">
+         <source file="..\..\..\STM32_Eval\STM32100E_EVAL\stm32100e_eval_lcd.c" lastModified="13dd6491adb"/>
+      </target>
+      <target file="queue.o" lastModified="13ddea099d8">
+         <source file="..\..\..\FreeRTOS\Source\queue.c" lastModified="13cf2a57ff0"/>
+      </target>
+      <target file="startup_stm32f10x_md.o" lastModified="13ddea073d2">
+         <source file="..\..\..\cmsis_boot\startup\startup_stm32f10x_md.c" lastModified="13dd647b60a"/>
+      </target>
+      <target file="stm32f10x_flash.o" lastModified="13ddea09638">
+         <source file="..\..\..\stm_lib\src\stm32f10x_flash.c" lastModified="13dd6bdd8e0"/>
+      </target>
+      <target file="list.o" lastModified="13ddea09167">
+         <source file="..\..\..\FreeRTOS\Source\list.c" lastModified="13cf2a54940"/>
+      </target>
+      <target file="port.o" lastModified="13ddea0979e">
+         <source file="..\..\..\FreeRTOS\Source\portable\GCC\ARM_CM3\port.c" lastModified="13cf2a55110"/>
+      </target>
+      <target file="stm32f10x_gpio.o" lastModified="13ddea075ad">
+         <source file="..\..\..\stm_lib\src\stm32f10x_gpio.c" lastModified="13dd648ee2a"/>
+      </target>
+      <target file="timers.o" lastModified="13ddea07dad">
+         <source file="..\..\..\FreeRTOS\Source\timers.c" lastModified="13cf2a587c0"/>
+      </target>
+      <target file="stm32f10x_exti.o" lastModified="13ddea08891">
+         <source file="..\..\..\stm_lib\src\stm32f10x_exti.c" lastModified="13dd66e7bfc"/>
+      </target>
+      <target file="system_stm32f10x.o" lastModified="13ddea072b7">
+         <source file="..\..\..\cmsis_boot\system_stm32f10x.c" lastModified="13dd647b618"/>
+      </target>
+      <target file="syscalls.o" lastModified="13ddea09368">
+         <source file="..\..\..\syscalls\syscalls.c" lastModified="13dd6436e94"/>
+      </target>
+      <target file="stm32100b_eval.o" lastModified="13ddea07c51">
+         <source file="..\..\..\STM32_Eval\STM32100B_EVAL\stm32100b_eval.c" lastModified="13dd6491a6f"/>
+      </target>
+      <target file="stm3210c_eval_lcd.o" lastModified="13ddea0a549">
+         <source file="..\..\..\STM32_Eval\STM3210C_EVAL\stm3210c_eval_lcd.c" lastModified="13dd6491bae"/>
+      </target>
+      <target file="stm32f10x_dma.o" lastModified="13ddea09c3b">
+         <source file="..\..\..\stm_lib\src\stm32f10x_dma.c" lastModified="13dd6c3b81a"/>
+      </target>
+      <target file="stm32100b_eval_lcd.o" lastModified="13ddea0b1df">
+         <source file="..\..\..\STM32_Eval\STM32100B_EVAL\stm32100b_eval_lcd.c" lastModified="13dd6491a82"/>
+      </target>
+      <target file="stm3210b_eval.o" lastModified="13ddea0a04d">
+         <source file="..\..\..\STM32_Eval\STM3210B_EVAL\stm3210b_eval.c" lastModified="13dd6491b18"/>
+      </target>
+      <target file="stm32f10x_usart.o" lastModified="13ddea08fbb">
+         <source file="..\..\..\stm_lib\src\stm32f10x_usart.c" lastModified="13dd648ee09"/>
+      </target>
+      <target file="main.o" lastModified="13ddea07ad0">
+         <source file="..\..\..\main.c" lastModified="13dde9e94ef"/>
+      </target>
+   </processor>
+</history>
