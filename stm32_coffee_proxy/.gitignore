@@ -1,0 +1,7 @@
+report*
+.metadata/
+json*
+.settings/
+.cproject
+.project
+Debug/
