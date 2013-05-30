@@ -30,8 +30,7 @@
 #define REQUEST_QUEUE_SIZE			20
 #define RESPONSE_QUEUE_SIZE			20
 
-
-
+#define SYSTEM_MSG_QUEUR_SIZE		(INCOME_MSG_QUEUE_SIZE * 2)
 
 /* end of transmission character */
 #define EOT	23
@@ -55,10 +54,17 @@ typedef enum _proxy_error_t {
 	JSONRPC_TRANSPORT_ERROR					= -32300
 } proxy_error_t;
 
-
-
 #define QUEUE_SEND_WAIT_TIMEOUT  	(2000 / portTICK_RATE_MS)
 #define QUEUE_RECEIVE_WAIT_TIMEOUT 	(1000 / portTICK_RATE_MS)
 
+#define SYSTEM_TASK_DELAY			(500 / portTICK_RATE_MS)
+
+/* task priorities */
+#define PRIORITY_SYSTEM_TASK				(tskIDLE_PRIORITY + 3)
+#define PRIORITY_PARSE_JSON_TASK			(tskIDLE_PRIORITY + 1)
+#define PRIORITY_HANDLE_REQUESTS_TASK		(tskIDLE_PRIORITY + 1)
+#define PRIORITY_HANDLE_RESPONSES_TASK		(tskIDLE_PRIORITY + 1)
+#define PRIORITY_USB_READER_TASK			(tskIDLE_PRIORITY + 1)
+#define PRIORITY_USB_WRITER_TASK			(tskIDLE_PRIORITY + 1)
 
 #endif  /*__APP_CONFIG_H*/

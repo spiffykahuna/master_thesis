@@ -818,9 +818,9 @@ void tskUSBReader(void *pvParameters) {
 		}
 
 
-		memset(tempSize, 0, 32);
-		siprintf(tempSize, "%s FREE: %d\n\r", taskName, xPortGetFreeHeapSize());
-		logger(LEVEL_DEBUG, tempSize);
+//		memset(tempSize, 0, 32);
+//		siprintf(tempSize, "%s FREE: %d\n\r", taskName, xPortGetFreeHeapSize());
+//		logger(LEVEL_DEBUG, tempSize);
 
 //		snprintf(tempSize, 32, "FLOAT %f\n", -555.666);
 //		log_d(tempSize);
@@ -829,8 +829,5 @@ void tskUSBReader(void *pvParameters) {
 	}
 }
 
-void tskSystem(void *pvParameters) {
-logger
-watchdog
 
 

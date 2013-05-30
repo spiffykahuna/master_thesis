@@ -16,7 +16,7 @@
 #include "stm32_eval.h"
 //#include "stm3210b_eval_lcd.h"
 
-
+#include "log.h"	/* <== specify logging function there*/
 
 #include "hw_config.h"
 #include "usb_lib.h"
@@ -25,7 +25,8 @@
 
 #include "app_config.h"
 #include "mainTasks.h"
-#include "log.h"	/* <== specify logging function there*/
+#include "tasks/systemTask.h"
+
 #include "jansson.h"
 #include "strbuffer.h"
 //#include "json_parse/json.h"
@@ -54,6 +55,8 @@ xSemaphoreHandle xLogMutex;
 xSemaphoreHandle xUSBSemaphore = NULL;
 xQueueHandle  usbIncomeQueue = NULL;
 xQueueHandle  usbOutComeQueue = NULL;
+
+extern xQueueHandle  systemMsgQueue;
 
 xQueueHandle  requestQueue;
 xQueueHandle  responseQueue;
@@ -186,7 +189,7 @@ int initUSBTransport(void) {
 		return ERROR;
 	};
 
-	xStatus  = xTaskCreate( tskUSBReader, ( signed char * ) "tskUSBReader", configMINIMAL_STACK_SIZE + configMINIMAL_STACK_SIZE , NULL, (tskIDLE_PRIORITY + 1), NULL );
+	xStatus  = xTaskCreate( tskUSBReader, ( signed char * ) "tskUSBReader", configMINIMAL_STACK_SIZE + configMINIMAL_STACK_SIZE , NULL, PRIORITY_USB_READER_TASK, NULL );
 	if(xStatus != pdPASS) {
 		logger(LEVEL_ERR, "Unable to create USB reader task\n\r");
 		return ERROR;
@@ -198,7 +201,7 @@ int initUSBTransport(void) {
 	writerConfig.queueTimeout = QUEUE_RECEIVE_WAIT_TIMEOUT;
 	writerConfig.write_func = log_usb;
 
-	xStatus  = xTaskCreate( tskAbstractWriter, ( signed char * ) "tskUSBWriter", configMINIMAL_STACK_SIZE , (void *) &writerConfig, (tskIDLE_PRIORITY + 1), NULL );
+	xStatus  = xTaskCreate( tskAbstractWriter, ( signed char * ) "tskUSBWriter", configMINIMAL_STACK_SIZE , (void *) &writerConfig, PRIORITY_USB_WRITER_TASK, NULL );
 	if(xStatus != pdPASS) {
 		logger(LEVEL_ERR, "Unable to create USB reader task\n\r");
 		return ERROR;
@@ -223,18 +226,28 @@ int initSystemHandlers(void) {
 		return ERROR;
 	};
 
-	xStatus = xTaskCreate( tskParseJson, ( signed char * ) "tskParseJson", configMINIMAL_STACK_SIZE + 400, NULL, (tskIDLE_PRIORITY + 1), NULL );
+	systemMsgQueue = xQueueCreate( SYSTEM_MSG_QUEUR_SIZE, sizeof(json_t *) );
+	if( systemMsgQueue == NULL ) {
+		logger(LEVEL_ERR, "Unable to create queue for system messages\n\r");
+		return ERROR;
+	};
+
+	xStatus = xTaskCreate( tskSystem, ( signed char * ) "tskSystem", configMINIMAL_STACK_SIZE, NULL, PRIORITY_SYSTEM_TASK, NULL );
 	if(xStatus != pdPASS) {
 		return ERROR;
 	}
 
-
-	xStatus = xTaskCreate( tskHandleRequests, ( signed char * ) "tskHandleRequests", configMINIMAL_STACK_SIZE, NULL, (tskIDLE_PRIORITY + 1), NULL );
+	xStatus = xTaskCreate( tskParseJson, ( signed char * ) "tskParseJson", configMINIMAL_STACK_SIZE + 400, NULL, PRIORITY_PARSE_JSON_TASK, NULL );
 	if(xStatus != pdPASS) {
 		return ERROR;
 	}
 
-	xStatus = xTaskCreate( tskHandleResponses, ( signed char * ) "tskHandleResponses", configMINIMAL_STACK_SIZE, NULL, (tskIDLE_PRIORITY + 1), NULL );
+	xStatus = xTaskCreate( tskHandleRequests, ( signed char * ) "tskHandleRequests", configMINIMAL_STACK_SIZE, NULL, PRIORITY_HANDLE_REQUESTS_TASK, NULL );
+	if(xStatus != pdPASS) {
+		return ERROR;
+	}
+
+	xStatus = xTaskCreate( tskHandleResponses, ( signed char * ) "tskHandleResponses", configMINIMAL_STACK_SIZE, NULL, PRIORITY_HANDLE_RESPONSES_TASK, NULL );
 	if(xStatus != pdPASS) {
 		return ERROR;
 	}
