@@ -26,8 +26,13 @@ typedef enum _system_msg_type_t {
 
 typedef struct _system_msg_t {
 	system_msg_type_t	msgType;
-
+	union {
+		strbuffer_t *logMsg;
+	};
 } system_msg_t;
+
+inline void system_msg_destroy(system_msg_t **sysMsg);
+inline system_msg_t * system_msg_new(system_msg_type_t msgType);
 
 void tskSystem(void *pvParameters);
 

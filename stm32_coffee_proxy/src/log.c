@@ -5,6 +5,8 @@
 
 extern xSemaphoreHandle xLogMutex;
 
+extern xQueueHandle  systemMsgQueue;
+
 extern __IO uint32_t packet_sent;
 __IO uint8_t Send_Buffer[VIRTUAL_COM_PORT_DATA_SIZE] ;
 //extern __IO  uint32_t packet_receive;
@@ -67,32 +69,49 @@ int log_d(char *str)
 }
 
 void logger(log_level_t level, char *msg) {
+	char temp[32];
+
+
+	strbuffer_t *logMsg = strbuffer_new();
+
+	snprintf(temp, 32, "%d   ", (int) xTaskGetTickCount());
+	strbuffer_append(logMsg, temp);
+
 	switch(level) {
 	case LEVEL_OFF:
 
 		return;
 	case LEVEL_FATAL:
-		log_func("FATAL : ");
+		strbuffer_append(logMsg, "FATAL : ");
 		break;
 
 	case LEVEL_ERR:
-		log_func("ERROR : ");
+		strbuffer_append(logMsg, "ERROR : ");
 		break;
 	case LEVEL_WARN:
-		log_func("WARN : ");
+		strbuffer_append(logMsg, "WARN : ");
 		break;
 	case LEVEL_INFO:
-		log_func("INFO : ");
+		strbuffer_append(logMsg, "INFO : ");
 		break;
 	case LEVEL_DEBUG:
-		log_func("DEBUG : ");
+		strbuffer_append(logMsg, "DEBUG : ");
 		break;
 	case LEVEL_TRACE:
-		log_func("TRACE : ");
+		strbuffer_append(logMsg, "TRACE : ");
 		break;
 	}
 
-	log_func(msg);
+	strbuffer_append(logMsg, msg);
+
+	system_msg_t *systemMsg = system_msg_new(MSG_TYPE_LOGGING);
+	if(systemMsg) {
+		systemMsg->logMsg = logMsg;
+		portBASE_TYPE xStatus = NULL;
+		while( xStatus != pdPASS) {
+			xStatus = xQueueSendToBack( systemMsgQueue, &systemMsg, (portTickType) QUEUE_SEND_WAIT_TIMEOUT );
+		}
+	}
 }
 
 

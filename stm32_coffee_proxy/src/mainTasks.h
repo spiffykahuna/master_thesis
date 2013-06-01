@@ -42,7 +42,7 @@ check task has detected an error or not. */
 //	char *data;
 //} read_string_t;
 
-
+#define BUFF_SIZE	64
 
 extern void tskLedBlinkTask(void *);
 

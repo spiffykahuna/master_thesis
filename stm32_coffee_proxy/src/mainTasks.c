@@ -21,6 +21,8 @@ extern xQueueHandle  responseQueue;
 //extern xSemaphoreHandle xLogMutex;
 extern xSemaphoreHandle xUSBSemaphore;
 
+extern log_func_t log_func;
+
 extern char  error_space[ERROR_BUFFER_SIZE];
 extern const msg_maintasks MSG_MAINTASKS;
 extern const msg_jsonrpc_errors MSG_JSONRPC_ERRORS;
@@ -132,7 +134,7 @@ json_t * parseJsonPacket(packet_t ** jsonPacket) {
 	transport_type_t transport = (*jsonPacket)->transport;
 
 	snprintf(error_space, ERROR_BUFFER_SIZE,
-			"parseJsonPacket\tReceived json packet: transport=%s\tlength=%d\n",
+			"parseJsonPacket    Received json packet: transport=%s    length=%d\n",
 			transport_type_to_str(transport), (*jsonPacket)->jsonDoc->length
 	);
 	logger(LEVEL_INFO, error_space);
@@ -562,7 +564,7 @@ void tskHandleRequests(void *pvParameters) {
 			methodObj = json_object_get(requestJson, "method");
 			methodName = json_string_value(methodObj);
 
-			snprintf(error_space, ERROR_BUFFER_SIZE, "%s :  Received request. id = %d\tmethod = %s\n", taskName, (int) id, methodName );
+			snprintf(error_space, ERROR_BUFFER_SIZE, "%s :  Received request. id = %d    method = %s\n", taskName, (int) id, methodName );
 			logger(LEVEL_INFO, error_space);
 
 			responseJson = handle_request(&requestJson);
@@ -571,10 +573,9 @@ void tskHandleRequests(void *pvParameters) {
 				idObj = json_object_get(responseJson, "id");
 				id = json_integer_value(idObj);
 
-				methodObj = json_object_get(responseJson, "method");
-				methodName = json_string_value(methodObj);
 
-				snprintf(error_space, ERROR_BUFFER_SIZE, "%s :  Received response. id = %d\tmethod = %s\n", taskName, (int)id, methodName );
+
+				snprintf(error_space, ERROR_BUFFER_SIZE, "%s :  Received response. id = %d\n", taskName, (int)id);
 				logger(LEVEL_INFO, error_space);
 
 				xStatus = xQueueSendToBack( responseQueue, &responseJson, (portTickType) QUEUE_SEND_WAIT_TIMEOUT );
@@ -617,13 +618,13 @@ void tskParseJson(void *pvParameters) {
 	while(1) {
 		xStatus = xQueueReceive( usbIncomeQueue, &incomePacket, (portTickType) QUEUE_RECEIVE_WAIT_TIMEOUT );
 		if( (xStatus == pdPASS) && incomePacket) {
-			snprintf(error_space, ERROR_BUFFER_SIZE, "%s :  Received packet. len = %d", taskName, incomePacket->jsonDoc->length );
+			snprintf(error_space, ERROR_BUFFER_SIZE, "%s :  Received packet. len = %d\n", taskName, incomePacket->jsonDoc->length );
 			logger(LEVEL_INFO, error_space);
 
 			requestJson = parseJsonPacket(&incomePacket);
 			if(requestJson) {
 				snprintf(error_space, ERROR_BUFFER_SIZE,
-					"%s :  Parsing packet was sucessful", taskName
+					"%s :  Parsing packet was sucessful\n", taskName
 				);
 				logger(LEVEL_INFO, error_space);
 
@@ -688,7 +689,8 @@ void tskUSBReader(void *pvParameters) {
 	strbuffer_t *temp = NULL;
 	char *terminator;
 
-	static char tempSize[32];
+
+	static char tempSize[BUFF_SIZE];
 
 	packet_t *incomePacket = NULL;
 
@@ -711,7 +713,7 @@ void tskUSBReader(void *pvParameters) {
 						);
 						strbuffer_destroy(&temp);
 
-						snprintf(tempSize, 32, "%s ", taskName);
+						snprintf(tempSize, BUFF_SIZE, "%s ", taskName);
 						logger(LEVEL_WARN, tempSize);
 						logger(LEVEL_WARN, MSG_MAINTASKS.tskUSBReader.unable_to_alloc_new_json_packet);
 
@@ -731,7 +733,7 @@ void tskUSBReader(void *pvParameters) {
 						);
 						strbuffer_destroy(&temp);
 
-						snprintf(tempSize, 32, "%s ", taskName);
+						snprintf(tempSize, BUFF_SIZE, "%s ", taskName);
 						logger(LEVEL_WARN, tempSize);
 						logger(LEVEL_WARN, MSG_MAINTASKS.tskUSBReader.unable_to_alloc_new_json_packet);
 
@@ -758,7 +760,7 @@ void tskUSBReader(void *pvParameters) {
 							packet_destroy(&incomePacket);
 							strbuffer_destroy(&temp);
 
-							snprintf(tempSize, 32, "%s ", taskName);
+							snprintf(tempSize, BUFF_SIZE, "%s ", taskName);
 							logger(LEVEL_WARN, tempSize);
 							logger(LEVEL_WARN, MSG_MAINTASKS.tskUSBReader.unable_to_alloc_new_json_packet);
 
@@ -782,7 +784,7 @@ void tskUSBReader(void *pvParameters) {
 								"null" 	/* <-- id */
 							);
 
-							snprintf(tempSize, 32, "%s ", taskName);
+							snprintf(tempSize, BUFF_SIZE, "%s ", taskName);
 							logger(LEVEL_WARN, tempSize);
 							logger(LEVEL_WARN, MSG_MAINTASKS.tskUSBReader.device_is_busy_timeout);
 
@@ -790,7 +792,7 @@ void tskUSBReader(void *pvParameters) {
 							continue;
 						}
 
-						snprintf(tempSize, 32, "%s Received new packet( len= %d )\n\r", taskName, temp->length);
+						snprintf(tempSize, BUFF_SIZE, "%s Received new packet( len= %d )\n\r", taskName, temp->length);
 						logger(LEVEL_DEBUG, tempSize);
 
 						temp = NULL;
@@ -806,7 +808,7 @@ void tskUSBReader(void *pvParameters) {
 								MSG_MAINTASKS.tskUSBReader.incoming_buffer_overflow , /* <-- data */
 								"null" 	/* <-- id */
 							);
-							snprintf(tempSize, 32, "%s ", taskName);
+							snprintf(tempSize, BUFF_SIZE, "%s ", taskName);
 							logger(LEVEL_WARN, tempSize);
 							logger(LEVEL_WARN, MSG_MAINTASKS.tskUSBReader.incoming_buffer_overflow);
 						}
@@ -818,11 +820,15 @@ void tskUSBReader(void *pvParameters) {
 		}
 
 
-//		memset(tempSize, 0, 32);
-//		siprintf(tempSize, "%s FREE: %d\n\r", taskName, xPortGetFreeHeapSize());
+		memset(tempSize, 0, BUFF_SIZE);
+		siprintf(tempSize, "%s FREE: %d\n\r", taskName, xPortGetFreeHeapSize());
+		log_func(tempSize);
+//
+//		memset(tempSize, 0, BUFF_SIZE);
+//		siprintf(tempSize, "%s STACK: %d\n\r", taskName, (int) uxTaskGetStackHighWaterMark( NULL ));
 //		logger(LEVEL_DEBUG, tempSize);
 
-//		snprintf(tempSize, 32, "FLOAT %f\n", -555.666);
+//		snprintf(tempSize, BUFF_SIZE, "FLOAT %f\n", -555.666);
 //		log_d(tempSize);
 
 		taskYIELD();

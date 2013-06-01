@@ -20,7 +20,10 @@
 #include "stm32_eval.h"
 //#include "stm3210b_eval_lcd.h"
 
+#include "strbuffer.h"
 #include "messages.h"
+
+#include "tasks/systemTask.h"
 
 
 #include "hw_config.h"

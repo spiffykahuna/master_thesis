@@ -226,7 +226,7 @@ int initSystemHandlers(void) {
 		return ERROR;
 	};
 
-	systemMsgQueue = xQueueCreate( SYSTEM_MSG_QUEUR_SIZE, sizeof(json_t *) );
+	systemMsgQueue = xQueueCreate( SYSTEM_MSG_QUEUR_SIZE, sizeof(system_msg_t *) );
 	if( systemMsgQueue == NULL ) {
 		logger(LEVEL_ERR, "Unable to create queue for system messages\n\r");
 		return ERROR;
