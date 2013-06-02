@@ -26,7 +26,7 @@ void tskSystem(void *pvParameters) {
 				}
 				system_msg_destroy(&sysMsg);
 			}
-			continue;
+			continue; /* until all system messages are processed */
 		}
 //			xStatus = xQueueReceive( responseQueue, &responceJson, (portTickType) QUEUE_RECEIVE_WAIT_TIMEOUT );
 //			if( (xStatus == pdPASS) && responceJson) {
@@ -68,12 +68,11 @@ inline
 void system_msg_destroy(system_msg_t **sysMsg) {
 	if(*sysMsg) {
 		switch((*sysMsg)->msgType) {
-		case MSG_TYPE_LOGGING:
-			strbuffer_destroy(&(*sysMsg)->logMsg);
-
-			break;
-		default:
-			break;
+			case MSG_TYPE_LOGGING:
+				strbuffer_destroy(&(*sysMsg)->logMsg);
+				break;
+			default:
+				break;
 		}
 		vPortFree(*sysMsg);
 		*sysMsg = NULL;
@@ -88,5 +87,12 @@ system_msg_t* system_msg_new(system_msg_type_t msgType) {
 	if(!sysMsg) { return NULL;}
 
 	sysMsg->msgType = msgType;
+	switch(msgType) {
+		case MSG_TYPE_LOGGING:
+			sysMsg->logMsg = strbuffer_new();
+			break;
+		default:
+			break;
+	}
 	return sysMsg;
 }

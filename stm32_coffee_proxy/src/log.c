@@ -49,20 +49,8 @@ int log_d(char *str)
 				 }
 			 }
 			 sendUsbPacket(str, strlen(str));
-		 }						/*
-
-						if(size > VIRTUAL_COM_PORT_DATA_SIZE) {
-							CDC_Send_DATA ((uint8_t *) str, size );
-						}
-						CDC_Send_DATA ((uint8_t *) str, size );
-					}
-					*/
-
-
-
+		 }
 	 }
-
-
 	}
 	xSemaphoreGive( xLogMutex );
 	return SUCCESS;
@@ -71,81 +59,46 @@ int log_d(char *str)
 void logger(log_level_t level, char *msg) {
 	char temp[32];
 
-
-	strbuffer_t *logMsg = strbuffer_new();
-
-	snprintf(temp, 32, "%d   ", (int) xTaskGetTickCount());
-	strbuffer_append(logMsg, temp);
-
-	switch(level) {
-	case LEVEL_OFF:
-
-		return;
-	case LEVEL_FATAL:
-		strbuffer_append(logMsg, "FATAL : ");
-		break;
-
-	case LEVEL_ERR:
-		strbuffer_append(logMsg, "ERROR : ");
-		break;
-	case LEVEL_WARN:
-		strbuffer_append(logMsg, "WARN : ");
-		break;
-	case LEVEL_INFO:
-		strbuffer_append(logMsg, "INFO : ");
-		break;
-	case LEVEL_DEBUG:
-		strbuffer_append(logMsg, "DEBUG : ");
-		break;
-	case LEVEL_TRACE:
-		strbuffer_append(logMsg, "TRACE : ");
-		break;
-	}
-
-	strbuffer_append(logMsg, msg);
-
 	system_msg_t *systemMsg = system_msg_new(MSG_TYPE_LOGGING);
 	if(systemMsg) {
-		systemMsg->logMsg = logMsg;
-		portBASE_TYPE xStatus = NULL;
+		snprintf(temp, 32, "%d   ", (int) xTaskGetTickCount());
+		strbuffer_append(systemMsg->logMsg, temp);
+
+		switch(level) {
+		case LEVEL_OFF:
+			return; /* no message here */
+		case LEVEL_FATAL:
+			strbuffer_append(systemMsg->logMsg, "FATAL : ");
+			break;
+
+		case LEVEL_ERR:
+			strbuffer_append(systemMsg->logMsg, "ERROR : ");
+			break;
+		case LEVEL_WARN:
+			strbuffer_append(systemMsg->logMsg, "WARN : ");
+			break;
+		case LEVEL_INFO:
+			strbuffer_append(systemMsg->logMsg, "INFO : ");
+			break;
+		case LEVEL_DEBUG:
+			strbuffer_append(systemMsg->logMsg, "DEBUG : ");
+			break;
+		case LEVEL_TRACE:
+			strbuffer_append(systemMsg->logMsg, "TRACE : ");
+			break;
+		}
+
+		strbuffer_append(systemMsg->logMsg, msg);
+
+		portBASE_TYPE xStatus = 0;
 		while( xStatus != pdPASS) {
 			xStatus = xQueueSendToBack( systemMsgQueue, &systemMsg, (portTickType) QUEUE_SEND_WAIT_TIMEOUT );
 		}
 	}
 }
 
-
+inline
 int log_usb(char *msg, size_t msgLength ) {
 	log_d(msg);
 	return SUCCESS;
 }
-/*
-void log_die(char *msg, ...)
-{
-    va_list argp;
-
-    //log_null(msg);
-
-    va_start(argp, msg);
-    vfprintf(stderr, msg, argp);
-    va_end(argp);
-
-    fprintf(stderr, "\n");
-    //abort();
-}
-
-void log_info(char *msg, ...)
-{
-    va_list argp;
-
-    //log_null(msg);
-
-    va_start(argp, msg);
-    vfprintf(stderr, msg, argp);
-    va_end(argp);
-
-    fprintf(stderr, "\n");
-}
-*/
-
-

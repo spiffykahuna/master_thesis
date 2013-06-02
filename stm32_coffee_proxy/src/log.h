@@ -48,9 +48,6 @@ typedef int (*log_func_t)(char *msg);
 
 int log_d(char* /*str*/);
 
-
-//#define log_null(x) log_assert(x != NULL)
-
 #define log_debug(msg, ...) log_info("%s: " msg, __func__, ##__VA_ARGS__)
 
 #define log_syserr(msg) log_die("%s: %s: %s", __func__, msg, strerror(errno))
@@ -58,7 +55,7 @@ int log_d(char* /*str*/);
 void log_die(char *msg, ...);
 void log_info(char *msg, ...);
 
-int log_usb(char *msg, size_t msgLength );
+inline int log_usb(char *msg, size_t msgLength );
 
 inline
 
