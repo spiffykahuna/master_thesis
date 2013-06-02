@@ -12,10 +12,6 @@
 
 #endif
 
-//#define SUCCESS 0
-//#define FAILED -1
-
-//#define MSG_BUFFER_SIZE 700
 #define STRING_BUFFER_SIZE 			512
 #define ERROR_BUFFER_SIZE 			512
 #define MAX_INCOME_MSG_SIZE 		1024
@@ -30,7 +26,7 @@
 #define REQUEST_QUEUE_SIZE			20
 #define RESPONSE_QUEUE_SIZE			20
 
-#define SYSTEM_MSG_QUEUR_SIZE		(INCOME_MSG_QUEUE_SIZE * 2)
+#define SYSTEM_MSG_QUEUE_SIZE		(INCOME_MSG_QUEUE_SIZE * 2)
 
 /* end of transmission character */
 #define EOT	23
@@ -54,10 +50,10 @@ typedef enum _proxy_error_t {
 	JSONRPC_TRANSPORT_ERROR					= -32300
 } proxy_error_t;
 
-#define QUEUE_SEND_WAIT_TIMEOUT  	(2000 / portTICK_RATE_MS)
-#define QUEUE_RECEIVE_WAIT_TIMEOUT 	(1000 / portTICK_RATE_MS)
+#define QUEUE_SEND_WAIT_TIMEOUT  			(2000 / portTICK_RATE_MS)
+#define QUEUE_RECEIVE_WAIT_TIMEOUT 			(1000 / portTICK_RATE_MS)
 
-#define SYSTEM_TASK_DELAY			(500 / portTICK_RATE_MS)
+#define SYSTEM_TASK_DELAY					(250 / portTICK_RATE_MS)
 
 /* task priorities */
 #define PRIORITY_SYSTEM_TASK				(tskIDLE_PRIORITY + 3)

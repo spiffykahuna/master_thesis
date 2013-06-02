@@ -152,7 +152,7 @@ json_t * parseJsonPacket(packet_t ** jsonPacket) {
 		if(isJsonRPCVersion2_0(root)){
 			json_t *transportCode = json_integer( (json_int_t) transport);
 			json_object_set_new(root, "transport", transportCode);
-			logger(LEVEL_INFO, "parseJsonPacket\tPacket parsing succeed\n");
+			logger(LEVEL_INFO, "parseJsonPacket Packet parsing succeed\n");
 		} else {
 			json_decref(root);
 			report_error_to_sender(
@@ -164,7 +164,7 @@ json_t * parseJsonPacket(packet_t ** jsonPacket) {
 				"null"
 			);
 			//print_help(transport);
-			logger(LEVEL_WARN, "parseJsonPacket\t");
+			logger(LEVEL_WARN, "parseJsonPacket ");
 			logger(LEVEL_WARN, MSG_MAINTASKS.parseJsonPacket.invalid_jsonrpc_2_0);
 
 			return NULL;
@@ -185,322 +185,7 @@ json_t * parseJsonPacket(packet_t ** jsonPacket) {
 		logger(LEVEL_WARN, "\n");
 		strbuffer_destroy(&errorText);
 	}
-
-
 	return root;
-	// return request_packet
-
-//			json_t *resp = json_object();
-//			json_t *result_json_arr = json_array();
-//
-//			json_t *integ = json_integer(42);
-
-
-
-//			json_object_set_new( resp, "command", json_string( "link_status" ) );
-//			json_object_set_new( resp, "result", result_json_arr );
-//
-//			json_object_set_new( resp, "ideal", json_string_value(integ));
-//
-//			memset(buffer, NULL, MSG_BUFFER_SIZE);
-//			snprintf(buffer, MSG_BUFFER_SIZE, "\nhipa: %d\n", xPortGetFreeHeapSize());
-//			log_d(buffer);
-//
-//
-//			char *responce = json_dumps(resp, 0);
-//			memset(buffer, NULL, MSG_BUFFER_SIZE);
-//						snprintf(buffer, MSG_BUFFER_SIZE, "responce: %s\n",responce);
-//						log_d(buffer);
-//			log_d(responce);
-//			vPortFree(responce);
-//			json_decref(resp);
-//
-//
-//
-//			memset(buffer, NULL, MSG_BUFFER_SIZE);
-//			snprintf(buffer, MSG_BUFFER_SIZE, "\nhipa: %d\n", xPortGetFreeHeapSize());
-//			log_d(buffer);
-//	char buffer[MSG_BUFFER_SIZE];
-//
-//
-//
-//	JSON_Value *root_value;
-//	JSON_Array *params;
-//	JSON_Object *root_object;
-//	size_t i;
-//
-//
-//
-//	for(i = 0; i < MSG_BUFFER_SIZE; i++) {
-//		buffer[i] = msgBuffer[i];
-//	}
-//	i = 0;
-//
-//	root_value = json_parse_string(buffer);//json_parse_file(output_filename);
-//	if (json_value_get_type(root_value) != JSONObject) {
-//		log_d("ERROR root is not object");
-//		return;
-//	}
-//
-//	root_object = json_value_get_object(root_value);
-//
-//	memset(buffer, NULL, MSG_BUFFER_SIZE);
-//
-//	snprintf(buffer, MSG_BUFFER_SIZE,"Method: %s\n", json_object_dotget_string(root_object, "method") );
-//	log_d(buffer);
-////	/* getting array from root value and printing commit info */
-////	commits = json_value_get_array(root_value);
-////	printf("%-10.10s %-10.10s %s\n", "Date", "SHA", "Author");
-////	for (i = 0; i < json_array_get_count(commits); i++) {
-////		commit = json_array_get_object(commits, i);
-////		printf("%.10s %.10s %s\n",
-////			   json_object_dotget_string(commit, "commit.author.date"),
-////			   json_object_get_string(commit, "sha"),
-////			   json_object_dotget_string(commit, "commit.author.name"));
-////	}
-//
-//	/* cleanup code */
-//	json_value_free(root_value);
-
-//	char buffer[MSG_BUFFER_SIZE];
-//	size_t printSize;
-//	size_t i;
-//
-//
-//	memset(buffer, NULL, MSG_BUFFER_SIZE);
-//
-//	for(i = 0; i < MSG_BUFFER_SIZE; i++) {
-//		buffer[i] = msgBuffer[i];
-//	}
-//
-//
-//
-//	int resultCode;
-//	size_t tokenIndex = 0, tokensLeft = 1;
-//	jsmn_parser parser;
-//	jsmntok_t tokens[100];
-//
-//	typedef enum { START, KEY, PRINT, SKIP, STOP } parse_state;
-//	parse_state state = START;
-//
-//	size_t object_tokens = 0;
-//
-//	char *KEYS[] = { "method", "params", "ideal" };
-//
-//	jsmn_init(&parser);
-//	resultCode = jsmn_parse(&parser, buffer, tokens, 100);
-//
-//	if(resultCode == JSMN_SUCCESS) {
-//
-//
-//		for ( tokenIndex = 0, tokensLeft = 1; tokensLeft > 0; tokenIndex++, tokensLeft--)
-//		{
-//			jsmntok_t *t = &tokens[tokenIndex];
-//
-//			char *tokenStr = json_token_tostr(buffer, t);
-//
-//			if(!(t->start != -1 && t->end != -1)) {
-//				log_d("Should never reach uninitialized tokens");
-//			}
-//
-//
-//			if (t->type == JSMN_ARRAY || t->type == JSMN_OBJECT)
-//				tokensLeft += t->size;
-//
-//			switch (state)
-//			{
-//				case START:
-//					if (!(t->type == JSMN_ARRAY || t->type == JSMN_OBJECT)) {
-//						log_d("Invalid response: root element must be an object.");
-//						return;
-//					}
-//
-//
-//					state = KEY;
-//					object_tokens = t->size;
-//
-//					if (object_tokens == 0)
-//						state = STOP;
-//
-//					if (object_tokens % 2 != 0) {
-//						log_d("Invalid response: object must have even number of children.");
-//						return;
-//					}
-//
-//
-//					break;
-//
-//				case KEY:
-//					object_tokens--;
-//
-//					if (t->type != JSMN_STRING) {
-//						log_d("Invalid response: object keys must be strings.");
-//						return;
-//					}
-//
-//
-//
-//					state = SKIP;
-//
-//					size_t keysCount = sizeof(KEYS)/sizeof(char *);
-//
-//					for (i = 0; i < keysCount; i++)
-//					{
-//						if (json_token_streq(buffer, t, KEYS[i]))
-//						{
-//							clearCharBuffer(msgBuffer, MSG_BUFFER_SIZE);
-//							printSize = sprintf(msgBuffer, "%s: ", KEYS[i]);
-//							state = PRINT;
-//							break;
-//						}
-//					}
-//
-//					break;
-//
-//				case SKIP:
-//					if (t->type != JSMN_STRING && t->type != JSMN_PRIMITIVE) {
-//						//log_d("Invalid response: object values must be strings or primitives.");
-//						//return;
-//					}
-//
-//
-//					object_tokens--;
-//					state = KEY;
-//
-//					if (object_tokens == 0)
-//						state = STOP;
-//
-//					break;
-//
-//				case PRINT:
-//					if (t->type != JSMN_STRING && t->type != JSMN_PRIMITIVE){
-//						//log_d("Invalid response: object values must be strings or primitives.");
-//						//return;
-//					}
-//					if(t->type == JSMN_ARRAY) {
-//						state = SKIP;
-//						continue;
-//					}
-//
-//					//if(t->type == JSMN_STRING) {
-//						char *str = json_token_tostr(buffer, t);
-//						printSize = sprintf(msgBuffer + printSize, "%s\n\r", str);
-//						log_d(msgBuffer);
-//					//}
-//
-////					if(t->type == JSMN_PRIMITIVE) {
-////						log_d(
-////					}
-//
-//
-//					object_tokens--;
-//					state = KEY;
-//
-//					if (object_tokens == 0)
-//						state = STOP;
-//
-//					break;
-//
-//				case STOP:
-//					// Just consume the tokens
-//					break;
-//
-//				default:
-//					log_d("Invalid state: ");
-//					//log_d(state);
-//					log_d("\n\r");
-//			}
-//		}
-//
-//
-//
-//
-//	} else {
-//
-//		switch(resultCode) {
-//
-//		case JSMN_ERROR_INVAL:
-//			log_d("failed to parse json: JSMN_ERROR_INVAL bad token, JSON string is corrupted\n\r");
-//			break;
-//
-//		case JSMN_ERROR_NOMEM:
-//			log_d("failed to parse json: JSMN_ERROR_NOMEM not enough tokens, JSON string is too large\n\r");
-//			break;
-//
-//		case JSMN_ERROR_PART:
-//			log_d("failed to parse json: JSMN_ERROR_PART JSON string is too short, expecting more JSON data\n\r");
-//			break;
-//
-//		default:
-//			log_d("failed to parse json: Unknown error\n\r");
-//			break;
-//		}
-//
-//
-//	}
-
-
-
-
-//		char buffer[MSG_BUFFER_SIZE];
-//		int resultCode;
-//		jsmn_parser p;
-//		static jsmntok_t tokens[TOKENS_COUNT];
-//
-//		json_t* root;
-////		json_t* key;
-//		json_t* value;
-//
-//		size_t tokenIndex = 0;
-//
-//////		size_t heapSize = xPortGetFreeHeapSize();
-////
-////		snprintf(buffer, MSG_BUFFER_SIZE, "\nhipa: %d\n", heapSize);
-////		log_d(buffer);
-//
-//		jsmn_init(&p);
-//		resultCode = jsmn_parse(&p, msgBuffer, tokens, TOKENS_COUNT);
-//
-//		if(resultCode == JSMN_SUCCESS) {
-//			root = initJsonObjects( msgBuffer, tokens, TOKENS_COUNT, &tokenIndex );
-//			if(!root) {
-//				log_d("PIZDEC");
-//			}
-//			value = json_object_get(root, "x^2 array");
-//
-////			char str[1024];
-////			memset(str,0, 1024);
-//			int charsCopied = 0;
-//
-//			char* result = json_to_string(root, buffer, &charsCopied);
-//
-//
-//		//	snprintf(buffer, MSG_BUFFER_SIZE, "Value of x^2 array(length=%d): %s\n",  charsCopied, result);
-//			log_d(result);
-//
-//			json_object_free(root);
-//
-//
-//		} else {
-//			switch(resultCode) {
-//				case JSMN_ERROR_INVAL:
-//					log_d("bad token, JSON string is corrupted\n");
-//					break;
-//
-//				case JSMN_ERROR_NOMEM:
-//					log_d("not enough tokens, JSON string is too large\n");
-//					break;
-//
-//				case JSMN_ERROR_PART:
-//					log_d("JSON string is too short, expecting more JSON data\n");
-//					break;
-//
-//				default:
-//					log_d("Unknown parsing error\n");
-//					break;
-//
-//			}
-//		}
 }
 
 void tskHandleResponses(void *pvParameters) {
@@ -509,34 +194,36 @@ void tskHandleResponses(void *pvParameters) {
 	portBASE_TYPE xStatus;
 
 	while(1) {
-		xStatus = xQueueReceive( responseQueue, &responceJson, (portTickType) QUEUE_RECEIVE_WAIT_TIMEOUT );
-		if( (xStatus == pdPASS) && responceJson) {
-			transport_type_t transport = json_integer_value(json_object_get(responceJson, "transport"));
-			json_object_del(responceJson, "transport");
+		if(uxQueueMessagesWaiting(responseQueue) > 0) {
+			xStatus = xQueueReceive( responseQueue, &responceJson, (portTickType) QUEUE_RECEIVE_WAIT_TIMEOUT );
+			if( (xStatus == pdPASS) && responceJson) {
+				transport_type_t transport = json_integer_value(json_object_get(responceJson, "transport"));
+				json_object_del(responceJson, "transport");
 
-//			json_t *idObj = json_object_get(responceJson, "id");
-//			json_int_t id = json_integer_value(idObj);
-//
-//			json_t *resultObj = json_object_get(responceJson, "result");
-//			double result = json_real_value(resultObj);
-//
-//			json_t *versionObj = json_object_get(responceJson, "jsonrpc");
-//			char * version = json_string_value(versionObj);
+	//			json_t *idObj = json_object_get(responceJson, "id");
+	//			json_int_t id = json_integer_value(idObj);
+	//
+	//			json_t *resultObj = json_object_get(responceJson, "result");
+	//			double result = json_real_value(resultObj);
+	//
+	//			json_t *versionObj = json_object_get(responceJson, "jsonrpc");
+	//			char * version = json_string_value(versionObj);
 
 
-			char *jsonData = json_dumps(responceJson, JSON_ENCODE_ANY );
-			if(jsonData) {
-				packet_t *packet = packet_new(transport);
-				strbuffer_t *payload = strbuffer_new();
-				strbuffer_append(payload, jsonData);
-				jsonp_free(jsonData);
+				char *jsonData = json_dumps(responceJson, JSON_ENCODE_ANY );
+				if(jsonData) {
+					packet_t *packet = packet_new(transport);
+					strbuffer_t *payload = strbuffer_new();
+					strbuffer_append(payload, jsonData);
+					vPortFree(jsonData);
 
-				packet->jsonDoc = payload;
-				send_packet_to_client(packet);
+					packet->jsonDoc = payload;
+					send_packet_to_client(packet);
+				}
+				json_decref(responceJson);
+				continue;
 			}
-			json_decref(responceJson);
 		}
-		if(uxQueueMessagesWaiting(responseQueue) > 0) continue;
 		taskYIELD();
 	}
 }
@@ -555,51 +242,54 @@ void tskHandleRequests(void *pvParameters) {
 
 	portBASE_TYPE xStatus;
 	while(1) {
-		xStatus = xQueueReceive( requestQueue, &requestJson, (portTickType) QUEUE_RECEIVE_WAIT_TIMEOUT );
-		if( (xStatus == pdPASS) && requestJson) {
+		if(uxQueueMessagesWaiting(requestQueue) > 0) {
+			xStatus = xQueueReceive( requestQueue, &requestJson, (portTickType) QUEUE_RECEIVE_WAIT_TIMEOUT );
+			if( (xStatus == pdPASS) && requestJson) {
 
-			idObj = json_object_get(requestJson, "id");
-			id = json_integer_value(idObj);
-
-			methodObj = json_object_get(requestJson, "method");
-			methodName = json_string_value(methodObj);
-
-			snprintf(error_space, ERROR_BUFFER_SIZE, "%s :  Received request. id = %d    method = %s\n", taskName, (int) id, methodName );
-			logger(LEVEL_INFO, error_space);
-
-			responseJson = handle_request(&requestJson);
-			if(responseJson) {
-
-				idObj = json_object_get(responseJson, "id");
+				idObj = json_object_get(requestJson, "id");
 				id = json_integer_value(idObj);
 
+				methodObj = json_object_get(requestJson, "method");
+				methodName = json_string_value(methodObj);
 
-
-				snprintf(error_space, ERROR_BUFFER_SIZE, "%s :  Received response. id = %d\n", taskName, (int)id);
+				snprintf(error_space, ERROR_BUFFER_SIZE, "%s :  Received request. id = %d    method = %s\n", taskName, (int) id, methodName );
 				logger(LEVEL_INFO, error_space);
 
-				xStatus = xQueueSendToBack( responseQueue, &responseJson, (portTickType) QUEUE_SEND_WAIT_TIMEOUT );
-				if( xStatus != pdPASS ){
-					char* idStr = json_dumps(json_object_get(requestJson, "id"), JSON_ENCODE_ANY);
-					transport_type_t transport = json_integer_value(json_object_get(requestJson, "transport"));
-					json_object_del(requestJson, "transport");
-					json_decref(requestJson);
-					// send using error reporting function
-					if(id && transport) {
-						report_error_to_sender(
-							transport,
-							MSG_JSONRPC_ERRORS.general_error_json,
-							JSONRPC_SERVER_ERROR,				/* <-- code */
-							MSG_JSONRPC_ERRORS.server_error,	/* <-- message */
-							MSG_MAINTASKS.tskUSBReader.device_is_busy_timeout , /* <-- data */
-							idStr
-						);
-					}
-					if(idStr) vPortFree(idStr);
-					snprintf(error_space, ERROR_BUFFER_SIZE, "%s :  Unable to add response to queue. id = %d\tmethod = %s\n", taskName, (int) id, methodName );
-					logger(LEVEL_INFO, error_space);
-				}
+				responseJson = handle_request(&requestJson);
+				json_decref(requestJson);
+				if(responseJson) {
 
+					idObj = json_object_get(responseJson, "id");
+					id = json_integer_value(idObj);
+
+
+
+					snprintf(error_space, ERROR_BUFFER_SIZE, "%s :  Received response. id = %d\n", taskName, (int)id);
+					logger(LEVEL_INFO, error_space);
+
+					xStatus = xQueueSendToBack( responseQueue, &responseJson, (portTickType) QUEUE_SEND_WAIT_TIMEOUT );
+					if( xStatus != pdPASS ){
+						char* idStr = json_dumps(json_object_get(requestJson, "id"), JSON_ENCODE_ANY);
+						transport_type_t transport = json_integer_value(json_object_get(requestJson, "transport"));
+						json_object_del(requestJson, "transport");
+						json_decref(requestJson);
+						// send using error reporting function
+						if(id && transport) {
+							report_error_to_sender(
+								transport,
+								MSG_JSONRPC_ERRORS.general_error_json,
+								JSONRPC_SERVER_ERROR,				/* <-- code */
+								MSG_JSONRPC_ERRORS.server_error,	/* <-- message */
+								MSG_MAINTASKS.tskUSBReader.device_is_busy_timeout , /* <-- data */
+								idStr
+							);
+						}
+						if(idStr) vPortFree(idStr);
+						snprintf(error_space, ERROR_BUFFER_SIZE, "%s :  Unable to add response to queue. id = %d\tmethod = %s\n", taskName, (int) id, methodName );
+						logger(LEVEL_INFO, error_space);
+					}
+
+				}
 			}
 		}
 		taskYIELD();
@@ -616,69 +306,99 @@ void tskParseJson(void *pvParameters) {
 
 	portBASE_TYPE xStatus;
 	while(1) {
-		xStatus = xQueueReceive( usbIncomeQueue, &incomePacket, (portTickType) QUEUE_RECEIVE_WAIT_TIMEOUT );
-		if( (xStatus == pdPASS) && incomePacket) {
-			snprintf(error_space, ERROR_BUFFER_SIZE, "%s :  Received packet. len = %d\n", taskName, incomePacket->jsonDoc->length );
-			logger(LEVEL_INFO, error_space);
-
-			requestJson = parseJsonPacket(&incomePacket);
-			if(requestJson) {
-				snprintf(error_space, ERROR_BUFFER_SIZE,
-					"%s :  Parsing packet was sucessful\n", taskName
-				);
+		if(uxQueueMessagesWaiting(usbIncomeQueue) > 0) {
+			xStatus = xQueueReceive( usbIncomeQueue, &incomePacket, (portTickType) QUEUE_RECEIVE_WAIT_TIMEOUT );
+			if( (xStatus == pdPASS) && incomePacket) {
+				snprintf(error_space, ERROR_BUFFER_SIZE, "%s :  Received packet. len = %d\n", taskName, incomePacket->jsonDoc->length );
 				logger(LEVEL_INFO, error_space);
 
-				json_incref(requestJson);
-				xStatus = xQueueSendToBack( requestQueue, &requestJson, (portTickType) QUEUE_SEND_WAIT_TIMEOUT );
-				if( xStatus != pdPASS ){
-
-					json_object_del(requestJson, "method");
-					json_object_del(requestJson, "params");
-
-					json_t* errorObj = json_pack(
-						"{s:i, s:s, s:s}",
-						"code", (json_int_t) JSONRPC_SERVER_ERROR,
-						"message", MSG_JSONRPC_ERRORS.server_error,
-						"data", MSG_MAINTASKS.tskUSBReader.device_is_busy_timeout
+				requestJson = parseJsonPacket(&incomePacket);
+				if(requestJson) {
+					snprintf(error_space, ERROR_BUFFER_SIZE,
+						"%s :  Parsing packet was sucessful\n", taskName
 					);
+					logger(LEVEL_INFO, error_space);
 
-					json_object_set_new(requestJson, "error", errorObj);
-
-					logger(LEVEL_WARN, taskName);
-					logger(LEVEL_WARN, " ");
-					logger(LEVEL_WARN, MSG_MAINTASKS.tskUSBReader.device_is_busy_timeout);
-
-					// send error back to client using output queue
-					xStatus = xQueueSendToBack( responseQueue, &requestJson, (portTickType) QUEUE_SEND_WAIT_TIMEOUT );
+					json_incref(requestJson);
+					xStatus = xQueueSendToBack( requestQueue, &requestJson, (portTickType) QUEUE_SEND_WAIT_TIMEOUT );
 					if( xStatus != pdPASS ){
-						char* id = json_dumps(json_object_get(requestJson, "id"), JSON_ENCODE_ANY);
-						transport_type_t transport = json_integer_value(json_object_get(requestJson, "transport"));
-						json_object_del(requestJson, "transport");
-						json_decref(requestJson);
-						// send using error reporting function
-						if(id && transport) {
-							report_error_to_sender(
-								transport,
-								MSG_JSONRPC_ERRORS.general_error_json,
-								JSONRPC_SERVER_ERROR,				/* <-- code */
-								MSG_JSONRPC_ERRORS.server_error,	/* <-- message */
-								MSG_MAINTASKS.tskUSBReader.device_is_busy_timeout , /* <-- data */
-								id
-							);
-						}
-						if(id) vPortFree(id);
+
+						json_object_del(requestJson, "method");
+						json_object_del(requestJson, "params");
+
+						json_t* errorObj = json_pack(
+							"{s:i, s:s, s:s}",
+							"code", (json_int_t) JSONRPC_SERVER_ERROR,
+							"message", MSG_JSONRPC_ERRORS.server_error,
+							"data", MSG_MAINTASKS.tskUSBReader.device_is_busy_timeout
+						);
+
+						json_object_set_new(requestJson, "error", errorObj);
 
 						logger(LEVEL_WARN, taskName);
 						logger(LEVEL_WARN, " ");
 						logger(LEVEL_WARN, MSG_MAINTASKS.tskUSBReader.device_is_busy_timeout);
+
+						// send error back to client using output queue
+						xStatus = xQueueSendToBack( responseQueue, &requestJson, (portTickType) QUEUE_SEND_WAIT_TIMEOUT );
+						if( xStatus != pdPASS ){
+							char* id = json_dumps(json_object_get(requestJson, "id"), JSON_ENCODE_ANY);
+							transport_type_t transport = json_integer_value(json_object_get(requestJson, "transport"));
+							json_object_del(requestJson, "transport");
+							json_decref(requestJson);
+							// send using error reporting function
+							if(id && transport) {
+								report_error_to_sender(
+									transport,
+									MSG_JSONRPC_ERRORS.general_error_json,
+									JSONRPC_SERVER_ERROR,				/* <-- code */
+									MSG_JSONRPC_ERRORS.server_error,	/* <-- message */
+									MSG_MAINTASKS.tskUSBReader.device_is_busy_timeout , /* <-- data */
+									id
+								);
+							}
+							if(id) vPortFree(id);
+
+							logger(LEVEL_WARN, taskName);
+							logger(LEVEL_WARN, " ");
+							logger(LEVEL_WARN, MSG_MAINTASKS.tskUSBReader.device_is_busy_timeout);
+						}
 					}
 				}
+				json_decref(requestJson);
+				packet_destroy(&incomePacket);
 			}
-			json_decref(requestJson);
-			packet_destroy(&incomePacket);
 		}
 		taskYIELD();
 	}
+}
+
+
+inline
+packet_t * createNewIncomePacketFromStr(strbuffer_t ** temp, signed char* taskName, char* tempSize) {
+	packet_t *incomePacket = NULL;
+	incomePacket = packet_new(TRANSPORT_USB);
+	if(!incomePacket) {
+		report_error_to_sender(
+			TRANSPORT_USB,
+			MSG_JSONRPC_ERRORS.general_error_json,
+			JSONRPC_SERVER_ERROR,				/* <-- code */
+			MSG_JSONRPC_ERRORS.server_error,	/* <-- message */
+			MSG_MAINTASKS.tskUSBReader.unable_to_alloc_new_json_packet , /* <-- data */
+			"null" 	/* <-- id */
+		);
+		packet_destroy(&incomePacket);
+		strbuffer_destroy(temp);
+
+		snprintf(tempSize, BUFF_SIZE, "%s ", taskName);
+		logger(LEVEL_WARN, tempSize);
+		logger(LEVEL_WARN, MSG_MAINTASKS.tskUSBReader.unable_to_alloc_new_json_packet);
+
+		Receive_length = 0;
+		return NULL;
+	}
+	incomePacket->jsonDoc = *temp;
+	return incomePacket;
 }
 
 
@@ -747,29 +467,9 @@ void tskUSBReader(void *pvParameters) {
 						strbuffer_pop(temp);
 						temp->value[temp->length] = '\0';
 
-						incomePacket = packet_new(TRANSPORT_USB);
-						if(!incomePacket) {
-							report_error_to_sender(
-								TRANSPORT_USB,
-								MSG_JSONRPC_ERRORS.general_error_json,
-								JSONRPC_SERVER_ERROR,				/* <-- code */
-								MSG_JSONRPC_ERRORS.server_error,	/* <-- message */
-								MSG_MAINTASKS.tskUSBReader.unable_to_alloc_new_json_packet , /* <-- data */
-								"null" 	/* <-- id */
-							);
-							packet_destroy(&incomePacket);
-							strbuffer_destroy(&temp);
-
-							snprintf(tempSize, BUFF_SIZE, "%s ", taskName);
-							logger(LEVEL_WARN, tempSize);
-							logger(LEVEL_WARN, MSG_MAINTASKS.tskUSBReader.unable_to_alloc_new_json_packet);
-
-							Receive_length = 0;
+						incomePacket = createNewIncomePacketFromStr(&temp, taskName, tempSize);
+						if(!incomePacket)
 							continue;
-						}
-
-						incomePacket->jsonDoc = temp;
-
 						xStatus = xQueueSendToBack( usbIncomeQueue, &incomePacket, (portTickType) QUEUE_SEND_WAIT_TIMEOUT );
 						if( xStatus != pdPASS )
 						{
@@ -812,6 +512,21 @@ void tskUSBReader(void *pvParameters) {
 							logger(LEVEL_WARN, tempSize);
 							logger(LEVEL_WARN, MSG_MAINTASKS.tskUSBReader.incoming_buffer_overflow);
 						}
+						/* Check if user request help message */
+						if( (strstr(temp->value, "help") != NULL) ||
+							(strstr(temp->value, "system.help") != NULL) ) {
+							strbuffer_destroy(&temp);
+
+							strbuffer_t *callHelp = strbuffer_new();
+							strbuffer_append(callHelp, "{\"jsonrpc\":\"2.0\",\"method\":\"system.help\",\"id\": null}");
+							incomePacket = createNewIncomePacketFromStr(&callHelp, taskName, tempSize);
+							if(!incomePacket)
+								continue;
+							xStatus = 0;
+							while(xStatus != pdPASS) {
+								xStatus = xQueueSendToBack( usbIncomeQueue, &incomePacket, (portTickType) QUEUE_SEND_WAIT_TIMEOUT );
+							}
+						}
 					}
 				}
 				Receive_length = 0;
@@ -820,13 +535,7 @@ void tskUSBReader(void *pvParameters) {
 		}
 
 
-		memset(tempSize, 0, BUFF_SIZE);
-		siprintf(tempSize, "%s FREE: %d\n\r", taskName, xPortGetFreeHeapSize());
-		log_func(tempSize);
-//
-//		memset(tempSize, 0, BUFF_SIZE);
-//		siprintf(tempSize, "%s STACK: %d\n\r", taskName, (int) uxTaskGetStackHighWaterMark( NULL ));
-//		logger(LEVEL_DEBUG, tempSize);
+
 
 //		snprintf(tempSize, BUFF_SIZE, "FLOAT %f\n", -555.666);
 //		log_d(tempSize);

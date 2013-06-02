@@ -26,38 +26,34 @@ void tskAbstractWriter(void *pvParameters) {
 		xQueueHandle dataQueue	= config->dataQueue;
 
 		while(1) {
-			xStatus = xQueueReceive( dataQueue, &dataPacket, config->queueTimeout );
-			if( (xStatus == pdPASS) && dataPacket) {
-				if(dataPacket->transport != config->transport_type) {
-					strbuffer_t *errorMsg = strbuffer_new();
-					strbuffer_append(errorMsg, taskName);
-					strbuffer_append(errorMsg, " : Received packed has different transport type. Expected => ");
-					strbuffer_append(errorMsg, transport_type_to_str(config->transport_type));
-					strbuffer_append(errorMsg, " Actual => ");
-					strbuffer_append(errorMsg, transport_type_to_str(dataPacket->transport));
-					strbuffer_append(errorMsg, ". Packet was deleted...\n");
-					logger(LEVEL_ERR, errorMsg->value);
-					strbuffer_destroy(&errorMsg);
+			if(uxQueueMessagesWaiting(dataQueue) > 0) {
+				xStatus = xQueueReceive( dataQueue, &dataPacket, config->queueTimeout );
+				if( (xStatus == pdPASS) && dataPacket) {
+					if(dataPacket->transport != config->transport_type) {
+						strbuffer_t *errorMsg = strbuffer_new();
+						strbuffer_append(errorMsg, taskName);
+						strbuffer_append(errorMsg, " : Received packed has different transport type. Expected => ");
+						strbuffer_append(errorMsg, transport_type_to_str(config->transport_type));
+						strbuffer_append(errorMsg, " Actual => ");
+						strbuffer_append(errorMsg, transport_type_to_str(dataPacket->transport));
+						strbuffer_append(errorMsg, ". Packet was deleted...\n");
+						logger(LEVEL_ERR, errorMsg->value);
+						strbuffer_destroy(&errorMsg);
 
+						packet_destroy(&dataPacket);
+						continue;
+					};
+					char * data = (dataPacket->jsonDoc)->value;
+					int result = write_func(data, strlen(data) + 1);
+					if(result != SUCCESS) {
+						logger(LEVEL_ERR, (char*) taskName);
+						logger(LEVEL_ERR, " : Unable to write output data\n");
+					}
 					packet_destroy(&dataPacket);
-					continue;
-				};
-				char * data = (dataPacket->jsonDoc)->value;
-				int result = write_func(data, strlen(data) + 1);
-				if(result != SUCCESS) {
-					logger(LEVEL_ERR, (char*) taskName);
-					logger(LEVEL_ERR, " : Unable to write output data\n");
 				}
-				packet_destroy(&dataPacket);
 			}
 			taskYIELD();
 		}
-
-	} else {
-		logger(LEVEL_ERR, (char*) taskName);
-		logger(LEVEL_ERR, "Input parameters were wrong. Deleting task\n");
-
-//		vTaskDelete(NULL);
 	}
 }
 

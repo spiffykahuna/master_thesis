@@ -287,10 +287,10 @@ static void Default_Handler(void)
 	//USART_ClearITPendingBit(USART1, USART_IT_TC);
 	int i;
   /* Go into an infinite loop. */
-  while (1)
-  {
-	  ++i;
-  }
+//  while (1)
+//  {
+//	  ++i;
+//  }
 }
 
 /*********************** (C) COPYRIGHT 2009 Coocox ************END OF FILE*****/

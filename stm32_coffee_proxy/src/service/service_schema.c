@@ -1,10 +1,10 @@
 #include "service_schema.h"
 
 
-static const char *SERVICE_SCHEMA = "{"
+const char *SERVICE_SCHEMA = "{"
 " \"id\":\"http://ttu.ee/denis_konstantinov/embedded_service.schema\",\n"
 "\"description\":\"This is a embedded service of a coffee machine.\"\n"
-"\"id\": \"0.1\",\n"
+"\"version\": \"0.1\",\n"
 "}";
 
 
@@ -39,6 +39,6 @@ static const char *SERVICE_SCHEMA = "{"
 //   "params":[{"type":"number","name":"*",
 //              "description":"Number to include in the sum"}]
 //   }
- };
+
 
 

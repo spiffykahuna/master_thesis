@@ -5,7 +5,7 @@ extern log_func_t log_func;
 
 void tskSystem(void *pvParameters) {
 	signed char *taskName = pcTaskGetTaskName(NULL);
-//	static char tempSize[32];
+	static char tempSize[32];
 	system_msg_t *sysMsg;
 	//json_t *responceJson = NULL;
 	portBASE_TYPE xStatus;
@@ -19,7 +19,11 @@ void tskSystem(void *pvParameters) {
 			if( (xStatus == pdPASS) && sysMsg) {
 				switch(sysMsg->msgType) {
 				case MSG_TYPE_LOGGING:
-					log_func(sysMsg->logMsg->value);
+					if(sysMsg->logMsg && sysMsg->logMsg->value) {
+						strbuffer_t * tempos = sysMsg->logMsg;
+						log_func(sysMsg->logMsg->value);
+					}
+
 					break;
 				default:
 					break;
@@ -59,6 +63,13 @@ void tskSystem(void *pvParameters) {
 //		memset(tempSize, 0, 32);
 //		siprintf(tempSize, "%s STACK: %d\n\r", taskName, (int) uxTaskGetStackHighWaterMark( NULL ));
 //		logger(LEVEL_DEBUG, tempSize);
+		//memset(tempSize, 0, BUFF_SIZE);
+		snprintf(tempSize, 32, "%s FREE: %d\n\r", taskName, xPortGetFreeHeapSize());
+		log_func(tempSize);
+//
+//		memset(tempSize, 0, BUFF_SIZE);
+//		siprintf(tempSize, "%s STACK: %d\n\r", taskName, (int) uxTaskGetStackHighWaterMark( NULL ));
+//		logger(LEVEL_DEBUG, tempSize);
 
 		vTaskDelayUntil( &xLastWakeTime, SYSTEM_TASK_DELAY  );
 	}
@@ -87,12 +98,12 @@ system_msg_t* system_msg_new(system_msg_type_t msgType) {
 	if(!sysMsg) { return NULL;}
 
 	sysMsg->msgType = msgType;
-	switch(msgType) {
-		case MSG_TYPE_LOGGING:
-			sysMsg->logMsg = strbuffer_new();
-			break;
-		default:
-			break;
-	}
+//	switch(msgType) {
+//		case MSG_TYPE_LOGGING:
+//			sysMsg->logMsg = strbuffer_new();
+//			break;
+//		default:
+//			break;
+//	}
 	return sysMsg;
 }

@@ -38,6 +38,7 @@
 /*-----------------------------------------------------------*/
 
 extern void logger(log_level_t level, char *msg);
+extern log_func_t log_func;
 
 void ledsInit(void);
 void USART_init(void);
@@ -116,7 +117,7 @@ void vApplicationStackOverflowHook( xTaskHandle pxTask, signed char *pcTaskName 
 }
 
 void vApplicationMallocFailedHook( void ) {
-	logger(LEVEL_ERR, "MALLOC FAILED IN TASK\r\n");
+	log_func( "MALLOC FAILED IN TASK\r\n");
 	for( ;; );
 }
 /*-----------------------------------------------------------*/
@@ -226,7 +227,7 @@ int initSystemHandlers(void) {
 		return ERROR;
 	};
 
-	systemMsgQueue = xQueueCreate( SYSTEM_MSG_QUEUR_SIZE, sizeof(system_msg_t *) );
+	systemMsgQueue = xQueueCreate( SYSTEM_MSG_QUEUE_SIZE, sizeof(system_msg_t *) );
 	if( systemMsgQueue == NULL ) {
 		logger(LEVEL_ERR, "Unable to create queue for system messages\n\r");
 		return ERROR;

@@ -59,36 +59,39 @@ int log_d(char *str)
 void logger(log_level_t level, char *msg) {
 	char temp[32];
 
-	system_msg_t *systemMsg = system_msg_new(MSG_TYPE_LOGGING);
-	if(systemMsg) {
+	strbuffer_t *logMsg = strbuffer_new();
+	if(logMsg) {
 		snprintf(temp, 32, "%d   ", (int) xTaskGetTickCount());
-		strbuffer_append(systemMsg->logMsg, temp);
+		strbuffer_append(logMsg, temp);
 
 		switch(level) {
 		case LEVEL_OFF:
 			return; /* no message here */
 		case LEVEL_FATAL:
-			strbuffer_append(systemMsg->logMsg, "FATAL : ");
+			strbuffer_append(logMsg, "FATAL : ");
 			break;
 
 		case LEVEL_ERR:
-			strbuffer_append(systemMsg->logMsg, "ERROR : ");
+			strbuffer_append(logMsg, "ERROR : ");
 			break;
 		case LEVEL_WARN:
-			strbuffer_append(systemMsg->logMsg, "WARN : ");
+			strbuffer_append(logMsg, "WARN : ");
 			break;
 		case LEVEL_INFO:
-			strbuffer_append(systemMsg->logMsg, "INFO : ");
+			strbuffer_append(logMsg, "INFO : ");
 			break;
 		case LEVEL_DEBUG:
-			strbuffer_append(systemMsg->logMsg, "DEBUG : ");
+			strbuffer_append(logMsg, "DEBUG : ");
 			break;
 		case LEVEL_TRACE:
-			strbuffer_append(systemMsg->logMsg, "TRACE : ");
+			strbuffer_append(logMsg, "TRACE : ");
 			break;
 		}
 
-		strbuffer_append(systemMsg->logMsg, msg);
+		strbuffer_append(logMsg, msg);
+
+		system_msg_t *systemMsg = system_msg_new(MSG_TYPE_LOGGING);
+		systemMsg->logMsg = logMsg;
 
 		portBASE_TYPE xStatus = 0;
 		while( xStatus != pdPASS) {

@@ -25,9 +25,18 @@
 				},
 				"required": ["jsonMaxDocLength", "maxIncomeMessages"]
 			}
-		},		
+		},
+		"system.help": {
+			"description" : "Prints this help document.",
+			"type" : "method",
+			"params" : null,
+			"returns" : {
+				"description" : "Full service description",
+				"type" : "string"				
+			}
+		}
 		"machine.getInfo" : {
-			"description" : "Get information about current coffee machine. This returns",
+			"description" : "Get information about current coffee machine. This returns some machine parameters",
 			"type" : "method",
 			"params" : null,
 			"returns" : {

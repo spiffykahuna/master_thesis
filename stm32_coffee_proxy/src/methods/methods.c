@@ -11,6 +11,7 @@
 
 //extern msg_methods MSG_METHODS;
 extern msg_jsonrpc_errors MSG_JSONRPC_ERRORS;
+extern char  error_space[ERROR_BUFFER_SIZE];
 
 inline
 void delete_rpc_method(json_t *requestJson) {
@@ -23,6 +24,28 @@ void add_jsonrpc2_0_version(json_t *requestJson) {
 	json_object_set_new(requestJson, "jsonrpc", versionObj);
 }
 
+inline
+json_t * create_error(int errorCode, char* errorMsg) {
+	json_t* errorObj = json_object();
+	json_object_set_new(errorObj, "code", json_integer(errorCode));
+	json_object_set_new(errorObj, "message", json_string(errorMsg));
+
+	return errorObj;
+}
+
+inline
+json_t * create_response_error(int errorCode, char* errorMsg) {
+	json_t *responseJson = NULL;
+	responseJson = json_object();
+	json_object_set_new(responseJson, "jsonrpc", json_string("2.0"));
+	json_object_set_new(responseJson, "id", json_null());
+
+	json_t* errorObj = create_error(errorCode, errorMsg);
+	json_object_set_new(responseJson, "error", errorObj);
+	return responseJson;
+}
+
+
 json_t * subtract(json_t **requestJson) {
 	json_t *responseJson = NULL;
 
@@ -32,6 +55,10 @@ json_t * subtract(json_t **requestJson) {
 	double minuend  	= 0.0;
 	double subtrahend   = 0.0;
 	double difference   = 0.0;
+
+	responseJson = json_object();
+	json_object_set(responseJson, "id",  json_object_get(*requestJson, "id"));
+
 
 	arguments = json_object_get(*requestJson, "params");
 	if(arguments &&
@@ -47,19 +74,16 @@ json_t * subtract(json_t **requestJson) {
 		difference = minuend - subtrahend;
 		numberObj = json_real(difference);
 
-		json_object_set_new(*requestJson, "result", numberObj);
+
+
+		json_object_set_new(responseJson, "result", numberObj);
 
 	} else {
-		json_t* errorObj = json_pack(
-			"{s:i, s:s}",
-			"code", (json_int_t) JSONRPC_INVALID_PARAMS,
-			"message", MSG_JSONRPC_ERRORS.invalid_params
-		);
-		json_object_set_new(*requestJson, "error", errorObj);
+		json_t* errorObj = create_error(JSONRPC_INVALID_PARAMS, MSG_JSONRPC_ERRORS.invalid_params);
+		json_object_set_new(responseJson, "error", errorObj);
 	}
-	json_incref(*requestJson);
-	responseJson = *requestJson;
 
+	json_decref(*requestJson);
 	return responseJson;
 }
 
@@ -67,62 +91,81 @@ json_t * handle_request(json_t **requestJson) {
 	json_t *responseJson = NULL;
 	json_t *methodNameObj = NULL;
 	json_t *errorObj = NULL;
-	const char *methodName = NULL;
+	strbuffer_t* errorMsg;
+	static char methodName[32];
+	methodName[0] = '\0';
 
-	json_t *id = json_object_get(*requestJson, "id");
-	json_t *transport = json_object_get(*requestJson, "transport");
 
+	if(!*requestJson) {
+		return create_response_error(JSONRPC_INVALID_REQUEST, MSG_JSONRPC_ERRORS.invalid_request);
+	}
+
+	json_int_t id = json_integer_value(json_object_get(*requestJson, "id"));
+	transport_type_t transport = json_integer_value(json_object_get(*requestJson, "transport"));
 	methodNameObj = json_object_get(*requestJson, "method");
-	methodName	= json_string_value(methodNameObj);
+	strncpy(methodName, json_string_value(methodNameObj), 32);
 
-	if(methodNameObj && methodName) {
+	if(methodName[0] != '\0') {
 		if(METHOD_IS("subtract", methodName)) { responseJson = subtract(requestJson);}
 
 
 	} else {
-		errorObj = json_pack(
-			"{s:i, s:s}",
-			"code", (json_int_t) JSONRPC_INVALID_REQUEST,
-			"message", MSG_JSONRPC_ERRORS.invalid_request
-		);
-		json_object_set_new(*requestJson, "error", errorObj);
-		responseJson = *requestJson;
-		logger(LEVEL_WARN, "handle_request\tMSG_JSONRPC_ERRORS.invalid_request\n");
+		json_decref(*requestJson);
+
+		errorMsg = strbuffer_new();
+		strbuffer_append(errorMsg, "handle_request : ");
+		strbuffer_append(errorMsg, MSG_JSONRPC_ERRORS.invalid_request);
+		strbuffer_append(errorMsg, "\n");
+
+
+		logger(LEVEL_WARN, errorMsg->value);
+		strbuffer_destroy(&errorMsg);
+
+		errorObj = create_response_error(JSONRPC_INVALID_REQUEST, MSG_JSONRPC_ERRORS.invalid_request);
+		json_object_set_new(errorObj, "id", json_integer(id));
+		json_object_set_new(errorObj, "transport", json_integer(transport));
+
+		return errorObj;
 	}
 
 	if(!responseJson) {
-		json_incref(*requestJson);
-		errorObj = json_pack(
-			"{s:i, s:s}",
-			"code", (json_int_t) JSONRPC_INVALID_REQUEST,
-			"message", MSG_JSONRPC_ERRORS.invalid_request
-		);
-		json_object_set_new(*requestJson, "error", errorObj);
-		responseJson = *requestJson;
+		json_decref(*requestJson);
 
+//		errorMsg = strbuffer_new();
+//		strbuffer_append(errorMsg, "handle_request method not found: ");
+//		strbuffer_append(errorMsg, methodName);
+//		strbuffer_append(errorMsg, "\n");
+
+
+
+		snprintf(error_space, ERROR_BUFFER_SIZE, "handle_request method not found: %s\n", methodName);
+		logger(LEVEL_WARN, error_space);
+//		strbuffer_destroy(&errorMsg);
+
+		errorObj = create_response_error(JSONRPC_METHOD_NOT_FOUND, MSG_JSONRPC_ERRORS.method_not_found);
+		json_object_set_new(errorObj, "id", json_integer(id));
+		json_object_set_new(errorObj, "transport", json_integer(transport));
+		return errorObj;
 	}
 
 	json_object_del(responseJson, "params");
 	json_object_del(responseJson, "method");
 	json_object_set_new(responseJson, "jsonrpc", json_string("2.0"));
 
-	if(!json_object_get(responseJson, "result")) {
-		errorObj = json_pack(
-			"{s:i, s:s}",
-			"code", (json_int_t) JSONRPC_SERVER_ERROR,
-			"message", MSG_JSONRPC_ERRORS.server_error
-		);
+	if(!json_object_get(responseJson, "result") && !json_object_get(responseJson, "error")) {
+		errorObj = create_error(JSONRPC_SERVER_ERROR, MSG_JSONRPC_ERRORS.server_error);
 		json_object_set_new(responseJson, "error", errorObj);
 	}
 
-	if(!json_equal(id, json_object_get(responseJson, "id"))) {
-		json_object_set_new(responseJson, "id", id);
+	if( id != json_integer_value(json_object_get(responseJson, "id"))) {
+		json_object_set_new(responseJson, "id", json_integer(id));
 	}
 
-	if(!json_equal(transport, json_object_get(responseJson, "transport"))) {
-		json_object_set_new(responseJson, "transport", transport);
+	if(transport != json_integer_value(json_object_get(responseJson, "transport"))) {
+		json_object_set_new(responseJson, "transport", json_integer(transport));
 	}
 
 	json_decref(*requestJson);
+
 	return responseJson;
 }
