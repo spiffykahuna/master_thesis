@@ -36,25 +36,27 @@ void send_packet_to_client(packet_t *packet) {
 	case TRANSPORT_USB:
 		xStatus =  xQueueSendToBack( usbOutComeQueue, &packet, (portTickType) QUEUE_SEND_WAIT_TIMEOUT );
 		if( xStatus != pdPASS ){
-
+			// TODO Error reporting on queue full
 		}
 		break;
 
 	default:
-		/* choose default transport or logging interface here */
+		/* TODO choose default transport or logging interface here */
 		break;
 	}
 }
 
+
+/* this function transmit data directly to the destination avoiding queue mechanism */
 inline
 void send_data_to_client(transport_type_t transport, char *data, size_t dataLength) {
 	switch(transport) {
 	case TRANSPORT_USB:
-//		write_usb(data, length);
+		write_usb(data, dataLength);
 		break;
 
 	default:
-		/* choose default transport or logging interface here */
+		/* TODO choose default transport or logging interface here */
 		break;
 	}
 }

@@ -29,7 +29,7 @@
 #define SYSTEM_MSG_QUEUE_SIZE		(INCOME_MSG_QUEUE_SIZE * 2)
 
 /* end of transmission character */
-#define EOT	23
+#define EOT_CHAR	10
 
 
 typedef enum _proxy_error_t {

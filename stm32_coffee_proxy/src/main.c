@@ -66,9 +66,10 @@ writer_params_t writerConfig;
 
 int main(void)
 {
+	SystemInit();
 	/* Setup STM32 system (clock, PLL and Flash configuration) */
 	json_set_alloc_funcs(pvPortMalloc, vPortFree);
-	SystemInit();
+
 
 	ledsInit();
 	//USART_init();

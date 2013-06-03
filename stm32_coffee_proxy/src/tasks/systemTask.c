@@ -107,3 +107,19 @@ system_msg_t* system_msg_new(system_msg_type_t msgType) {
 //	}
 	return sysMsg;
 }
+
+int system_msg_add_to_queue(system_msg_t *sysMsg) {
+	int retries;
+	portBASE_TYPE xStatus = 0;
+
+	if(systemMsgQueue != NULL) {
+		retries = 5;
+		while(retries--) {
+			xStatus = xQueueSendToBack( systemMsgQueue, &sysMsg, (portTickType) QUEUE_SEND_WAIT_TIMEOUT );
+		}
+	} else {
+		return FALSE;
+	}
+
+	return (xStatus == pdPASS);
+}

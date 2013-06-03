@@ -3,7 +3,7 @@
 	"id" : "http://ttu.ee/denis_konstantinov/embedded_service.schema",
 	"description" : "This is a embedded service of a coffee machine.",
 	"version" : "0.1",
-	"operations" : [
+	"operations" : {
 		"system.getLimits" : {
 			"description" : "Get limits of physical capabilities of a sistem.",
 			"type" : "method",
@@ -34,7 +34,7 @@
 				"description" : "Full service description",
 				"type" : "string"				
 			}
-		}
+		},
 		"machine.getInfo" : {
 			"description" : "Get information about current coffee machine. This returns some machine parameters",
 			"type" : "method",
@@ -60,7 +60,7 @@
 				"type": "array",
 				"minItems": 0,
 				"items": { "$ref": "#/definitions/Product" },
-				"uniqueItems": true,					
+				"uniqueItems": true					
 			}
 		},
 		"machine.orderProduct": {
@@ -72,7 +72,7 @@
 				"enum": [ "PRODUCT_STATE_STARTED", "PRODUCT_STATE_IN_PROGRESS", "PRODUCT_STATE_FINISHED" ]				
 			}
 		}
-	],
+	},
 	"definitions": {
 		"Product": {
 			"description": "The product of current coffee machine.",
@@ -80,7 +80,7 @@
 			"properties": {
 				"id": { "$ref": "#/definitions/positiveInteger" },
 				"name": { "type": "string" },
-				"price": { "$ref": "#/definitions/Price" } 
+				"price": { "$ref": "#/definitions/Price" },
 				"image": {
 					"description": "Base64 encoded image of a product",
 					"type": "string"
@@ -93,7 +93,7 @@
 			"properties": {
 				"amount": { "$ref": "#/definitions/positiveNumber" },
 				"currency":  { "enum": [ "EUR", "USD", "LTL", "LVL", "RUB", "SEK" ] }				
-			}
+			},
 			"required": ["amount", "currency"]
 		},
 		"positiveInteger": {

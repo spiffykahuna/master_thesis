@@ -21,18 +21,21 @@
 
 
 typedef enum _system_msg_type_t {
-	MSG_TYPE_LOGGING=1
+	MSG_TYPE_LOGGING=1,
+	MSG_TYPE_PRINT_HELP=2
 } system_msg_type_t;
 
 typedef struct _system_msg_t {
 	system_msg_type_t	msgType;
 	union {
 		strbuffer_t *logMsg;
+		transport_type_t transport;
 	};
 } system_msg_t;
 
 inline void system_msg_destroy(system_msg_t **sysMsg);
 inline system_msg_t * system_msg_new(system_msg_type_t msgType);
+int system_msg_add_to_queue(system_msg_t *sysMsg);
 
 void tskSystem(void *pvParameters);
 

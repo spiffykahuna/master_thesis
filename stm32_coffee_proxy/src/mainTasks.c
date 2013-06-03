@@ -29,75 +29,6 @@ extern const msg_jsonrpc_errors MSG_JSONRPC_ERRORS;
 /* Private function prototypes -----------------------------------------------*/
 /* Private functions ---------------------------------------------------------*/
 
-void tskLedBlinkTask(void *pvParameters)
-{
-	int i;
-	//char buffer[100];
-	Led_TypeDef led = (Led_TypeDef) pvParameters;
-	while (1)
-	  {
-			STM_EVAL_LEDToggle(led);
-			for(i=0;i<(0x100000 / (led + 1));i++);
-//			printf("READY\n");
-//			fputs("TEST", stdout);
-//			fputs("TEST", stderr);
-//			fprintf(stderr, "%d", 1);
-//			scanf( "%s", buffer);
-//			fputs("TEST", (FILE*) pvParameters);
-//			char *buf = (char *) pvPortMalloc(3000* sizeof(char));
-//			free(buf);
-			taskYIELD();
-	  }
-
-
-}
-
-/*
-void sendDataBack(uint8_t msgBuffer[MSG_BUFFER_SIZE], uint8_t msgLen) {
-	if (bDeviceState == CONFIGURED)
-	{
-		xSemaphoreTake( xLogMutex, portMAX_DELAY );
-		{
-			if (bDeviceState == CONFIGURED)
-			{
-				if (packet_sent == 1)
-				{
-					CDC_Send_DATA (msgBuffer, msgLen);
-				}
-			}
-
-		}
-		xSemaphoreGive( xLogMutex );
-	}
-}
-
-
-inline
-void clearCharBuffer(char * buffer, size_t arraySize) {
-	int i;
-	for (i = 0; i < arraySize; i++) {
-		buffer[i] = 0;
-	}
-}
-*/
-//bool json_token_streq(char *js, jsmntok_t *t, char *s)
-//{
-//    return (strncmp(js + t->start, s, t->end - t->start) == 0
-//            && strlen(s) == (size_t) (t->end - t->start));
-//}
-//
-//char * json_token_tostr(char *js, jsmntok_t *t)
-//{
-//	static char string[MSG_BUFFER_SIZE];
-//	int i,j;
-//
-//	clearCharBuffer(string, MSG_BUFFER_SIZE);
-//	for(i = 0, j = t->start; j < t->end; i++, j++) {
-//		string[i] = js[j];
-//	}
-//	string[++i] = '\0';
-//    return string;
-//}
 inline
 int isJsonRPCVersion2_0(json_t *object) {
 	if(!json_is_object(object))	return FALSE; 	 /* may be also array if it is batch request, not implemented yet */
@@ -461,11 +392,26 @@ void tskUSBReader(void *pvParameters) {
 						continue;
 					}
 
-					terminator = strchr(temp->value, EOT);
+					terminator = strchr(temp->value, EOT_CHAR);
 					if( terminator != NULL) {
 						/* remove EOT character from the end */
 						strbuffer_pop(temp);
 						temp->value[temp->length] = '\0';
+
+						/* Check if user requested help message */
+						if( (strcmp(temp->value, "--help") == 0) ||
+							(strcmp(temp->value, "-h") == 0) )
+						{
+							strbuffer_t *callHelp = strbuffer_new();
+							strbuffer_append(callHelp, "{\"jsonrpc\":\"2.0\",\"method\":\"system.help\",\"id\": null}");
+							incomePacket = createNewIncomePacketFromStr(&callHelp, taskName, tempSize);
+							if(!incomePacket)
+								continue;
+							xStatus = 0;
+							while(xStatus != pdPASS) {
+								xStatus = xQueueSendToBack( usbIncomeQueue, &incomePacket, (portTickType) QUEUE_SEND_WAIT_TIMEOUT );
+							}
+						}
 
 						incomePacket = createNewIncomePacketFromStr(&temp, taskName, tempSize);
 						if(!incomePacket)
@@ -511,21 +457,6 @@ void tskUSBReader(void *pvParameters) {
 							snprintf(tempSize, BUFF_SIZE, "%s ", taskName);
 							logger(LEVEL_WARN, tempSize);
 							logger(LEVEL_WARN, MSG_MAINTASKS.tskUSBReader.incoming_buffer_overflow);
-						}
-						/* Check if user request help message */
-						if( (strstr(temp->value, "help") != NULL) ||
-							(strstr(temp->value, "system.help") != NULL) ) {
-							strbuffer_destroy(&temp);
-
-							strbuffer_t *callHelp = strbuffer_new();
-							strbuffer_append(callHelp, "{\"jsonrpc\":\"2.0\",\"method\":\"system.help\",\"id\": null}");
-							incomePacket = createNewIncomePacketFromStr(&callHelp, taskName, tempSize);
-							if(!incomePacket)
-								continue;
-							xStatus = 0;
-							while(xStatus != pdPASS) {
-								xStatus = xQueueSendToBack( usbIncomeQueue, &incomePacket, (portTickType) QUEUE_SEND_WAIT_TIMEOUT );
-							}
 						}
 					}
 				}

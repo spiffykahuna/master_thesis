@@ -89,6 +89,7 @@ void logger(log_level_t level, char *msg) {
 		}
 
 		strbuffer_append(logMsg, msg);
+		strbuffer_append(logMsg, "\n");
 
 		system_msg_t *systemMsg = system_msg_new(MSG_TYPE_LOGGING);
 		systemMsg->logMsg = logMsg;

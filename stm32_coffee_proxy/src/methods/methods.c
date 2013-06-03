@@ -9,6 +9,8 @@
 
 #define METHOD_IS(actual, expected)		(strcmp((actual), (expected)) == 0)
 
+extern xQueueHandle  systemMsgQueue;
+
 //extern msg_methods MSG_METHODS;
 extern msg_jsonrpc_errors MSG_JSONRPC_ERRORS;
 extern char  error_space[ERROR_BUFFER_SIZE];
@@ -87,6 +89,38 @@ json_t * subtract(json_t **requestJson) {
 	return responseJson;
 }
 
+json_t * getSystemHelp(json_t **requestJson) {
+	json_int_t id = json_integer_value(json_object_get(*requestJson, "id"));
+	transport_type_t transport = json_integer_value(json_object_get(*requestJson, "transport"));
+	json_decref(*requestJson);
+
+	snprintf(error_space, ERROR_BUFFER_SIZE, "getSystemHelp : Requested help message id = %d", (int) id);
+	logger(LEVEL_INFO, error_space);
+	json_t *responseJson = NULL;
+
+	system_msg_t * helpMsg = system_msg_new(MSG_TYPE_PRINT_HELP);
+	helpMsg->transport = transport;
+
+	int result = system_msg_add_to_queue(helpMsg);
+	if(!result) {
+		snprintf(error_space, ERROR_BUFFER_SIZE, "getSystemHelp : Unable to add system message. Request id = %d", (int) id);
+		logger(LEVEL_INFO, error_space);
+		responseJson = create_response_error(JSONRPC_SERVER_ERROR, MSG_JSONRPC_ERRORS.server_error);
+		json_object_set_new(responseJson, "id", json_integer(id));
+		json_object_set_new(responseJson, "transport", json_integer(transport));
+
+		return responseJson;
+	}
+
+	responseJson = json_object();
+	json_object_set_new(responseJson, "result", json_integer(id));
+	json_object_set_new(responseJson, "id", json_integer(id));
+	json_object_set_new(responseJson, "transport", json_integer(transport));
+
+	return responseJson;
+}
+
+
 json_t * handle_request(json_t **requestJson) {
 	json_t *responseJson = NULL;
 	json_t *methodNameObj = NULL;
@@ -107,6 +141,9 @@ json_t * handle_request(json_t **requestJson) {
 
 	if(methodName[0] != '\0') {
 		if(METHOD_IS("subtract", methodName)) { responseJson = subtract(requestJson);}
+		if(METHOD_IS("system.help", methodName)) { responseJson = getSystemHelp(requestJson);}
+
+
 
 
 	} else {
