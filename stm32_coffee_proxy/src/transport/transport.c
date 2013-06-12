@@ -11,6 +11,8 @@
 char error_space[ERROR_BUFFER_SIZE];
 
 extern xQueueHandle  usbOutComeQueue;
+extern xSemaphoreHandle xUSBWriteMutex;
+extern xSemaphoreHandle xUSBReadSemaphore;
 
 //inline
 //char * format_error_code(proxy_error_t errorCode) {
@@ -52,7 +54,7 @@ inline
 void send_data_to_client(transport_type_t transport, char *data, size_t dataLength) {
 	switch(transport) {
 	case TRANSPORT_USB:
-		write_usb(data, dataLength);
+			write_usb(data, dataLength);
 		break;
 
 	default:
@@ -87,3 +89,70 @@ char * transport_type_to_str(transport_type_t transport) {
 	default:				return "TRANSPORT_UNKNOWN";
 	}
 }
+
+inline
+int wait_for_semaphore(xSemaphoreHandle semaphore) {
+	portBASE_TYPE xStatus;
+	int retries = 10;
+	while(retries--) {
+		xStatus = xSemaphoreTake(semaphore, QUEUE_RECEIVE_WAIT_TIMEOUT);
+		if(xStatus == pdPASS) {
+			return xStatus;
+		} else {
+			vTaskDelay( SYSTEM_TASK_DELAY );
+		}
+	}
+
+	return xStatus;
+}
+
+inline
+int transport_lock(transport_type_t transport, transport_direction_t direction) {
+	switch(direction) {
+		case DIRECTION_INPUT:
+			switch(transport) {
+				case TRANSPORT_USB:		return wait_for_semaphore(xUSBReadSemaphore);
+
+
+
+				default:				return pdFALSE;
+			}
+			break;
+
+		case DIRECTION_OUTPUT:
+			switch(transport) {
+				case TRANSPORT_USB:		return wait_for_semaphore(xUSBWriteMutex);
+				default:				return pdFALSE;
+			}
+			break;
+		default:	return pdFALSE;
+	}
+
+	return pdFALSE;
+}
+
+inline
+int transport_unlock(transport_type_t transport, transport_direction_t direction) {
+	switch(direction) {
+		case DIRECTION_INPUT:
+			switch(transport) {
+				case TRANSPORT_USB:		return xSemaphoreGive(xUSBReadSemaphore);
+
+
+
+				default:				return pdFALSE;
+			}
+			break;
+
+		case DIRECTION_OUTPUT:
+			switch(transport) {
+				case TRANSPORT_USB:		return xSemaphoreGive(xUSBWriteMutex);
+				default:				return pdFALSE;
+			}
+			break;
+		default:	return pdFALSE;
+	}
+
+	return pdFALSE;
+}
+

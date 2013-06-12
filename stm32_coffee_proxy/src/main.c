@@ -53,7 +53,9 @@ USART_InitTypeDef USART_InitStructure;
 
 xSemaphoreHandle xLogMutex;
 
-xSemaphoreHandle xUSBSemaphore = NULL;
+xSemaphoreHandle xUSBReadSemaphore = NULL;
+xSemaphoreHandle xUSBWriteMutex = NULL;
+
 xQueueHandle  usbIncomeQueue = NULL;
 xQueueHandle  usbOutComeQueue = NULL;
 
@@ -118,7 +120,9 @@ void vApplicationStackOverflowHook( xTaskHandle pxTask, signed char *pcTaskName 
 }
 
 void vApplicationMallocFailedHook( void ) {
-	log_func( "MALLOC FAILED IN TASK\r\n");
+	static char buffer[64];
+	snprintf(buffer, 64,"MALLOC FAILED IN TASK: %s \r\n", pcTaskGetTaskName(NULL) );
+	log_func(buffer);
 	for( ;; );
 }
 /*-----------------------------------------------------------*/
@@ -174,8 +178,13 @@ void USB_initialize(void)
 inline
 int initUSBTransport(void) {
 	portBASE_TYPE xStatus;
-	vSemaphoreCreateBinary( xUSBSemaphore );
-	if( xUSBSemaphore == NULL ) {
+	vSemaphoreCreateBinary( xUSBReadSemaphore );
+	if( xUSBReadSemaphore == NULL ) {
+		return ERROR;
+	};
+
+	xUSBWriteMutex = xSemaphoreCreateMutex( );
+	if( xUSBWriteMutex == NULL ) {
 		return ERROR;
 	};
 
@@ -202,6 +211,7 @@ int initUSBTransport(void) {
 	writerConfig.dataQueue = usbOutComeQueue;
 	writerConfig.queueTimeout = QUEUE_RECEIVE_WAIT_TIMEOUT;
 	writerConfig.write_func = log_usb;
+	writerConfig.writeMutex = xUSBWriteMutex;
 
 	xStatus  = xTaskCreate( tskAbstractWriter, ( signed char * ) "tskUSBWriter", configMINIMAL_STACK_SIZE , (void *) &writerConfig, PRIORITY_USB_WRITER_TASK, NULL );
 	if(xStatus != pdPASS) {

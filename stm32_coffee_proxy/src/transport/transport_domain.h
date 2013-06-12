@@ -19,4 +19,9 @@ typedef struct _packet_t {
 	strbuffer_t		 *jsonDoc;
 } packet_t;
 
+typedef enum _transport_direction_t {
+	DIRECTION_INPUT=1,
+	DIRECTION_OUTPUT=2,
+} transport_direction_t;
+
 #endif /* TRANSPORT_TYPE_H_ */

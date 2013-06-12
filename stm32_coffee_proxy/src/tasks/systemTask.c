@@ -1,6 +1,8 @@
 #include "systemTask.h"
 
 xQueueHandle  systemMsgQueue = NULL;
+
+
 extern log_func_t log_func;
 
 void tskSystem(void *pvParameters) {
@@ -11,20 +13,21 @@ void tskSystem(void *pvParameters) {
 	portBASE_TYPE xStatus;
 
 	portTickType xLastWakeTime = xTaskGetTickCount();
-	//
+
 	while(1) {
 		if(uxQueueMessagesWaiting(systemMsgQueue) > 0) {
-
 			xStatus = xQueueReceive( systemMsgQueue, &sysMsg, (portTickType) QUEUE_RECEIVE_WAIT_TIMEOUT );
 			if( (xStatus == pdPASS) && sysMsg) {
 				switch(sysMsg->msgType) {
 				case MSG_TYPE_LOGGING:
 					if(sysMsg->logMsg && sysMsg->logMsg->value) {
-						strbuffer_t * tempos = sysMsg->logMsg;
-						log_func(sysMsg->logMsg->value);
+						if(transport_lock(TRANSPORT_USB, DIRECTION_OUTPUT) == pdPASS) {
+							log_func(sysMsg->logMsg->value);
+							transport_unlock(TRANSPORT_USB, DIRECTION_OUTPUT);
+						}
 					}
-
 					break;
+				// TODO system dynamic properties ( json object maybe or plain structure with mutex)
 				default:
 					break;
 				}
@@ -64,8 +67,14 @@ void tskSystem(void *pvParameters) {
 //		siprintf(tempSize, "%s STACK: %d\n\r", taskName, (int) uxTaskGetStackHighWaterMark( NULL ));
 //		logger(LEVEL_DEBUG, tempSize);
 		//memset(tempSize, 0, BUFF_SIZE);
+
+
+
 		snprintf(tempSize, 32, "%s FREE: %d\n\r", taskName, xPortGetFreeHeapSize());
-		log_func(tempSize);
+		if(transport_lock(TRANSPORT_USB, DIRECTION_OUTPUT) == pdPASS) {
+			log_func(tempSize);
+			transport_unlock(TRANSPORT_USB, DIRECTION_OUTPUT);
+		}
 //
 //		memset(tempSize, 0, BUFF_SIZE);
 //		siprintf(tempSize, "%s STACK: %d\n\r", taskName, (int) uxTaskGetStackHighWaterMark( NULL ));
@@ -122,4 +131,15 @@ int system_msg_add_to_queue(system_msg_t *sysMsg) {
 	}
 
 	return (xStatus == pdPASS);
+}
+
+inline
+void system_flush_messages() {
+	while(1) {
+		if(uxQueueMessagesWaiting(systemMsgQueue) > 0) {
+			vTaskDelay( SYSTEM_TASK_DELAY );
+		} else {
+			break;
+		}
+	}
 }

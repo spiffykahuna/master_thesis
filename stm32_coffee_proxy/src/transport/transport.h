@@ -31,4 +31,10 @@ void report_error_to_sender(transport_type_t transport,const char *msgFormat, ..
 inline
 char * transport_type_to_str(transport_type_t transport);
 
+inline
+int transport_lock(transport_type_t transport, transport_direction_t direction);
+
+inline
+int transport_unlock(transport_type_t transport, transport_direction_t direction);
+
 #endif /* TRANSPORT_H_ */

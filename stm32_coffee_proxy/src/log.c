@@ -20,7 +20,7 @@ log_func_t log_func = log_d;	/* <== specify logging function here*/
 inline
 void sendUsbPacket(char* str, size_t size) {
 	while (packet_sent != 1) {
-		vTaskDelay(100 / portTICK_RATE_MS);
+		vTaskDelay(5 / portTICK_RATE_MS);
 	}
 	CDC_Send_DATA((uint8_t*) str, size);
 }
@@ -31,7 +31,7 @@ int log_d(char *str)
 	size_t size = strlen(str);
 	size_t i = 0;
 
-	xSemaphoreTake( xLogMutex, portMAX_DELAY );
+	xSemaphoreTake( xLogMutex, SYSTEM_TASK_DELAY );
 	{
 
 	 if (bDeviceState == CONFIGURED)
@@ -106,3 +106,7 @@ int log_usb(char *msg, size_t msgLength ) {
 	log_d(msg);
 	return SUCCESS;
 }
+
+// TODO proper logging everywhere ( on method start, finish, between on )
+// TODO	logger_format function with static buffer and mutex
+

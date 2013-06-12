@@ -44,11 +44,19 @@ void tskAbstractWriter(void *pvParameters) {
 						continue;
 					};
 					char * data = (dataPacket->jsonDoc)->value;
-					int result = write_func(data, strlen(data) + 1);
-					if(result != SUCCESS) {
-						logger(LEVEL_ERR, (char*) taskName);
-						logger(LEVEL_ERR, " : Unable to write output data\n");
+
+					int result = ERROR;
+
+					if(transport_lock(config->transport_type, DIRECTION_OUTPUT) == pdPASS) {
+						result = write_func(data, strlen(data) + 1);
+						if(result != SUCCESS) {
+							logger(LEVEL_ERR, (char*) taskName);
+							logger(LEVEL_ERR, " : Unable to write output data\n");
+						}
+						transport_unlock(config->transport_type, DIRECTION_OUTPUT);
 					}
+
+
 					packet_destroy(&dataPacket);
 				}
 			}

@@ -48,7 +48,7 @@ extern __IO uint32_t packet_receive;
 extern __IO uint8_t Receive_Buffer[VIRTUAL_COM_PORT_DATA_SIZE];
 uint32_t Receive_length;
 
-extern xSemaphoreHandle xUSBSemaphore;
+extern xSemaphoreHandle xUSBReadSemaphore;
 /* Private function prototypes -----------------------------------------------*/
 /* Private functions ---------------------------------------------------------*/
 
@@ -82,7 +82,7 @@ void EP3_OUT_Callback(void)
 
 	PMAToUserBufferCopy((unsigned char*)Receive_Buffer, ENDP3_RXADDR, Receive_length);
 
-	xSemaphoreGiveFromISR( xUSBSemaphore, &xHigherPriorityTaskWoken );
+	xSemaphoreGiveFromISR( xUSBReadSemaphore, &xHigherPriorityTaskWoken );
 
 	if( xHigherPriorityTaskWoken == pdTRUE) {
 		portYIELD();

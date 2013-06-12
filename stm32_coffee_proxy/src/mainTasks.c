@@ -19,7 +19,7 @@ extern xQueueHandle  requestQueue;
 extern xQueueHandle  responseQueue;
 
 //extern xSemaphoreHandle xLogMutex;
-extern xSemaphoreHandle xUSBSemaphore;
+extern xSemaphoreHandle xUSBReadSemaphore;
 
 extern log_func_t log_func;
 
@@ -139,7 +139,7 @@ void tskHandleResponses(void *pvParameters) {
 	//
 	//			json_t *versionObj = json_object_get(responceJson, "jsonrpc");
 	//			char * version = json_string_value(versionObj);
-
+				system_flush_messages();
 
 				char *jsonData = json_dumps(responceJson, JSON_ENCODE_ANY );
 				if(jsonData) {
@@ -148,6 +148,7 @@ void tskHandleResponses(void *pvParameters) {
 					strbuffer_append(payload, jsonData);
 					vPortFree(jsonData);
 
+					strbuffer_append(payload, "\n");
 					packet->jsonDoc = payload;
 					send_packet_to_client(packet);
 				}
@@ -176,6 +177,7 @@ void tskHandleRequests(void *pvParameters) {
 		if(uxQueueMessagesWaiting(requestQueue) > 0) {
 			xStatus = xQueueReceive( requestQueue, &requestJson, (portTickType) QUEUE_RECEIVE_WAIT_TIMEOUT );
 			if( (xStatus == pdPASS) && requestJson) {
+				system_flush_messages();
 
 				idObj = json_object_get(requestJson, "id");
 				id = json_integer_value(idObj);
@@ -189,6 +191,8 @@ void tskHandleRequests(void *pvParameters) {
 				responseJson = handle_request(&requestJson);
 				json_decref(requestJson);
 				if(responseJson) {
+
+					system_flush_messages();
 
 					idObj = json_object_get(responseJson, "id");
 					id = json_integer_value(idObj);
@@ -242,6 +246,8 @@ void tskParseJson(void *pvParameters) {
 			if( (xStatus == pdPASS) && incomePacket) {
 				snprintf(error_space, ERROR_BUFFER_SIZE, "%s :  Received packet. len = %d\n", taskName, incomePacket->jsonDoc->length );
 				logger(LEVEL_INFO, error_space);
+
+				system_flush_messages();
 
 				requestJson = parseJsonPacket(&incomePacket);
 				if(requestJson) {
@@ -347,7 +353,7 @@ void tskUSBReader(void *pvParameters) {
 
 	while (1) {
 		if (bDeviceState == CONFIGURED && packet_receive == 1) {
-			if( xSemaphoreTake( xUSBSemaphore, portMAX_DELAY ) == pdTRUE ) {
+			if( xSemaphoreTake( xUSBReadSemaphore, SYSTEM_TASK_DELAY ) == pdTRUE ) {
 				if(Receive_length  != 0) {
 					if(!temp) {
 						temp = strbuffer_new();
@@ -402,6 +408,8 @@ void tskUSBReader(void *pvParameters) {
 						if( (strcmp(temp->value, "--help") == 0) ||
 							(strcmp(temp->value, "-h") == 0) )
 						{
+							strbuffer_destroy(&temp);
+
 							strbuffer_t *callHelp = strbuffer_new();
 							strbuffer_append(callHelp, "{\"jsonrpc\":\"2.0\",\"method\":\"system.help\",\"id\": null}");
 							incomePacket = createNewIncomePacketFromStr(&callHelp, taskName, tempSize);
@@ -411,6 +419,7 @@ void tskUSBReader(void *pvParameters) {
 							while(xStatus != pdPASS) {
 								xStatus = xQueueSendToBack( usbIncomeQueue, &incomePacket, (portTickType) QUEUE_SEND_WAIT_TIMEOUT );
 							}
+							continue;
 						}
 
 						incomePacket = createNewIncomePacketFromStr(&temp, taskName, tempSize);

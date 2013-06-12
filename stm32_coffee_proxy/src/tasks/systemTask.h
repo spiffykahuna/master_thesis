@@ -39,5 +39,7 @@ int system_msg_add_to_queue(system_msg_t *sysMsg);
 
 void tskSystem(void *pvParameters);
 
+inline
+void system_flush_messages();
 
 #endif /* SYSTEMTASK_H_ */

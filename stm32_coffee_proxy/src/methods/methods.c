@@ -98,25 +98,43 @@ json_t * getSystemHelp(json_t **requestJson) {
 	logger(LEVEL_INFO, error_space);
 	json_t *responseJson = NULL;
 
-	system_msg_t * helpMsg = system_msg_new(MSG_TYPE_PRINT_HELP);
-	helpMsg->transport = transport;
+	extern const char *SERVICE_SCHEMA;
+	logger(LEVEL_INFO, "getSystemHelp : Starting to send service schema");
 
-	int result = system_msg_add_to_queue(helpMsg);
-	if(!result) {
-		snprintf(error_space, ERROR_BUFFER_SIZE, "getSystemHelp : Unable to add system message. Request id = %d", (int) id);
-		logger(LEVEL_INFO, error_space);
-		responseJson = create_response_error(JSONRPC_SERVER_ERROR, MSG_JSONRPC_ERRORS.server_error);
-		json_object_set_new(responseJson, "id", json_integer(id));
-		json_object_set_new(responseJson, "transport", json_integer(transport));
+	system_flush_messages();
 
-		return responseJson;
+	if(transport_lock(transport, DIRECTION_OUTPUT) == pdPASS) {
+		snprintf(error_space, ERROR_BUFFER_SIZE, "{\"jsonrpc\": \"2.0\", \"id\": %d, \"result\": ", (int) id);
+		send_data_to_client(transport, error_space, strlen(error_space));
+
+		send_data_to_client(transport, SERVICE_SCHEMA, strlen(SERVICE_SCHEMA));
+		snprintf(error_space, ERROR_BUFFER_SIZE, "}\n");
+		send_data_to_client(transport, error_space, strlen(error_space));
+
+		transport_unlock(transport, DIRECTION_OUTPUT);
+	} else {
+		return create_response_error(JSONRPC_SERVER_ERROR, MSG_JSONRPC_ERRORS.server_error);
 	}
+	logger(LEVEL_INFO, "Finished to send service schema");
+
+
+
+//	system_msg_t * helpMsg = system_msg_new(MSG_TYPE_PRINT_HELP);
+//	helpMsg->transport = transport;
+//
+//	int result = system_msg_add_to_queue(helpMsg);
+//	if(!result) {
+//		snprintf(error_space, ERROR_BUFFER_SIZE, "getSystemHelp : Unable to add system message. Request id = %d", (int) id);
+//		logger(LEVEL_INFO, error_space);
+//		responseJson = create_response_error(JSONRPC_SERVER_ERROR, MSG_JSONRPC_ERRORS.server_error);
+//		json_object_set_new(responseJson, "id", json_integer(id));
+//		json_object_set_new(responseJson, "transport", json_integer(transport));
+//
+//		return responseJson;
+//	}
 
 	responseJson = json_object();
-	json_object_set_new(responseJson, "result", json_integer(id));
-	json_object_set_new(responseJson, "id", json_integer(id));
-	json_object_set_new(responseJson, "transport", json_integer(transport));
-
+	json_object_set_new(responseJson, "no_reply", json_true());
 	return responseJson;
 }
 
@@ -133,6 +151,8 @@ json_t * handle_request(json_t **requestJson) {
 	if(!*requestJson) {
 		return create_response_error(JSONRPC_INVALID_REQUEST, MSG_JSONRPC_ERRORS.invalid_request);
 	}
+
+	system_flush_messages();
 
 	json_int_t id = json_integer_value(json_object_get(*requestJson, "id"));
 	transport_type_t transport = json_integer_value(json_object_get(*requestJson, "transport"));
@@ -165,6 +185,8 @@ json_t * handle_request(json_t **requestJson) {
 		return errorObj;
 	}
 
+	system_flush_messages();
+
 	if(!responseJson) {
 		json_decref(*requestJson);
 
@@ -172,7 +194,6 @@ json_t * handle_request(json_t **requestJson) {
 //		strbuffer_append(errorMsg, "handle_request method not found: ");
 //		strbuffer_append(errorMsg, methodName);
 //		strbuffer_append(errorMsg, "\n");
-
 
 
 		snprintf(error_space, ERROR_BUFFER_SIZE, "handle_request method not found: %s\n", methodName);
@@ -183,6 +204,12 @@ json_t * handle_request(json_t **requestJson) {
 		json_object_set_new(errorObj, "id", json_integer(id));
 		json_object_set_new(errorObj, "transport", json_integer(transport));
 		return errorObj;
+	}
+
+	if(json_object_get(responseJson, "no_reply")) {
+		/* Mehtod was notification only */
+		json_decref(responseJson);
+		return NULL;
 	}
 
 	json_object_del(responseJson, "params");

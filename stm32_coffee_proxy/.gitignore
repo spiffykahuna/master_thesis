@@ -5,3 +5,4 @@ json*
 .cproject
 .project
 Debug/
+*.log
