@@ -24,6 +24,7 @@
 #include "messages.h"
 
 #include "tasks/systemTask.h"
+#include "transport/transport.h"
 
 
 #include "hw_config.h"
@@ -62,5 +63,7 @@ inline
 void sendUsbPacket(char* str, size_t size);
 
 void logger(log_level_t level, char *msg);
+
+void logger_format(log_level_t level, char *msgFormat, ...);
 
 #endif  /*__LOG_H*/

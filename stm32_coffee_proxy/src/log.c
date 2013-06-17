@@ -14,6 +14,8 @@ __IO uint8_t Send_Buffer[VIRTUAL_COM_PORT_DATA_SIZE] ;
 //extern __IO  uint8_t Receive_Buffer[VIRTUAL_COM_PORT_DATA_SIZE];
 //extern __IO  uint32_t Receive_length ;
 
+static char logBuffer[STRING_BUFFER_SIZE];
+
 
 log_func_t log_func = log_d;	/* <== specify logging function here*/
 
@@ -31,8 +33,8 @@ int log_d(char *str)
 	size_t size = strlen(str);
 	size_t i = 0;
 
-	xSemaphoreTake( xLogMutex, SYSTEM_TASK_DELAY );
-	{
+//	xSemaphoreTake( xLogMutex, SYSTEM_TASK_DELAY );
+//	{
 
 	 if (bDeviceState == CONFIGURED)
 	 {
@@ -51,8 +53,8 @@ int log_d(char *str)
 			 sendUsbPacket(str, strlen(str));
 		 }
 	 }
-	}
-	xSemaphoreGive( xLogMutex );
+//	}
+//	xSemaphoreGive( xLogMutex );
 	return SUCCESS;
 }
 
@@ -105,6 +107,24 @@ inline
 int log_usb(char *msg, size_t msgLength ) {
 	log_d(msg);
 	return SUCCESS;
+}
+
+void logger_format(log_level_t level, char *msgFormat, ...) {
+
+	va_list args;
+
+	if(wait_for_semaphore(xLogMutex) == pdPASS) {
+		// format error
+			memset(logBuffer, 0, STRING_BUFFER_SIZE);
+			va_start (args, msgFormat );
+			vsnprintf(logBuffer, STRING_BUFFER_SIZE, msgFormat, args);
+			va_end(args);
+
+		logger(level, logBuffer);
+		xSemaphoreGive(xLogMutex);
+	}
+
+
 }
 
 // TODO proper logging everywhere ( on method start, finish, between on )

@@ -14,4 +14,6 @@
 inline strbuffer_t * strbuffer_new(void);
 inline void strbuffer_destroy(strbuffer_t **string);
 
+inline char* int_to_string(int value);
+
 #endif /* STRING_UTILS_H_ */

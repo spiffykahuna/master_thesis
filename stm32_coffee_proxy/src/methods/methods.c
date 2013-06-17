@@ -94,8 +94,8 @@ json_t * getSystemHelp(json_t **requestJson) {
 	transport_type_t transport = json_integer_value(json_object_get(*requestJson, "transport"));
 	json_decref(*requestJson);
 
-	snprintf(error_space, ERROR_BUFFER_SIZE, "getSystemHelp : Requested help message id = %d", (int) id);
-	logger(LEVEL_INFO, error_space);
+	logger_format(LEVEL_INFO, "getSystemHelp : Requested help message id = %d", (int) id);
+
 	json_t *responseJson = NULL;
 
 	extern const char *SERVICE_SCHEMA;
@@ -104,12 +104,19 @@ json_t * getSystemHelp(json_t **requestJson) {
 	system_flush_messages();
 
 	if(transport_lock(transport, DIRECTION_OUTPUT) == pdPASS) {
-		snprintf(error_space, ERROR_BUFFER_SIZE, "{\"jsonrpc\": \"2.0\", \"id\": %d, \"result\": ", (int) id);
-		send_data_to_client(transport, error_space, strlen(error_space));
+		strbuffer_t *schemaMsg = strbuffer_new();
+
+		strbuffer_append(schemaMsg, "{\"jsonrpc\": \"2.0\", \"id\": " );
+		strbuffer_append(schemaMsg, int_to_string((int) id));
+		strbuffer_append(schemaMsg, ", \"result\": ");
+		send_data_to_client(transport, schemaMsg->value, schemaMsg->length);
 
 		send_data_to_client(transport, SERVICE_SCHEMA, strlen(SERVICE_SCHEMA));
-		snprintf(error_space, ERROR_BUFFER_SIZE, "}\n");
-		send_data_to_client(transport, error_space, strlen(error_space));
+
+		strbuffer_clear(schemaMsg);
+		strbuffer_append(schemaMsg, "}\n");
+		send_data_to_client(transport, schemaMsg->value, schemaMsg->length);
+		strbuffer_destroy(&schemaMsg);
 
 		transport_unlock(transport, DIRECTION_OUTPUT);
 	} else {
@@ -190,15 +197,7 @@ json_t * handle_request(json_t **requestJson) {
 	if(!responseJson) {
 		json_decref(*requestJson);
 
-//		errorMsg = strbuffer_new();
-//		strbuffer_append(errorMsg, "handle_request method not found: ");
-//		strbuffer_append(errorMsg, methodName);
-//		strbuffer_append(errorMsg, "\n");
-
-
-		snprintf(error_space, ERROR_BUFFER_SIZE, "handle_request method not found: %s\n", methodName);
-		logger(LEVEL_WARN, error_space);
-//		strbuffer_destroy(&errorMsg);
+		logger_format(LEVEL_WARN, "handle_request method not found: %s\n", methodName);
 
 		errorObj = create_response_error(JSONRPC_METHOD_NOT_FOUND, MSG_JSONRPC_ERRORS.method_not_found);
 		json_object_set_new(errorObj, "id", json_integer(id));

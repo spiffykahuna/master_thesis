@@ -29,3 +29,11 @@ void strbuffer_destroy(strbuffer_t **string) {
 		*string = NULL;
 	}
 }
+
+inline
+char* int_to_string(int value) {
+	char buffer[32];
+	snprintf(buffer, 32, "%d", value);
+
+	return buffer;
+}

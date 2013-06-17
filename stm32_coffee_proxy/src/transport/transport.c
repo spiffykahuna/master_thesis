@@ -73,6 +73,7 @@ void report_error_to_sender(transport_type_t transport, const char *msgFormat, .
 	va_end (args);
 
 	send_data_to_client(transport, error_space, strlen(error_space));
+	//TODO uncomment here
 }
 
 inline

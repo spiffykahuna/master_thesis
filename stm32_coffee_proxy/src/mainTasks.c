@@ -50,10 +50,20 @@ int isJsonRPCVersion2_0(json_t *object) {
 inline
 void format_error_text(strbuffer_t *errorText, json_error_t *error) {
 	if(errorText && error) {
-		snprintf(error_space,ERROR_BUFFER_SIZE,
-				"Text: %s    Source: %s    Line: %d    Column: %d   Position: %d",
-				error->text, error->source, error->line, error->column, error->position);
-		strbuffer_append(errorText, error_space);
+		strbuffer_append(errorText, "Text: ");
+		strbuffer_append(errorText, error->text);
+
+		strbuffer_append(errorText, "    Source: ");
+		strbuffer_append(errorText, error->source);
+
+		strbuffer_append(errorText, "    Line: ");
+		strbuffer_append(errorText, int_to_string(error->line));
+
+		strbuffer_append(errorText, "    Column: ");
+		strbuffer_append(errorText, int_to_string(error->column));
+
+		strbuffer_append(errorText, "    Position: ");
+		strbuffer_append(errorText, int_to_string(error->position));
 	}
 }
 
@@ -64,12 +74,10 @@ json_t * parseJsonPacket(packet_t ** jsonPacket) {
 
 	transport_type_t transport = (*jsonPacket)->transport;
 
-	snprintf(error_space, ERROR_BUFFER_SIZE,
+	logger_format(LEVEL_INFO,
 			"parseJsonPacket    Received json packet: transport=%s    length=%d\n",
 			transport_type_to_str(transport), (*jsonPacket)->jsonDoc->length
 	);
-	logger(LEVEL_INFO, error_space);
-
 
 	root = json_loads((*jsonPacket)->jsonDoc->value, 0, &error);
 	packet_destroy(jsonPacket);
@@ -185,8 +193,7 @@ void tskHandleRequests(void *pvParameters) {
 				methodObj = json_object_get(requestJson, "method");
 				methodName = json_string_value(methodObj);
 
-				snprintf(error_space, ERROR_BUFFER_SIZE, "%s :  Received request. id = %d    method = %s\n", taskName, (int) id, methodName );
-				logger(LEVEL_INFO, error_space);
+				logger_format(LEVEL_INFO, "%s :  Received request. id = %d    method = %s\n", taskName, (int) id, methodName );
 
 				responseJson = handle_request(&requestJson);
 				json_decref(requestJson);
@@ -197,10 +204,7 @@ void tskHandleRequests(void *pvParameters) {
 					idObj = json_object_get(responseJson, "id");
 					id = json_integer_value(idObj);
 
-
-
-					snprintf(error_space, ERROR_BUFFER_SIZE, "%s :  Received response. id = %d\n", taskName, (int)id);
-					logger(LEVEL_INFO, error_space);
+					logger_format(LEVEL_INFO, "%s :  Received response. id = %d\n", taskName, (int) id);
 
 					xStatus = xQueueSendToBack( responseQueue, &responseJson, (portTickType) QUEUE_SEND_WAIT_TIMEOUT );
 					if( xStatus != pdPASS ){
@@ -220,8 +224,7 @@ void tskHandleRequests(void *pvParameters) {
 							);
 						}
 						if(idStr) vPortFree(idStr);
-						snprintf(error_space, ERROR_BUFFER_SIZE, "%s :  Unable to add response to queue. id = %d\tmethod = %s\n", taskName, (int) id, methodName );
-						logger(LEVEL_INFO, error_space);
+						logger_format(LEVEL_INFO, "%s :  Unable to add response to queue. id = %d\tmethod = %s\n", taskName, (int) id, methodName );
 					}
 
 				}
@@ -244,17 +247,12 @@ void tskParseJson(void *pvParameters) {
 		if(uxQueueMessagesWaiting(usbIncomeQueue) > 0) {
 			xStatus = xQueueReceive( usbIncomeQueue, &incomePacket, (portTickType) QUEUE_RECEIVE_WAIT_TIMEOUT );
 			if( (xStatus == pdPASS) && incomePacket) {
-				snprintf(error_space, ERROR_BUFFER_SIZE, "%s :  Received packet. len = %d\n", taskName, incomePacket->jsonDoc->length );
-				logger(LEVEL_INFO, error_space);
-
+				logger_format(LEVEL_INFO, "%s :  Received packet. len = %d\n", taskName, incomePacket->jsonDoc->length);
 				system_flush_messages();
 
 				requestJson = parseJsonPacket(&incomePacket);
 				if(requestJson) {
-					snprintf(error_space, ERROR_BUFFER_SIZE,
-						"%s :  Parsing packet was sucessful\n", taskName
-					);
-					logger(LEVEL_INFO, error_space);
+					logger_format(LEVEL_INFO, "%s :  Parsing packet was sucessful\n", taskName);
 
 					json_incref(requestJson);
 					xStatus = xQueueSendToBack( requestQueue, &requestJson, (portTickType) QUEUE_SEND_WAIT_TIMEOUT );

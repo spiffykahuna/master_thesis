@@ -32,6 +32,9 @@ inline
 char * transport_type_to_str(transport_type_t transport);
 
 inline
+int wait_for_semaphore(xSemaphoreHandle semaphore);
+
+inline
 int transport_lock(transport_type_t transport, transport_direction_t direction);
 
 inline
