@@ -18,12 +18,8 @@ extern xQueueHandle  usbIncomeQueue;
 extern xQueueHandle  requestQueue;
 extern xQueueHandle  responseQueue;
 
-//extern xSemaphoreHandle xLogMutex;
 extern xSemaphoreHandle xUSBReadSemaphore;
 
-extern log_func_t log_func;
-
-extern char  error_space[ERROR_BUFFER_SIZE];
 extern const msg_maintasks MSG_MAINTASKS;
 extern const msg_jsonrpc_errors MSG_JSONRPC_ERRORS;
 /* Private function prototypes -----------------------------------------------*/
@@ -75,15 +71,14 @@ json_t * parseJsonPacket(packet_t ** jsonPacket) {
 	transport_type_t transport = (*jsonPacket)->transport;
 
 	logger_format(LEVEL_INFO,
-			"parseJsonPacket    Received json packet: transport=%s    length=%d\n",
+			"parseJsonPacket    Received json packet: transport=%s    length=%d",
 			transport_type_to_str(transport), (*jsonPacket)->jsonDoc->length
 	);
 
 	root = json_loads((*jsonPacket)->jsonDoc->value, 0, &error);
-	packet_destroy(jsonPacket);
-
+	//packet_destroy(jsonPacket);
 	if(root != NULL) {
-		/*
+		/*	TODO
 			decode array or object
 			array --> batch (optional, but will be implemented only  if there will be enough resources mcu flash)
 			if batch proceed requests one by one and put the batch flag
@@ -91,7 +86,7 @@ json_t * parseJsonPacket(packet_t ** jsonPacket) {
 		if(isJsonRPCVersion2_0(root)){
 			json_t *transportCode = json_integer( (json_int_t) transport);
 			json_object_set_new(root, "transport", transportCode);
-			logger(LEVEL_INFO, "parseJsonPacket Packet parsing succeed\n");
+			logger(LEVEL_INFO, "parseJsonPacket Packet parsing succeed");
 		} else {
 			json_decref(root);
 			report_error_to_sender(
@@ -102,9 +97,10 @@ json_t * parseJsonPacket(packet_t ** jsonPacket) {
 				MSG_MAINTASKS.parseJsonPacket.invalid_jsonrpc_2_0,
 				"null"
 			);
-			//print_help(transport);
-			logger(LEVEL_WARN, "parseJsonPacket ");
-			logger(LEVEL_WARN, MSG_MAINTASKS.parseJsonPacket.invalid_jsonrpc_2_0);
+			// TODO print_help(transport);
+			logger_format(LEVEL_WARN, "%s.parseJsonPacket :  %s"
+					, pcTaskGetTaskName(NULL), MSG_MAINTASKS.parseJsonPacket.invalid_jsonrpc_2_0
+			);
 
 			return NULL;
 		}
@@ -119,9 +115,7 @@ json_t * parseJsonPacket(packet_t ** jsonPacket) {
 			errorText->value,
 			"null"
 		);
-		logger(LEVEL_WARN, "parseJsonPacket\t Packet parsing failed: ");
-		logger(LEVEL_WARN, errorText->value);
-		logger(LEVEL_WARN, "\n");
+		logger_format(LEVEL_WARN, "parseJsonPacket Packet parsing failed: %s", errorText->value);
 		strbuffer_destroy(&errorText);
 	}
 	return root;
@@ -176,9 +170,7 @@ void tskHandleRequests(void *pvParameters) {
 
 	json_t *idObj;
 	json_int_t id;
-	json_t *methodObj;
 	char* methodName;
-
 
 	portBASE_TYPE xStatus;
 	while(1) {
@@ -187,16 +179,7 @@ void tskHandleRequests(void *pvParameters) {
 			if( (xStatus == pdPASS) && requestJson) {
 				system_flush_messages();
 
-				idObj = json_object_get(requestJson, "id");
-				id = json_integer_value(idObj);
-
-				methodObj = json_object_get(requestJson, "method");
-				methodName = json_string_value(methodObj);
-
-				logger_format(LEVEL_INFO, "%s :  Received request. id = %d    method = %s\n", taskName, (int) id, methodName );
-
 				responseJson = handle_request(&requestJson);
-				json_decref(requestJson);
 				if(responseJson) {
 
 					system_flush_messages();
@@ -204,7 +187,7 @@ void tskHandleRequests(void *pvParameters) {
 					idObj = json_object_get(responseJson, "id");
 					id = json_integer_value(idObj);
 
-					logger_format(LEVEL_INFO, "%s :  Received response. id = %d\n", taskName, (int) id);
+					logger_format(LEVEL_INFO, "%s :  Received response. id = %d", taskName, (int) id);
 
 					xStatus = xQueueSendToBack( responseQueue, &responseJson, (portTickType) QUEUE_SEND_WAIT_TIMEOUT );
 					if( xStatus != pdPASS ){
@@ -224,10 +207,11 @@ void tskHandleRequests(void *pvParameters) {
 							);
 						}
 						if(idStr) vPortFree(idStr);
-						logger_format(LEVEL_INFO, "%s :  Unable to add response to queue. id = %d\tmethod = %s\n", taskName, (int) id, methodName );
+						logger_format(LEVEL_INFO, "%s :  Unable to add response to queue. id = %d   method = %s", taskName, (int) id, methodName );
 					}
 
 				}
+				json_decref(requestJson);
 			}
 		}
 		taskYIELD();
@@ -247,32 +231,29 @@ void tskParseJson(void *pvParameters) {
 		if(uxQueueMessagesWaiting(usbIncomeQueue) > 0) {
 			xStatus = xQueueReceive( usbIncomeQueue, &incomePacket, (portTickType) QUEUE_RECEIVE_WAIT_TIMEOUT );
 			if( (xStatus == pdPASS) && incomePacket) {
-				logger_format(LEVEL_INFO, "%s :  Received packet. len = %d\n", taskName, incomePacket->jsonDoc->length);
+				logger_format(LEVEL_INFO, "%s :  Received packet. len = %d   transport=%s"
+						, taskName, incomePacket->jsonDoc->length, transport_type_to_str(incomePacket->transport)
+				);
 				system_flush_messages();
 
 				requestJson = parseJsonPacket(&incomePacket);
+				packet_destroy(&incomePacket);
 				if(requestJson) {
-					logger_format(LEVEL_INFO, "%s :  Parsing packet was sucessful\n", taskName);
+					logger_format(LEVEL_INFO, "%s :  Parsing packet was successful.", taskName);
 
-					json_incref(requestJson);
+//					json_incref(requestJson);
 					xStatus = xQueueSendToBack( requestQueue, &requestJson, (portTickType) QUEUE_SEND_WAIT_TIMEOUT );
 					if( xStatus != pdPASS ){
 
 						json_object_del(requestJson, "method");
 						json_object_del(requestJson, "params");
 
-						json_t* errorObj = json_pack(
-							"{s:i, s:s, s:s}",
-							"code", (json_int_t) JSONRPC_SERVER_ERROR,
-							"message", MSG_JSONRPC_ERRORS.server_error,
-							"data", MSG_MAINTASKS.tskUSBReader.device_is_busy_timeout
-						);
+						json_t* errorObj = create_error(JSONRPC_SERVER_ERROR, MSG_JSONRPC_ERRORS.server_error);
+						json_object_set_new(errorObj, "data", json_string(MSG_MAINTASKS.tskUSBReader.device_is_busy_timeout));
 
 						json_object_set_new(requestJson, "error", errorObj);
 
-						logger(LEVEL_WARN, taskName);
-						logger(LEVEL_WARN, " ");
-						logger(LEVEL_WARN, MSG_MAINTASKS.tskUSBReader.device_is_busy_timeout);
+						logger_format(LEVEL_WARN, "%s %s", taskName, MSG_MAINTASKS.tskUSBReader.device_is_busy_timeout);
 
 						// send error back to client using output queue
 						xStatus = xQueueSendToBack( responseQueue, &requestJson, (portTickType) QUEUE_SEND_WAIT_TIMEOUT );
@@ -293,15 +274,11 @@ void tskParseJson(void *pvParameters) {
 								);
 							}
 							if(id) vPortFree(id);
-
-							logger(LEVEL_WARN, taskName);
-							logger(LEVEL_WARN, " ");
-							logger(LEVEL_WARN, MSG_MAINTASKS.tskUSBReader.device_is_busy_timeout);
+							logger_format(LEVEL_WARN, "%s %s", taskName, MSG_MAINTASKS.tskUSBReader.device_is_busy_timeout);
 						}
 					}
 				}
-				json_decref(requestJson);
-				packet_destroy(&incomePacket);
+//				json_decref(requestJson);
 			}
 		}
 		taskYIELD();
@@ -310,7 +287,7 @@ void tskParseJson(void *pvParameters) {
 
 
 inline
-packet_t * createNewIncomePacketFromStr(strbuffer_t ** temp, signed char* taskName, char* tempSize) {
+packet_t * createNewIncomePacketFromStr(strbuffer_t ** temp) {
 	packet_t *incomePacket = NULL;
 	incomePacket = packet_new(TRANSPORT_USB);
 	if(!incomePacket) {
@@ -325,14 +302,13 @@ packet_t * createNewIncomePacketFromStr(strbuffer_t ** temp, signed char* taskNa
 		packet_destroy(&incomePacket);
 		strbuffer_destroy(temp);
 
-		snprintf(tempSize, BUFF_SIZE, "%s ", taskName);
-		logger(LEVEL_WARN, tempSize);
-		logger(LEVEL_WARN, MSG_MAINTASKS.tskUSBReader.unable_to_alloc_new_json_packet);
+		logger_format(LEVEL_WARN, "%s %s", pcTaskGetTaskName(NULL), MSG_MAINTASKS.tskUSBReader.unable_to_alloc_new_json_packet);
 
 		Receive_length = 0;
 		return NULL;
 	}
-	incomePacket->jsonDoc = *temp;
+	incomePacket->jsonDoc = strbuffer_new();
+	strbuffer_append(incomePacket->jsonDoc, (*temp)->value);
 	return incomePacket;
 }
 
@@ -343,9 +319,6 @@ void tskUSBReader(void *pvParameters) {
 	portBASE_TYPE xStatus;
 	strbuffer_t *temp = NULL;
 	char *terminator;
-
-
-	static char tempSize[BUFF_SIZE];
 
 	packet_t *incomePacket = NULL;
 
@@ -368,10 +341,7 @@ void tskUSBReader(void *pvParameters) {
 						);
 						strbuffer_destroy(&temp);
 
-						snprintf(tempSize, BUFF_SIZE, "%s ", taskName);
-						logger(LEVEL_WARN, tempSize);
-						logger(LEVEL_WARN, MSG_MAINTASKS.tskUSBReader.unable_to_alloc_new_json_packet);
-
+						logger_format(LEVEL_WARN, "%s %s", taskName, MSG_MAINTASKS.tskUSBReader.unable_to_alloc_new_json_packet);
 						Receive_length = 0;
 						continue;
 					}
@@ -388,9 +358,7 @@ void tskUSBReader(void *pvParameters) {
 						);
 						strbuffer_destroy(&temp);
 
-						snprintf(tempSize, BUFF_SIZE, "%s ", taskName);
-						logger(LEVEL_WARN, tempSize);
-						logger(LEVEL_WARN, MSG_MAINTASKS.tskUSBReader.unable_to_alloc_new_json_packet);
+						logger_format(LEVEL_WARN, "%s %s", taskName, MSG_MAINTASKS.tskUSBReader.unable_to_alloc_new_json_packet);
 
 						Receive_length = 0;
 						continue;
@@ -407,10 +375,12 @@ void tskUSBReader(void *pvParameters) {
 							(strcmp(temp->value, "-h") == 0) )
 						{
 							strbuffer_destroy(&temp);
+							logger_format(LEVEL_WARN, "%s System help was requested", taskName);
 
 							strbuffer_t *callHelp = strbuffer_new();
 							strbuffer_append(callHelp, "{\"jsonrpc\":\"2.0\",\"method\":\"system.help\",\"id\": null}");
-							incomePacket = createNewIncomePacketFromStr(&callHelp, taskName, tempSize);
+							incomePacket = createNewIncomePacketFromStr(&callHelp);
+							strbuffer_destroy(&callHelp);
 							if(!incomePacket)
 								continue;
 							xStatus = 0;
@@ -420,7 +390,8 @@ void tskUSBReader(void *pvParameters) {
 							continue;
 						}
 
-						incomePacket = createNewIncomePacketFromStr(&temp, taskName, tempSize);
+						incomePacket = createNewIncomePacketFromStr(&temp);
+						strbuffer_destroy(&temp);
 						if(!incomePacket)
 							continue;
 						xStatus = xQueueSendToBack( usbIncomeQueue, &incomePacket, (portTickType) QUEUE_SEND_WAIT_TIMEOUT );
@@ -437,16 +408,13 @@ void tskUSBReader(void *pvParameters) {
 								"null" 	/* <-- id */
 							);
 
-							snprintf(tempSize, BUFF_SIZE, "%s ", taskName);
-							logger(LEVEL_WARN, tempSize);
-							logger(LEVEL_WARN, MSG_MAINTASKS.tskUSBReader.device_is_busy_timeout);
+							logger_format(LEVEL_WARN, "%s %s", taskName, MSG_MAINTASKS.tskUSBReader.device_is_busy_timeout);
 
 							Receive_length = 0;
 							continue;
 						}
 
-						snprintf(tempSize, BUFF_SIZE, "%s Received new packet( len= %d )\n\r", taskName, temp->length);
-						logger(LEVEL_DEBUG, tempSize);
+						logger_format(LEVEL_DEBUG, "%s Received new packet( len= %d )", taskName, temp->length);
 
 						temp = NULL;
 					} else {
@@ -461,9 +429,7 @@ void tskUSBReader(void *pvParameters) {
 								MSG_MAINTASKS.tskUSBReader.incoming_buffer_overflow , /* <-- data */
 								"null" 	/* <-- id */
 							);
-							snprintf(tempSize, BUFF_SIZE, "%s ", taskName);
-							logger(LEVEL_WARN, tempSize);
-							logger(LEVEL_WARN, MSG_MAINTASKS.tskUSBReader.incoming_buffer_overflow);
+							logger_format(LEVEL_WARN, "%s %s", taskName, MSG_MAINTASKS.tskUSBReader.incoming_buffer_overflow);
 						}
 					}
 				}
@@ -471,13 +437,6 @@ void tskUSBReader(void *pvParameters) {
 			}
 			CDC_Receive_DATA();
 		}
-
-
-
-
-//		snprintf(tempSize, BUFF_SIZE, "FLOAT %f\n", -555.666);
-//		log_d(tempSize);
-
 		taskYIELD();
 	}
 }

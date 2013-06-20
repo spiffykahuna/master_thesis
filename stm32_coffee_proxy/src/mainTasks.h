@@ -26,11 +26,7 @@
 #include "messages.h"
 #include "transport/transport.h"
 #include "methods/methods.h"
-//#include "parson.h"
-//#include "jsmn.h"
-//#include "json_parse/json.h"
-
-
+#include "system/error.h"
 
 /* The time between cycles of the 'check' task - which depends on whether the
 check task has detected an error or not. */

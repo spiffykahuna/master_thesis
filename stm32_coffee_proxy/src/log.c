@@ -63,7 +63,7 @@ void logger(log_level_t level, char *msg) {
 
 	strbuffer_t *logMsg = strbuffer_new();
 	if(logMsg) {
-		snprintf(temp, 32, "%d   ", (int) xTaskGetTickCount());
+		snprintf(temp, 32, "%d   %d   ", (int) xTaskGetTickCount(), (int) xPortGetFreeHeapSize());
 		strbuffer_append(logMsg, temp);
 
 		switch(level) {
@@ -123,10 +123,8 @@ void logger_format(log_level_t level, char *msgFormat, ...) {
 		logger(level, logBuffer);
 		xSemaphoreGive(xLogMutex);
 	}
-
-
 }
 
 // TODO proper logging everywhere ( on method start, finish, between on )
-// TODO	logger_format function with static buffer and mutex
+
 

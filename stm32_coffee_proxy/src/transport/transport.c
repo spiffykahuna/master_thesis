@@ -36,10 +36,11 @@ void send_packet_to_client(packet_t *packet) {
 
 	switch(packet->transport) {
 	case TRANSPORT_USB:
-		xStatus =  xQueueSendToBack( usbOutComeQueue, &packet, (portTickType) QUEUE_SEND_WAIT_TIMEOUT );
-		if( xStatus != pdPASS ){
-			// TODO Error reporting on queue full
-		}
+		do {
+			xStatus =  xQueueSendToBack( usbOutComeQueue, &packet, (portTickType) QUEUE_SEND_WAIT_TIMEOUT );
+			if(xStatus == pdPASS) { break; }
+			vTaskDelay( SYSTEM_TASK_DELAY);
+		} while( xStatus != pdPASS );
 		break;
 
 	default:

@@ -17,8 +17,6 @@
 #define MAX_INCOME_MSG_SIZE 		1024
 #define MAX_INCOME_MSG_SIZE_MSG 	"1024"	/* <== used in error message */
 
-#define TOKENS_COUNT 300
-
 /* QUEUES */
 #define INCOME_MSG_QUEUE_SIZE		10
 #define OUTCOME_MSG_QUEUE_SIZE		10

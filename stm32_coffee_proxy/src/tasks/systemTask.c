@@ -28,6 +28,7 @@ void tskSystem(void *pvParameters) {
 					}
 					break;
 				// TODO system dynamic properties ( json object maybe or plain structure with mutex)
+				// TODO dynamic system configuration
 				default:
 					break;
 				}
