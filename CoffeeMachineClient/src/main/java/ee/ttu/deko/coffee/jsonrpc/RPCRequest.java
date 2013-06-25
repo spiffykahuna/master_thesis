@@ -24,6 +24,12 @@ public class RPCRequest extends JSONRPC2Request {
         super(request.getMethod(), request.getID());
         setNamedParams(request.getNamedParams());
         setPositionalParams(request.getPositionalParams());
+
+        if(request.getNonStdAttributes() != null && request.getNonStdAttributes().size() > 0) {
+            for(Map.Entry<String, Object> attribute: request.getNonStdAttributes().entrySet()) {
+                appendNonStdAttribute(attribute.getKey(), attribute.getValue());
+            }
+        }
     }
 
     public String toJsonString(boolean prettyPrint) {

@@ -36,7 +36,7 @@ public class MessageReader implements Runnable {
         } catch (Exception e) {
             logger.error("Read loop terminated", e);
         }
-        logger.info("Reader was closed");
+        logger.info("Reader loop ended successfully");
     }
 
     private void doRun() throws IOException, InterruptedException  {
@@ -45,16 +45,16 @@ public class MessageReader implements Runnable {
 
             synchronized (this) {
                 Thread thisThread = Thread.currentThread();
-                if(thisThread.isInterrupted())  return;
-                if(readThread != thisThread)    return;
-                if(isClosed)                    return;
+                if(thisThread.isInterrupted())  break;
+                if(readThread != thisThread)    break;
+                if(isClosed)                    break;
             }
 
             int newChar = inputReader.read();
             if (newChar < 0) {
                 // EOF
                 logger.debug("End of stream appeared");
-                return;
+                break;
             }
 
             messageBuffer.append((char) newChar);
@@ -62,6 +62,11 @@ public class MessageReader implements Runnable {
                 logger.debug("Processing new line...");
                 processNewMessage(messageBuffer);
             }
+        }
+        // process buffer before exiting thread
+        if(hasNewLine(messageBuffer)) {
+            logger.debug("Processing new line...");
+            processNewMessage(messageBuffer);
         }
     }
 
