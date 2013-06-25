@@ -92,4 +92,12 @@ public class MessageReader implements Runnable {
             thread.interrupt();
         }
     }
+
+    public boolean isAlive() {
+        if(readThread != null) {
+            return readThread.isAlive();
+        } else {
+            return false;
+        }
+    }
 }
