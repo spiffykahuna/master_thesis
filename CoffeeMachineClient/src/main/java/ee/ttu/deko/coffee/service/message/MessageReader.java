@@ -1,12 +1,10 @@
 package ee.ttu.deko.coffee.service.message;
 
-import ee.ttu.deko.coffee.service.ServiceListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.Reader;
-import java.util.Set;
 
 public class MessageReader implements Runnable {
     private final static Logger logger = LoggerFactory.getLogger(MessageReader.class);
@@ -20,6 +18,9 @@ public class MessageReader implements Runnable {
     private StringBuilder messageBuffer = new StringBuilder();
 
     public MessageReader(Reader inputReader, MessageHandler messageHandler) {
+        if(inputReader == null) throw new IllegalArgumentException("Unable to create reader. Stream is null");
+        if(messageHandler == null) throw new IllegalArgumentException("Unable to create reader. Message handler is null");
+
         this.inputReader = inputReader;
         this.messageHandler = messageHandler;
     }

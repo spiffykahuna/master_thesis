@@ -2,6 +2,7 @@ package ee.ttu.deko.coffee.service;
 
 import ee.ttu.deko.coffee.service.domain.Product;
 import ee.ttu.deko.coffee.service.domain.ServiceContract;
+import ee.ttu.deko.coffee.service.message.MessageHandler;
 import ee.ttu.deko.coffee.service.message.MessageReader;
 import ee.ttu.deko.coffee.service.message.MessageWriter;
 import org.slf4j.Logger;
@@ -22,9 +23,11 @@ public abstract class AbstractCoffeeMachineService implements CoffeeMachineServi
     protected Writer outputWriter;
     protected MessageReader reader;
     protected MessageWriter writer;
+    protected MessageHandler messageHandler;
 
     Set<ServiceListener> listeners = new CopyOnWriteArraySet<ServiceListener>();
     protected boolean isConnected = false;
+
 
     protected AbstractCoffeeMachineService() {
         inputReader = null;
@@ -33,45 +36,24 @@ public abstract class AbstractCoffeeMachineService implements CoffeeMachineServi
         writer = null;
     }
 
-    @Override
-    public synchronized ServiceContract getServiceContract() {
-        throw new UnsupportedOperationException();
-    }
+    public abstract ServiceContract getServiceContract();
 
-    @Override
-    public synchronized Object getInfo() {
-        throw new UnsupportedOperationException();
-    }
+    public abstract Object getInfo();
 
-    @Override
-    public synchronized List<Product> getProducts() {
-        throw new UnsupportedOperationException();
-    }
+    public abstract List<Product> getProducts();
 
-    @Override
-    public synchronized void orderProduct(Product product) {
-        throw new UnsupportedOperationException();
-    }
+    public abstract void orderProduct(Product product);
 
-    @Override
-    public synchronized void cancelProduct(Product product) {
-        throw new UnsupportedOperationException();
-    }
+    public abstract void cancelProduct(Product product);
 
-    @Override
-    public synchronized void connect(Reader inputReader, Writer outputWriter) {
-        throw new UnsupportedOperationException();
-    }
+    public abstract void connect(Reader inputReader, Writer outputWriter);
 
     @Override
     public synchronized boolean isConnected() {
         return isConnected;
     }
 
-    @Override
-    public synchronized void disconnect() {
-        throw new UnsupportedOperationException();
-    }
+    public abstract void disconnect();
 
     @Override
     public synchronized void addListener(ServiceListener listener) {
@@ -82,4 +64,10 @@ public abstract class AbstractCoffeeMachineService implements CoffeeMachineServi
     public synchronized void removeListener(ServiceListener listener) {
         listeners.remove(listener);
     }
+
+    public abstract void start();
+
+    public abstract boolean isRunning();
+
+    public abstract void stop();
 }
