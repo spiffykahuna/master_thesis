@@ -1,5 +1,6 @@
 package ee.ttu.deko.coffee.service;
 
+import ee.ttu.deko.coffee.jsonrpc.RPCRequest;
 import ee.ttu.deko.coffee.service.domain.Product;
 import ee.ttu.deko.coffee.service.domain.ServiceContract;
 import ee.ttu.deko.coffee.service.message.JsonRPCMessageHandler;
@@ -9,8 +10,14 @@ import ee.ttu.deko.coffee.service.message.MessageWriter;
 import java.io.Reader;
 import java.io.Writer;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicLong;
 
 public class JsonRpcCoffeeMachineService extends AbstractCoffeeMachineService {
+    /*
+        System.out.println(new Date(Long.MAX_VALUE));
+        Sun Aug 17 09:12:55 EET 292278994
+     */
+    private static AtomicLong idCounter = new AtomicLong(System.currentTimeMillis());
 
     public JsonRpcCoffeeMachineService() {
         if(listeners == null) throw new IllegalStateException("Unable to create service. Service listeners collection is null");
@@ -19,7 +26,13 @@ public class JsonRpcCoffeeMachineService extends AbstractCoffeeMachineService {
 
     @Override
     public ServiceContract getServiceContract() {
-        return null;  
+        long id = nextId();
+        RPCRequest request = new RPCRequest("system.help", id);
+        messageHandler.handleMessage(request);
+
+        // TODO each method should handle rpc error ( id may be null)
+        // TODO compare error codes (between JSONRPC2Error and my embedded server)
+        return null;
     }
 
     @Override
@@ -28,17 +41,17 @@ public class JsonRpcCoffeeMachineService extends AbstractCoffeeMachineService {
     }
 
     @Override
-    public List<Product> getProducts() {
+    public synchronized List<Product> getProducts() {
         return null;  
     }
 
     @Override
-    public void orderProduct(Product product) {
+    public synchronized void orderProduct(Product product) {
         
     }
 
     @Override
-    public void cancelProduct(Product product) {
+    public synchronized void cancelProduct(Product product) {
         
     }
 
@@ -60,7 +73,7 @@ public class JsonRpcCoffeeMachineService extends AbstractCoffeeMachineService {
 
     @Override
     public synchronized void disconnect() {
-        if(isRunning()) throw new IllegalStateException("Unable to disconnect service. Service is running. Please stop service first");
+        if(isRunning()) throw new IllegalStateException("Unable to disconnect service. Service is running. Please stop service first.");
         // TODO implement service disconnect
         isConnected = false;
     }
@@ -80,11 +93,15 @@ public class JsonRpcCoffeeMachineService extends AbstractCoffeeMachineService {
     }
 
     @Override
-    public void stop() {
+    public synchronized void stop() {
         if((reader == null)) throw new IllegalStateException("Unable to stop service. Reader is not initialized");
         if((writer == null)) throw new IllegalStateException("Unable to stop service. Writer is not initialized");
 
         if(reader.isAlive()) reader.close();
         if(writer.isAlive()) writer.close();
+    }
+
+    private Long nextId() {
+        return idCounter.incrementAndGet();
     }
 }

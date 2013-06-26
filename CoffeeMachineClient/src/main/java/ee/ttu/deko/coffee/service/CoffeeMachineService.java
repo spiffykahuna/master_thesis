@@ -7,7 +7,7 @@ import java.io.Reader;
 import java.io.Writer;
 import java.util.List;
 
-public interface CoffeeMachineService {
+public interface CoffeeMachineService extends Service {
     ServiceContract getServiceContract();
 
     // coffee machine methods
@@ -15,13 +15,4 @@ public interface CoffeeMachineService {
     List<Product>  getProducts();
     void orderProduct(Product product);
     void cancelProduct(Product product);
-
-
-    // connect methods
-    void connect(Reader inputReader, Writer outputWriter);
-    boolean isConnected();
-    void disconnect();
-
-    void addListener(ServiceListener listener);
-    void removeListener(ServiceListener listener);
 }

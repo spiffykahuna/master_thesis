@@ -25,8 +25,10 @@ public abstract class AbstractCoffeeMachineService implements CoffeeMachineServi
     protected MessageWriter writer;
     protected MessageHandler messageHandler;
 
-    Set<ServiceListener> listeners = new CopyOnWriteArraySet<ServiceListener>();
+    Set<RPCServiceListener> listeners = new CopyOnWriteArraySet<RPCServiceListener>();
     protected boolean isConnected = false;
+
+    protected long timeoutMs;
 
 
     protected AbstractCoffeeMachineService() {
@@ -56,13 +58,23 @@ public abstract class AbstractCoffeeMachineService implements CoffeeMachineServi
     public abstract void disconnect();
 
     @Override
-    public synchronized void addListener(ServiceListener listener) {
-        listeners.add(listener);
+    public synchronized boolean addListener(RPCServiceListener listener) {
+        return listeners.add(listener);
     }
 
     @Override
-    public synchronized void removeListener(ServiceListener listener) {
-        listeners.remove(listener);
+    public synchronized boolean removeListener(RPCServiceListener listener) {
+        return listeners.remove(listener);
+    }
+
+    @Override
+    public synchronized void setTimeoutMs(long timeoutMs) {
+        this.timeoutMs = timeoutMs;
+    }
+
+    @Override
+    public synchronized long getTimeoutMs() {
+        return timeoutMs;
     }
 
     public abstract void start();

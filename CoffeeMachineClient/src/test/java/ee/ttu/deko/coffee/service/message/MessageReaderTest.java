@@ -1,5 +1,8 @@
 package ee.ttu.deko.coffee.service.message;
 
+import ee.ttu.deko.coffee.jsonrpc.RPCNotification;
+import ee.ttu.deko.coffee.jsonrpc.RPCRequest;
+import ee.ttu.deko.coffee.jsonrpc.RPCResponse;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -28,6 +31,15 @@ public class MessageReaderTest {
             msgList.add(new String(msg));
             handleCounter++;
         }
+
+        @Override
+        public void handleMessage(RPCRequest request) { }
+
+        @Override
+        public void handleMessage(RPCNotification notification) { }
+
+        @Override
+        public void handleMessage(RPCResponse response) { }
     };
 
     public void execReader(MessageReader reader) throws InterruptedException {

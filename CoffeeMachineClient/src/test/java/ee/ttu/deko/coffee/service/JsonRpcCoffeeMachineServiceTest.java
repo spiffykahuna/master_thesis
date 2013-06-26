@@ -28,11 +28,12 @@ public class JsonRpcCoffeeMachineServiceTest {
 
         outputWriter = new PipedWriter();
         outputReader = new PipedReader((PipedWriter) outputWriter);
+
+        service = new JsonRpcCoffeeMachineService();
     }
 
     @Test
     public void testStart() throws Exception {
-        service = new JsonRpcCoffeeMachineService();
         try {
             service.start();
             fail("Service should not start. Readers/Writers streams are not connected");
@@ -60,12 +61,64 @@ public class JsonRpcCoffeeMachineServiceTest {
 
         service.start();
         assertTrue(service.isRunning());
-    }
 
-    @After
-    public void tearDown() throws Exception {
         service.stop();
         Thread.sleep(2000);
         assertFalse(service.isRunning());
+    }
+
+    @Test
+    public void testConnect() throws Exception {
+        try {
+            service.connect(null, outputWriter);
+            fail("You should not get here!!! Get out!!!");
+        } catch(Exception e) {
+            // this is a right place to be
+        }
+
+        try {
+            service.connect(inputReader, null);
+            fail("You should not get here!!! Get out!!!");
+        } catch(Exception e) {
+            // this is a right place to be
+        }
+
+        try {
+            service.connect(null, null);
+            fail("You should not get here!!! Get out!!!");
+        } catch(Exception e) {
+            // this is a right place to be
+        }
+
+        service.connect(inputReader, outputWriter);
+        assertTrue(service.isConnected());
+    }
+
+    @Test
+    public void testDisconnect() throws Exception {
+        service.connect(inputReader, outputWriter);
+        assertTrue(service.isConnected());
+
+        service.disconnect();
+
+        service.connect(inputReader, outputWriter);
+        assertTrue(service.isConnected());
+
+        service.start();
+        assertTrue(service.isRunning());
+
+        try {
+            service.disconnect();
+            fail("Service should be stopped before disconnecting.");
+        } catch (IllegalStateException ise) {
+            // silence
+        }
+
+        service.stop();
+        Thread.sleep(1000);
+        assertFalse(service.isRunning());
+
+        service.disconnect();
+        assertFalse(service.isConnected());
     }
 }

@@ -4,7 +4,7 @@ import com.thetransactioncompany.jsonrpc2.*;
 import ee.ttu.deko.coffee.jsonrpc.RPCNotification;
 import ee.ttu.deko.coffee.jsonrpc.RPCRequest;
 import ee.ttu.deko.coffee.jsonrpc.RPCResponse;
-import ee.ttu.deko.coffee.service.ServiceListener;
+import ee.ttu.deko.coffee.service.RPCServiceListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -13,13 +13,13 @@ import java.util.Set;
 public class JsonRPCMessageHandler implements MessageHandler {
     private final static Logger logger = LoggerFactory.getLogger(MessageReader.class);
 
-    public void setListeners(Set<ServiceListener> listeners) {
+    public void setListeners(Set<RPCServiceListener> listeners) {
         this.listeners = listeners;
     }
 
-    Set<ServiceListener> listeners;
+    Set<RPCServiceListener> listeners;
 
-    public JsonRPCMessageHandler(Set<ServiceListener> listeners) {
+    public JsonRPCMessageHandler(Set<RPCServiceListener> listeners) {
         if(listeners == null) throw new IllegalArgumentException("Listeners should not be null");
         this.listeners = listeners;
     }
@@ -60,36 +60,36 @@ public class JsonRPCMessageHandler implements MessageHandler {
         }
 
         logger.debug("UnknownMessage received: {}", msg);
-        for(ServiceListener listener: listeners) {
+        for(RPCServiceListener listener: listeners) {
             listener.onUnknownMessage(msg);
         }
     }
 
-    private void handleMessage(RPCNotification notification) {
+    public void handleMessage(RPCNotification notification) {
         checkListeners();
         logger.debug("RPCNotification received: {}", notification);
         synchronized (listeners) {
-            for(ServiceListener listener: listeners) {
+            for(RPCServiceListener listener: listeners) {
                 listener.onNotification(notification);
             }
         }
     }
 
-    private void handleMessage(RPCResponse response) {
+    public void handleMessage(RPCResponse response) {
         checkListeners();
         logger.debug("RPCResponse received: {}", response);
         synchronized (listeners) {
-            for(ServiceListener listener: listeners) {
+            for(RPCServiceListener listener: listeners) {
                 listener.onResponse(response);
             }
         }
     }
 
-    private void handleMessage(RPCRequest request) {
+    public void handleMessage(RPCRequest request) {
         checkListeners();
         logger.debug("RPCRequest received: {}", request);
         synchronized (listeners) {
-            for(ServiceListener listener: listeners) {
+            for(RPCServiceListener listener: listeners) {
                 listener.onRequest(request);
             }
         }

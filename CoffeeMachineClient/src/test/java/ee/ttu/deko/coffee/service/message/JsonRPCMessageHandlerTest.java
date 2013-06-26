@@ -4,7 +4,7 @@ import com.thetransactioncompany.jsonrpc2.JSONRPC2Message;
 import ee.ttu.deko.coffee.jsonrpc.RPCNotification;
 import ee.ttu.deko.coffee.jsonrpc.RPCRequest;
 import ee.ttu.deko.coffee.jsonrpc.RPCResponse;
-import ee.ttu.deko.coffee.service.ServiceListener;
+import ee.ttu.deko.coffee.service.RPCServiceListener;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -16,9 +16,9 @@ import static org.junit.Assert.assertEquals;
 public class JsonRPCMessageHandlerTest {
     JsonRPCMessageHandler handler;
     TestListener listener;
-    Set<ServiceListener> listeners;
+    Set<RPCServiceListener> listeners;
 
-    public class TestListener implements ServiceListener {
+    public class TestListener implements RPCServiceListener {
         public List<RPCRequest> requests = new ArrayList<RPCRequest>();
         public List<RPCResponse> responses = new ArrayList<RPCResponse>();
         public List<RPCNotification> notifications = new ArrayList<RPCNotification>();
@@ -51,7 +51,7 @@ public class JsonRPCMessageHandlerTest {
     @Before
     public void setUp() throws Exception {
         listener = new TestListener();
-        listeners = new CopyOnWriteArraySet<ServiceListener>() {{
+        listeners = new CopyOnWriteArraySet<RPCServiceListener>() {{
             add(listener);
         }};
         handler = new JsonRPCMessageHandler(listeners);
