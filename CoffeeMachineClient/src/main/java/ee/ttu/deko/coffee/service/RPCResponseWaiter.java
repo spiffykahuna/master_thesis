@@ -19,7 +19,7 @@ public class RPCResponseWaiter implements RPCServiceListener {
         service.addListener(this);
     }
 
-    public RPCResponse getResponse(long timeout) throws InterruptedException {
+    public RPCResponse getResponseOrNull(long timeout) throws InterruptedException {
         synchronized (lock) {
             if (response != null) {
                 service.removeListener(this);

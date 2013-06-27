@@ -1,5 +1,6 @@
 package ee.ttu.deko.coffee.service;
 
+import ee.ttu.deko.coffee.service.domain.ServiceContract;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -120,5 +121,13 @@ public class JsonRpcCoffeeMachineServiceTest {
 
         service.disconnect();
         assertFalse(service.isConnected());
+    }
+
+    @Test
+    public void testGetServiveContract() throws Exception {
+        service.connect(inputReader, outputWriter);
+        //ServiceContract contract = service.getServiceContract();
+
+
     }
 }

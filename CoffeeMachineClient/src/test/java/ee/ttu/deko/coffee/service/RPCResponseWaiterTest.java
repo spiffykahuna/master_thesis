@@ -2,13 +2,11 @@ package ee.ttu.deko.coffee.service;
 
 import ee.ttu.deko.coffee.jsonrpc.RPCRequest;
 import ee.ttu.deko.coffee.jsonrpc.RPCResponse;
-import org.hamcrest.MatcherAssert;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.io.Reader;
 import java.io.Writer;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -82,7 +80,7 @@ public class RPCResponseWaiterTest {
         RPCResponse response = new RPCResponse("success", 1);
 
         waiter.onResponse(response);
-        assertEquals(response, waiter.getResponse(0));
+        assertEquals(response, waiter.getResponseOrNull(0));
     }
 
     @Test(timeout = 2000)
@@ -98,7 +96,7 @@ public class RPCResponseWaiterTest {
             waiter = new RPCResponseWaiter(request, service);
             assertEquals(1, service.listeners.size());
             waiter.onResponse(response);
-            waiter.getResponse(0);
+            waiter.getResponseOrNull(0);
             assertEquals(0, service.listeners.size());
         }
     }
@@ -112,7 +110,7 @@ public class RPCResponseWaiterTest {
         assertNotNull(response.getError());
 
         waiter.onResponse(response);
-        assertEquals(response, waiter.getResponse(0));
+        assertEquals(response, waiter.getResponseOrNull(0));
     }
 
     @Test

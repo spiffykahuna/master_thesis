@@ -1,6 +1,7 @@
 package ee.ttu.deko.coffee.service;
 
 import ee.ttu.deko.coffee.jsonrpc.RPCRequest;
+import ee.ttu.deko.coffee.jsonrpc.RPCResponse;
 import ee.ttu.deko.coffee.service.domain.Product;
 import ee.ttu.deko.coffee.service.domain.ServiceContract;
 import ee.ttu.deko.coffee.service.message.JsonRPCMessageHandler;
@@ -30,9 +31,21 @@ public class JsonRpcCoffeeMachineService extends AbstractCoffeeMachineService {
         RPCRequest request = new RPCRequest("system.help", id);
         messageHandler.handleMessage(request);
 
+        RPCResponseWaiter waiter = new RPCResponseWaiter(request, this);
+
+        RPCResponse response = null;
+
+        try {
+            response =  waiter.getResponseOrNull(this.timeoutMs);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        ServiceContract contract = new ServiceContract();
+
         // TODO each method should handle rpc error ( id may be null)
         // TODO compare error codes (between JSONRPC2Error and my embedded server)
-        return null;
+        return contract;
     }
 
     @Override
