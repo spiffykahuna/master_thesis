@@ -2,6 +2,7 @@ package ee.ttu.deko.coffee.service;
 
 import ee.ttu.deko.coffee.jsonrpc.RPCRequest;
 import ee.ttu.deko.coffee.jsonrpc.RPCResponse;
+import ee.ttu.deko.coffee.service.request.RequestProcessor;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -53,6 +54,10 @@ public class RPCResponseWaiterTest {
         @Override
         public long getTimeoutMs() {
             return timeoutMs;
+        }
+
+        @Override
+        public void setRequestProcessor(RequestProcessor requestProcessor) {
         }
     }
 

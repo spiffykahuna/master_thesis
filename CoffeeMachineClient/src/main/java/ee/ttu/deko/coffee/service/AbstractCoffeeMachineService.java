@@ -5,6 +5,8 @@ import ee.ttu.deko.coffee.service.domain.ServiceContract;
 import ee.ttu.deko.coffee.service.message.MessageHandler;
 import ee.ttu.deko.coffee.service.message.MessageReader;
 import ee.ttu.deko.coffee.service.message.MessageWriter;
+import ee.ttu.deko.coffee.service.request.NoRequestProcessor;
+import ee.ttu.deko.coffee.service.request.RequestProcessor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,17 +27,20 @@ public abstract class AbstractCoffeeMachineService implements CoffeeMachineServi
     protected MessageWriter writer;
     protected MessageHandler messageHandler;
 
-    Set<RPCServiceListener> listeners = new CopyOnWriteArraySet<RPCServiceListener>();
+    protected RequestProcessor requestProcessor;
+
+    protected Set<RPCServiceListener> listeners = new CopyOnWriteArraySet<RPCServiceListener>();
     protected boolean isConnected = false;
 
     protected long timeoutMs;
-
 
     protected AbstractCoffeeMachineService() {
         inputReader = null;
         outputWriter = null;
         reader = null;
         writer = null;
+
+        requestProcessor = new NoRequestProcessor();
     }
 
     public abstract ServiceContract getServiceContract();
@@ -75,6 +80,11 @@ public abstract class AbstractCoffeeMachineService implements CoffeeMachineServi
     @Override
     public synchronized long getTimeoutMs() {
         return timeoutMs;
+    }
+
+    public void setRequestProcessor(RequestProcessor requestProcessor) {
+        if(requestProcessor == null) throw new IllegalArgumentException("Specified request processor is null");
+        this.requestProcessor = requestProcessor;
     }
 
     public abstract void start();

@@ -10,6 +10,8 @@ public class RPCResponseWaiter implements RPCServiceListener {
     private RPCResponse response;
     private Service service;
 
+    private long timeoutMs = 1; // <-- Object.wait(0) will wait until notify() method call.
+
     public RPCResponseWaiter(RPCRequest request, Service service) {
         if(request == null) throw new IllegalArgumentException("Unable to create responce waiter. Specified request is null");
         if(service == null) throw new IllegalArgumentException("Unable to create responce waiter. Specified service is null");
@@ -30,6 +32,10 @@ public class RPCResponseWaiter implements RPCServiceListener {
         }
         service.removeListener(this);
         return response;
+    }
+
+    public RPCResponse getResponseOrNull() throws InterruptedException {
+        return getResponseOrNull(this.timeoutMs);
     }
 
     @Override
@@ -64,5 +70,9 @@ public class RPCResponseWaiter implements RPCServiceListener {
 
     @Override
     public void onUnknownMessage(String messageText) {
+    }
+
+    public RPCRequest getRequest() {
+        return request;
     }
 }

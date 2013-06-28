@@ -7,6 +7,9 @@ import ee.ttu.deko.coffee.service.domain.ServiceContract;
 import ee.ttu.deko.coffee.service.message.JsonRPCMessageHandler;
 import ee.ttu.deko.coffee.service.message.MessageReader;
 import ee.ttu.deko.coffee.service.message.MessageWriter;
+import ee.ttu.deko.coffee.service.request.RequestProcessor;
+import ee.ttu.deko.coffee.service.request.SingleRPCRequest;
+import ee.ttu.deko.coffee.service.request.SingleRequestProcessor;
 
 import java.io.Reader;
 import java.io.Writer;
@@ -23,23 +26,28 @@ public class JsonRpcCoffeeMachineService extends AbstractCoffeeMachineService {
     public JsonRpcCoffeeMachineService() {
         if(listeners == null) throw new IllegalStateException("Unable to create service. Service listeners collection is null");
         messageHandler = new JsonRPCMessageHandler(listeners);
+        requestProcessor = new SingleRPCRequest(messageHandler, this);
     }
 
     @Override
     public ServiceContract getServiceContract() {
         long id = nextId();
         RPCRequest request = new RPCRequest("system.help", id);
-        messageHandler.handleMessage(request);
 
-        RPCResponseWaiter waiter = new RPCResponseWaiter(request, this);
+        // TODO factory or method how to create new request processors.
+        Object response = requestProcessor.processRequest(request);
 
-        RPCResponse response = null;
-
-        try {
-            response =  waiter.getResponseOrNull(this.timeoutMs);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+//        messageHandler.handleMessage(request);
+//
+//        RPCResponseWaiter waiter = new RPCResponseWaiter(request, this);
+//
+//        RPCResponse response = null;
+//
+//        try {
+//            response =  waiter.getResponseOrNull(this.timeoutMs);
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
 
         ServiceContract contract = new ServiceContract();
 
