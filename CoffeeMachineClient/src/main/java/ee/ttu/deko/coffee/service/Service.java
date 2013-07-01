@@ -6,6 +6,7 @@ import java.io.Reader;
 import java.io.Writer;
 
 public interface Service {
+
     // connect methods
     void connect(Reader inputReader, Writer outputWriter);
     boolean isConnected();

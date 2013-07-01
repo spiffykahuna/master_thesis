@@ -89,6 +89,11 @@ public class JsonRPCMessageHandler implements MessageHandler {
         checkListeners();
         logger.debug("RPCRequest received: {}", request);
         synchronized (listeners) {
+            /* TODO there may be such case, when listener method blocks whole process. It might be transport delay or smth similar.
+               One solution is to start a new thread for each listener
+               Another is to start a new thread for all listeners.
+               It depends on what will listeners do and what does handleMessage caller expect
+              */
             for(RPCServiceListener listener: listeners) {
                 listener.onRequest(request);
             }

@@ -28,13 +28,21 @@ public class SingleRPCRequest extends SingleRequestProcessor {
     protected void sendRequest(Object request) {
         logger.debug("Sending request: {}", request.toString());
 
-        if(request != null) {
-            RPCRequest rpcRequest = (RPCRequest) request;
+        if(request == null) throw new IllegalArgumentException("Specified request is null");
 
-            messageHandler.handleMessage(rpcRequest);
-
-            waiter = new RPCResponseWaiter(rpcRequest, service);
+        RPCRequest rpcRequest = null;
+        try {
+            rpcRequest = (RPCRequest) request;
+        } catch(ClassCastException cce) {
+            throw new IllegalArgumentException(
+                    "Unable to get RPC request from argument specified. Argument should be instance of "
+                            + getClass().getCanonicalName());
         }
+
+        messageHandler.handleMessage(rpcRequest);
+
+        waiter = new RPCResponseWaiter(rpcRequest, service);
+
         logger.debug("Request was sent");
     }
 
@@ -47,5 +55,10 @@ public class SingleRPCRequest extends SingleRequestProcessor {
             logger.debug("Request was interrupted ( Request id={})", waiter.getRequest().getID());
         }
         return response;
+    }
+
+    @Override
+    public RequestProcessor cloneProcessor() {
+        return new SingleRPCRequest(messageHandler, service);
     }
 }

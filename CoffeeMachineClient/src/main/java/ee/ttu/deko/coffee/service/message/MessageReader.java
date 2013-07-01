@@ -16,6 +16,7 @@ public class MessageReader implements Runnable {
     private boolean isClosed;
 
     private StringBuilder messageBuffer = new StringBuilder();
+    private boolean isStarted;
 
     public MessageReader(Reader inputReader, MessageHandler messageHandler) {
         if(inputReader == null) throw new IllegalArgumentException("Unable to create reader. Stream is null");
@@ -25,9 +26,12 @@ public class MessageReader implements Runnable {
         this.messageHandler = messageHandler;
     }
 
-    public void start() {
-        readThread = new Thread(this, getClass().getSimpleName());
-        readThread.start();
+    public synchronized void start() {
+        if(!isStarted) {
+            isStarted = true;
+            readThread = new Thread(this, getClass().getSimpleName());
+            readThread.start();
+        }
     }
 
     @Override
@@ -69,6 +73,7 @@ public class MessageReader implements Runnable {
             logger.debug("Processing new line...");
             processNewMessage(messageBuffer);
         }
+        logger.info("Reader loop was stopped.");
     }
 
     private boolean hasNewLine(StringBuilder messageBuffer) {
@@ -88,8 +93,8 @@ public class MessageReader implements Runnable {
         messageHandler.handleMessage(msg);
     }
 
-    public synchronized void close() {
-        logger.info("Closing reader");
+    public synchronized void stop() {
+        logger.info("Stopping reader");
         isClosed = true;
 
         if(readThread != null) {

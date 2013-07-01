@@ -8,4 +8,9 @@ public class NoRequestProcessor implements RequestProcessor {
     public Object processRequest(Object request) {
         return null;
     }
+
+    @Override
+    public RequestProcessor cloneProcessor() {
+        return new NoRequestProcessor();
+    }
 }

@@ -6,7 +6,6 @@ import ee.ttu.deko.coffee.jsonrpc.RPCResponse;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.io.BufferedReader;
 import java.io.Reader;
 import java.io.StringReader;
 import java.util.ArrayList;
@@ -45,7 +44,7 @@ public class MessageReaderTest {
     public void execReader(MessageReader reader) throws InterruptedException {
         reader.start();
         Thread.sleep(1000);
-        reader.close();
+        reader.stop();
         while(reader.isAlive());
     }
 

@@ -1,15 +1,18 @@
 package ee.ttu.deko.coffee.service;
 
+import ee.ttu.deko.coffee.jsonrpc.JsonRpc2_0Spec;
+import ee.ttu.deko.coffee.jsonrpc.RPCRequest;
+import ee.ttu.deko.coffee.jsonrpc.RPCResponse;
 import ee.ttu.deko.coffee.service.domain.ServiceContract;
+import ee.ttu.deko.coffee.service.request.RequestProcessor;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.io.*;
+import java.util.HashMap;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 public class JsonRpcCoffeeMachineServiceTest {
     JsonRpcCoffeeMachineService service;
@@ -126,8 +129,76 @@ public class JsonRpcCoffeeMachineServiceTest {
     @Test
     public void testGetServiveContract() throws Exception {
         service.connect(inputReader, outputWriter);
-        //ServiceContract contract = service.getServiceContract();
 
+        final String contractMethodName =  "system.help";
+
+        service.setRequestProcessor(new RequestProcessor() {
+            @Override
+            public Object processRequest(Object request) {
+                RPCRequest rpcRequest = (RPCRequest) request;
+
+                assertEquals(contractMethodName, rpcRequest.getMethod());
+                JsonRpc2_0Spec.checkId(rpcRequest.getID());
+
+                RPCResponse response = new RPCResponse(rpcRequest.getID());
+                ServiceContract contract = new ServiceContract();
+                contract.setId("some_service_id");
+                contract.setDescription("some_service_description");
+                contract.setVersion("some_service_version");
+                contract.setOperations( new HashMap<String, Object>() {{
+                    put("someMethod1", "someMethod1_declaration");
+                    put("someMethod2", "someMethod2_declaration");
+                    put("someMethod3", "someMethod3_declaration");
+                }});
+
+                contract.setDefinitions(new HashMap<String, Object>() {{
+                    put("someDef1", "someDef1_declaration");
+                    put("someDef2", "someDef2_declaration");
+                    put("someDef3", "someDef3_declaration");
+                }});
+                response.setResult(contract);
+                return response;
+            }
+
+            @Override
+            public RequestProcessor cloneProcessor() {
+                return this;
+            }
+        });
+
+        ServiceContract contract = service.getServiceContract();
+
+        assertEquals("some_service_id", contract.getId());
+        assertEquals("some_service_description", contract.getDescription());
+        assertEquals("some_service_version", contract.getVersion());
+        assertEquals(3, contract.getOperations().size());
+        assertTrue(contract.getOperations().containsKey("someMethod1"));
+        assertTrue(contract.getOperations().containsKey("someMethod2"));
+        assertTrue(contract.getOperations().containsKey("someMethod3"));
+
+        assertEquals(3, contract.getDefinitions().size());
+        assertTrue(contract.getDefinitions().containsKey("someDef1"));
+        assertTrue(contract.getDefinitions().containsKey("someDef2"));
+        assertTrue(contract.getDefinitions().containsKey("someDef3"));
+        assertTrue(outputReader.toString().contains(contractMethodName));
+
+        // request is null
+        service.setRequestProcessor( new RequestProcessor() {
+            @Override
+            public Object processRequest(Object request) {
+                return null;
+            }
+
+            @Override
+            public RequestProcessor cloneProcessor() {
+                return this;
+            }
+        });
+
+        try{
+            contract = service.getServiceContract();
+            fail("null response should cause an exception");
+        } catch (Exception e) {}
 
     }
 }
