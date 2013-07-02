@@ -37,6 +37,16 @@ public class JsonRpcCoffeeMachineService extends AbstractCoffeeMachineService {
         RPCRequest request = new RPCRequest("system.help", id);
 
         logger.debug("Processing contract request");
+        RPCResponse response = processRPCRequest(processor, request);
+
+        logger.debug("Creating new service contract using result of response");
+        // TODO each method should handle rpc error ( id may be null)
+        // TODO compare error codes (between JSONRPC2Error and my embedded server)
+
+        return new ServiceContract(response.getResult());
+    }
+
+    private RPCResponse processRPCRequest(RequestProcessor processor, RPCRequest request) {
         RPCResponse response = null;
         try{
             response = (RPCResponse) processor.processRequest(request);
@@ -44,11 +54,7 @@ public class JsonRpcCoffeeMachineService extends AbstractCoffeeMachineService {
             logger.warn("Processor returned invalid response: {}", cce);
             throw new RuntimeException("Processor returned invalid response.", cce);
         }
-
-        logger.debug("Creating new service contract using result of response");
-        // TODO each method should handle rpc error ( id may be null)
-        // TODO compare error codes (between JSONRPC2Error and my embedded server)
-        return new ServiceContract(response.getResult());
+        return response;
     }
 
     @Override

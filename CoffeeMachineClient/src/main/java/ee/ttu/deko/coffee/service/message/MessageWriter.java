@@ -1,5 +1,6 @@
 package ee.ttu.deko.coffee.service.message;
 
+import com.thetransactioncompany.jsonrpc2.JSONRPC2Message;
 import ee.ttu.deko.coffee.jsonrpc.RPCNotification;
 import ee.ttu.deko.coffee.jsonrpc.RPCRequest;
 import ee.ttu.deko.coffee.jsonrpc.RPCResponse;
@@ -10,9 +11,10 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.Writer;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.TimeUnit;
 
 public class MessageWriter implements  Runnable, RPCServiceListener{
     private final static Logger logger = LoggerFactory.getLogger(MessageWriter.class);
@@ -25,7 +27,7 @@ public class MessageWriter implements  Runnable, RPCServiceListener{
     private volatile Thread writeThread;
 
     /* TODO think about request priority and PriorityBlockingQueue */
-    private BlockingQueue<RPCRequest> requests = new ArrayBlockingQueue<RPCRequest>(10 /* TODO place somethere this magic constant */, true);
+    private BlockingQueue<JSONRPC2Message> requests = new ArrayBlockingQueue<JSONRPC2Message>(100 /* TODO place somewhere this magic constant */, true);
 
 
     public MessageWriter(Writer outputWriter, Service service) {
@@ -37,17 +39,15 @@ public class MessageWriter implements  Runnable, RPCServiceListener{
     }
 
     public synchronized boolean isAlive() {
-        if(writeThread != null) {
-            return writeThread.isAlive();
-        } else {
-            return false;
-        }
+        return writeThread != null && writeThread.isAlive();
     }
 
     public synchronized void start() {
         if(!isStarted) {
             isStarted = true;
             writeThread = new Thread(this, getClass().getSimpleName());
+
+            service.addListener(this);
             writeThread.start();
         }
     }
@@ -62,6 +62,7 @@ public class MessageWriter implements  Runnable, RPCServiceListener{
             thread.interrupt();
         }
         isStarted = false;
+        service.removeListener(this);
     }
 
     @Override
@@ -74,32 +75,57 @@ public class MessageWriter implements  Runnable, RPCServiceListener{
             logger.error("Write loop terminated", e);
         }
         logger.info("Write loop ended successfully");
+        requests.clear();
     }
 
     private void doRun() throws InterruptedException {
         logger.info("Starting write loop");
-        for (; !isClosed ;) {
-            synchronized (this) {
-                Thread thisThread = Thread.currentThread();
-                if(thisThread.isInterrupted())  break;
-                if(writeThread != thisThread)    break;
-                if(isClosed)                    break;
-            }
+        List<JSONRPC2Message> newMessages = new ArrayList<JSONRPC2Message>();
 
-            logger.info("Waiting for new request to send...");
-            RPCRequest request = requests.poll(1, TimeUnit.SECONDS);
-            if(request != null) {
-                logger.debug("Sending new request...");
-                writeRequest(request);
+        for (; !isClosed ;) {
+            if (isNeededToStop()) break;
+
+            logger.debug("Waiting for new request to send...");
+            if(requests.size() > 0) {
+                int itemsReceived = requests.drainTo(newMessages);
+                if(itemsReceived > 0) {
+                    boolean doubleBreak = false;
+
+                    for(JSONRPC2Message message: newMessages) {
+                        if (isNeededToStop()) { doubleBreak = true; break;}
+
+                        if(message != null) {
+                            logger.debug("Sending new request...");
+                            writeNewMessage(message);
+                        }
+                    }
+                    newMessages.clear();
+
+                    if(doubleBreak) break;
+                }
             }
+//            RPCRequest request = requests.poll(100, TimeUnit.MILLISECONDS);
+//            if(request != null) {
+//                logger.debug("Sending new request...");
+//                writeNewMessage(request);
+//            }
         }
         logger.info("Writer loop was stopped.");
     }
 
-    private void writeRequest(RPCRequest request) {
+    private synchronized boolean isNeededToStop() {
+        Thread thisThread = Thread.currentThread();
+        if(thisThread.isInterrupted()) return true;
+        if(writeThread != thisThread) return true;
+        if(isClosed) return true;
+
+        return false;
+    }
+
+    private void writeNewMessage(JSONRPC2Message message) {
         String data = null;
         try{
-            data = request.toString();
+            data = message.toString();
         }catch (Exception e) {
             logger.error("Unable to get request data. ", e);
         }
@@ -116,10 +142,17 @@ public class MessageWriter implements  Runnable, RPCServiceListener{
     @Override
     public void onRequest(RPCRequest request) {
         // TODO think about how message will be added( offer vs put vs add)
-        try {
-            requests.put(request);
-        } catch (InterruptedException e) {
-            logger.warn("Request addition to request send queue was interrupted");
+        addMessageToWriteQueue(request);
+
+    }
+
+    private void addMessageToWriteQueue(JSONRPC2Message message) {
+        if(message != null && isAlive()) {
+            try {
+                requests.put(message);
+            } catch (InterruptedException e) {
+                logger.warn("Request addition to request send queue was interrupted");
+            }
         }
     }
 
@@ -129,6 +162,7 @@ public class MessageWriter implements  Runnable, RPCServiceListener{
 
     @Override
     public void onNotification(RPCNotification notification) {
+        addMessageToWriteQueue(notification);
     }
 
     @Override

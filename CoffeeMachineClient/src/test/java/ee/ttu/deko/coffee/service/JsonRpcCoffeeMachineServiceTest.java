@@ -132,11 +132,14 @@ public class JsonRpcCoffeeMachineServiceTest {
 
         final String contractMethodName =  "system.help";
 
+        final String[] requestJson = new String[1];
+
         service.setRequestProcessor(new RequestProcessor() {
             @Override
             public Object processRequest(Object request) {
                 RPCRequest rpcRequest = (RPCRequest) request;
 
+                requestJson[0] = rpcRequest.toString();
                 assertEquals(contractMethodName, rpcRequest.getMethod());
                 JsonRpc2_0Spec.checkId(rpcRequest.getID());
 
@@ -180,7 +183,8 @@ public class JsonRpcCoffeeMachineServiceTest {
         assertTrue(contract.getDefinitions().containsKey("someDef1"));
         assertTrue(contract.getDefinitions().containsKey("someDef2"));
         assertTrue(contract.getDefinitions().containsKey("someDef3"));
-        assertTrue(outputReader.toString().contains(contractMethodName));
+
+        assertTrue(requestJson[0].contains(contractMethodName));
 
         // request is null
         service.setRequestProcessor( new RequestProcessor() {
@@ -199,6 +203,42 @@ public class JsonRpcCoffeeMachineServiceTest {
             contract = service.getServiceContract();
             fail("null response should cause an exception");
         } catch (Exception e) {}
+
+
+        // id do not match
+        service.setRequestProcessor( new RequestProcessor() {
+            @Override
+            public Object processRequest(Object request) {
+                RPCRequest rpcRequest = (RPCRequest) request;
+                Object responseId;
+                Object id = rpcRequest.getID();
+                if(id instanceof  Number) {
+                    responseId = ((Number) id).longValue() + 1L;
+                }
+                if(id instanceof String) {
+                    responseId = ((String) id) + "1";
+                }
+                return null;
+            }
+
+            @Override
+            public RequestProcessor cloneProcessor() {
+                return this;
+            }
+        });
+
+        // TODO null ids and not equal ids should be skipped ???
+//        try{
+//            contract = service.getServiceContract();
+//            fail("null response should cause an exception");
+//        } catch (Exception e) {}
+
+    }
+
+    @Test
+    public void disconnectShouldBeAfterStop() throws Exception {
+        // TODO connect -> start -> disconnect
+
 
     }
 }
