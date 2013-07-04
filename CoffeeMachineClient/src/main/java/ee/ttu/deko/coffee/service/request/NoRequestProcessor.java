@@ -13,4 +13,13 @@ public class NoRequestProcessor implements RequestProcessor {
     public RequestProcessor cloneProcessor() {
         return new NoRequestProcessor();
     }
+
+    @Override
+    public void setTimeoutMs(long timeoutMs) {
+    }
+
+    @Override
+    public long getTimeoutMs() {
+        return 0;
+    }
 }

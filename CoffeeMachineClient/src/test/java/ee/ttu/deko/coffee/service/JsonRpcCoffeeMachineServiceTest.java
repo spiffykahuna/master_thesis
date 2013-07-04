@@ -24,6 +24,31 @@ public class JsonRpcCoffeeMachineServiceTest {
     Reader outputReader;
     Writer outputWriter;
 
+    class TestProcessor implements RequestProcessor {
+        long timeoutMs = 1;
+
+        @Override
+        public Object processRequest(Object request) {
+            return null;
+        }
+
+        @Override
+        public RequestProcessor cloneProcessor() {
+            return this;
+        }
+
+        @Override
+        public void setTimeoutMs(long timeoutMs) {
+            if(timeoutMs < 0) throw new IllegalArgumentException("Timeout should be positive. Wrong value specified");
+            this.timeoutMs = timeoutMs;
+        }
+
+        @Override
+        public long getTimeoutMs() {
+            return timeoutMs;
+        }
+    }
+
     @Before
     public void setUp() throws Exception {
         /*
@@ -36,6 +61,7 @@ public class JsonRpcCoffeeMachineServiceTest {
         outputReader = new PipedReader((PipedWriter) outputWriter);
 
         service = new JsonRpcCoffeeMachineService();
+        service.setTimeoutMs(1); // to speedUp tests
     }
 
     @After
@@ -142,7 +168,7 @@ public class JsonRpcCoffeeMachineServiceTest {
 
         final String[] requestJson = new String[1];
 
-        service.setRequestProcessor(new RequestProcessor() {
+        service.setRequestProcessor(new TestProcessor() {
             @Override
             public Object processRequest(Object request) {
                 RPCRequest rpcRequest = (RPCRequest) request;
@@ -171,11 +197,6 @@ public class JsonRpcCoffeeMachineServiceTest {
                 response.setResult(contract);
                 return response;
             }
-
-            @Override
-            public RequestProcessor cloneProcessor() {
-                return this;
-            }
         });
 
         ServiceContract contract = service.getServiceContract();
@@ -196,15 +217,10 @@ public class JsonRpcCoffeeMachineServiceTest {
         assertTrue(requestJson[0].contains(contractMethodName));
 
         // request is null
-        service.setRequestProcessor( new RequestProcessor() {
+        service.setRequestProcessor( new TestProcessor() {
             @Override
             public Object processRequest(Object request) {
                 return null;
-            }
-
-            @Override
-            public RequestProcessor cloneProcessor() {
-                return this;
             }
         });
 
@@ -212,7 +228,7 @@ public class JsonRpcCoffeeMachineServiceTest {
         assertNull(contract);
 
         // processor returns wrong response(This is not valid behaviour).  id do not match
-        service.setRequestProcessor( new RequestProcessor() {
+        service.setRequestProcessor( new TestProcessor() {
             @Override
             public Object processRequest(Object request) {
                 RPCRequest rpcRequest = (RPCRequest) request;
@@ -234,18 +250,13 @@ public class JsonRpcCoffeeMachineServiceTest {
                 assertNotNull(response);
                 return response;
             }
-
-            @Override
-            public RequestProcessor cloneProcessor() {
-                return this;
-            }
         });
 
         contract = service.getServiceContract();
         assertNull(contract);
 
         // processor returns wrong response(This is not valid behaviour).  id is null
-        service.setRequestProcessor( new RequestProcessor() {
+        service.setRequestProcessor( new TestProcessor() {
             @Override
             public Object processRequest(Object request) {
                 RPCRequest rpcRequest = (RPCRequest) request;
@@ -256,28 +267,18 @@ public class JsonRpcCoffeeMachineServiceTest {
                 assertNotNull(response);
                 return response;
             }
-
-            @Override
-            public RequestProcessor cloneProcessor() {
-                return this;
-            }
         });
 
         contract = service.getServiceContract();
         assertNull(contract);
 
         // processor returns different kind of object
-        service.setRequestProcessor( new RequestProcessor() {
+        service.setRequestProcessor( new TestProcessor() {
             @Override
             public Object processRequest(Object request) {
                 RPCRequest rpcRequest = (RPCRequest) request;
                 assertNotNull(rpcRequest);
                 return new String("This should fail. Processor should return only response objects.");
-            }
-
-            @Override
-            public RequestProcessor cloneProcessor() {
-                return this;
             }
         });
 
@@ -285,7 +286,7 @@ public class JsonRpcCoffeeMachineServiceTest {
         assertNull(contract);
 
         // processor returns error object
-        service.setRequestProcessor( new RequestProcessor() {
+        service.setRequestProcessor( new TestProcessor() {
             @Override
             public Object processRequest(Object request) {
                 RPCRequest rpcRequest = (RPCRequest) request;
@@ -293,11 +294,6 @@ public class JsonRpcCoffeeMachineServiceTest {
 
                 RPCResponse response = new RPCResponse(JSONRPC2Error.METHOD_NOT_FOUND, rpcRequest.getID());
                 return response;
-            }
-
-            @Override
-            public RequestProcessor cloneProcessor() {
-                return this;
             }
         });
         contract = service.getServiceContract();
@@ -398,5 +394,17 @@ public class JsonRpcCoffeeMachineServiceTest {
 
         service.disconnect();
         assertFalse(service.isRunning());
+    }
+
+    @Test(timeout = 2000)
+    public void getServiceContractReturnsNullOnTimeout() throws Exception {
+        service.connect(inputReader, outputWriter);
+        service.setTimeoutMs(500);
+        service.start();
+
+        // just start receiving data while nobody is writing to inputReader character stream
+        ServiceContract contract = service.getServiceContract();
+        assertNull(contract);
+
     }
 }

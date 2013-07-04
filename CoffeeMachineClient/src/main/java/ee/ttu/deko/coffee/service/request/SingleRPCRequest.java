@@ -50,7 +50,7 @@ public class SingleRPCRequest extends SingleRequestProcessor {
     protected Object waitForResponse() {
         Object response = null;
         try {
-            response = waiter.getResponseOrNull();
+            response = waiter.getResponseOrNull(this.timeoutMs);
         } catch (InterruptedException e) {
             logger.debug("Request was interrupted ( Request id={})", waiter.getRequest().getID());
         }
@@ -59,6 +59,13 @@ public class SingleRPCRequest extends SingleRequestProcessor {
 
     @Override
     public RequestProcessor cloneProcessor() {
-        return new SingleRPCRequest(messageHandler, service);
+        RequestProcessor processor =  new SingleRPCRequest(messageHandler, service);
+        processor.setTimeoutMs(this.timeoutMs);
+        return  processor;
+    }
+
+    @Override
+    public synchronized void setTimeoutMs(long timeoutMs) {
+        super.setTimeoutMs(timeoutMs);
     }
 }

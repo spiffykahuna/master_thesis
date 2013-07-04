@@ -74,7 +74,9 @@ public abstract class AbstractCoffeeMachineService implements CoffeeMachineServi
 
     @Override
     public synchronized void setTimeoutMs(long timeoutMs) {
+        if(timeoutMs < 0) throw new IllegalArgumentException("Timeout should be positive. Wrong value specified");
         this.timeoutMs = timeoutMs;
+        requestProcessor.setTimeoutMs(timeoutMs);
     }
 
     @Override
