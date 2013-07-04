@@ -1,5 +1,6 @@
 package ee.ttu.deko.coffee.service;
 
+import com.thetransactioncompany.jsonrpc2.JSONRPC2Error;
 import ee.ttu.deko.coffee.jsonrpc.JsonRpc2_0Spec;
 import ee.ttu.deko.coffee.jsonrpc.RPCRequest;
 import ee.ttu.deko.coffee.jsonrpc.RPCResponse;
@@ -12,6 +13,7 @@ import org.junit.Test;
 import java.io.*;
 import java.util.HashMap;
 
+import static org.hamcrest.core.StringContains.containsString;
 import static org.junit.Assert.*;
 
 public class JsonRpcCoffeeMachineServiceTest {
@@ -34,6 +36,12 @@ public class JsonRpcCoffeeMachineServiceTest {
         outputReader = new PipedReader((PipedWriter) outputWriter);
 
         service = new JsonRpcCoffeeMachineService();
+    }
+
+    @After
+    public void tearDown() throws Exception {
+        if(service.isRunning())     service.stop();
+        if(service.isConnected())   service.disconnect();
     }
 
     @Test
@@ -138,6 +146,7 @@ public class JsonRpcCoffeeMachineServiceTest {
             @Override
             public Object processRequest(Object request) {
                 RPCRequest rpcRequest = (RPCRequest) request;
+                assertNotNull(rpcRequest);
 
                 requestJson[0] = rpcRequest.toString();
                 assertEquals(contractMethodName, rpcRequest.getMethod());
@@ -199,26 +208,31 @@ public class JsonRpcCoffeeMachineServiceTest {
             }
         });
 
-        try{
-            contract = service.getServiceContract();
-            fail("null response should cause an exception");
-        } catch (Exception e) {}
+        contract = service.getServiceContract();
+        assertNull(contract);
 
-
-        // id do not match
+        // processor returns wrong response(This is not valid behaviour).  id do not match
         service.setRequestProcessor( new RequestProcessor() {
             @Override
             public Object processRequest(Object request) {
                 RPCRequest rpcRequest = (RPCRequest) request;
-                Object responseId;
+                assertNotNull(rpcRequest);
+
+                Object responseId = null;
+
                 Object id = rpcRequest.getID();
                 if(id instanceof  Number) {
                     responseId = ((Number) id).longValue() + 1L;
                 }
+
                 if(id instanceof String) {
                     responseId = ((String) id) + "1";
                 }
-                return null;
+                if(responseId == null) responseId = Long.valueOf(Long.MAX_VALUE);
+
+                RPCResponse response = new RPCResponse("some_result", responseId);
+                assertNotNull(response);
+                return response;
             }
 
             @Override
@@ -227,18 +241,162 @@ public class JsonRpcCoffeeMachineServiceTest {
             }
         });
 
-        // TODO null ids and not equal ids should be skipped ???
-//        try{
-//            contract = service.getServiceContract();
-//            fail("null response should cause an exception");
-//        } catch (Exception e) {}
+        contract = service.getServiceContract();
+        assertNull(contract);
 
+        // processor returns wrong response(This is not valid behaviour).  id is null
+        service.setRequestProcessor( new RequestProcessor() {
+            @Override
+            public Object processRequest(Object request) {
+                RPCRequest rpcRequest = (RPCRequest) request;
+                assertNotNull(rpcRequest);
+
+
+                RPCResponse response = new RPCResponse("some_result", null);
+                assertNotNull(response);
+                return response;
+            }
+
+            @Override
+            public RequestProcessor cloneProcessor() {
+                return this;
+            }
+        });
+
+        contract = service.getServiceContract();
+        assertNull(contract);
+
+        // processor returns different kind of object
+        service.setRequestProcessor( new RequestProcessor() {
+            @Override
+            public Object processRequest(Object request) {
+                RPCRequest rpcRequest = (RPCRequest) request;
+                assertNotNull(rpcRequest);
+                return new String("This should fail. Processor should return only response objects.");
+            }
+
+            @Override
+            public RequestProcessor cloneProcessor() {
+                return this;
+            }
+        });
+
+        contract = service.getServiceContract();
+        assertNull(contract);
+
+        // processor returns error object
+        service.setRequestProcessor( new RequestProcessor() {
+            @Override
+            public Object processRequest(Object request) {
+                RPCRequest rpcRequest = (RPCRequest) request;
+                assertNotNull(rpcRequest);
+
+                RPCResponse response = new RPCResponse(JSONRPC2Error.METHOD_NOT_FOUND, rpcRequest.getID());
+                return response;
+            }
+
+            @Override
+            public RequestProcessor cloneProcessor() {
+                return this;
+            }
+        });
+        contract = service.getServiceContract();
+        assertNull(contract);
+
+        service = new JsonRpcCoffeeMachineService();
+        service.connect(inputReader, outputWriter);
     }
 
     @Test
     public void disconnectShouldBeAfterStop() throws Exception {
-        // TODO connect -> start -> disconnect
+        service.connect(inputReader, outputWriter);
+        service.start();
+        try {
+            service.disconnect();
+            fail("Disconnect should throw exception if it was called before service was stopped");
+        } catch (IllegalStateException iseValid) {}
+    }
 
+    @Test(timeout = 5000)
+    public void getContractWritesResultToStream() throws Exception {
+        final JsonRpcCoffeeMachineService jsonService = new JsonRpcCoffeeMachineService();
+        jsonService.connect(inputReader, outputWriter);
+        jsonService.start();
 
+        new Thread( new Runnable() {
+            @Override
+            public void run() {
+                ServiceContract contract = jsonService.getServiceContract();
+            }
+        }).start();
+
+        StringBuilder sb = new StringBuilder();
+        int c = 0;
+        String outValue = "";
+        do {
+            c = outputReader.read();
+            sb.append((char) c);
+            outValue = sb.toString();
+            int opens = countOf(outValue, '{');
+            int closes = countOf(outValue, '}');
+            if( (opens != 0) && (closes != 0) && ( (opens + closes) % 2 == 0)) { //TODO implement this control statement in embedded service too
+                break;
+            }
+        } while( c != -1);
+
+        outValue = sb.toString();
+        assertThat(outValue, containsString("jsonrpc"));
+        assertThat(outValue, containsString("2.0"));
+        assertThat(outValue, containsString("id"));
+        assertThat(outValue, containsString("method"));
+        assertThat(outValue, containsString("system.help"));
+
+    }
+
+    public static int countOf( final String s, final char c ) {
+        final char[] chars = s.toCharArray();
+        int count = 0;
+        for(int i=0; i<chars.length; i++) {
+            if (chars[i] == c) {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    @Test
+    public void serviceCannotStartAfterDisconnect() throws Exception {
+        service.connect(inputReader, outputWriter);
+        service.disconnect();
+        try{
+            service.start();
+            fail("Service should not start after disconnect");
+        } catch (IllegalStateException iseValid) {}
+
+        service.connect(inputReader, outputWriter);
+        service.start();
+        service.stop();
+        service.disconnect();
+        try{
+            service.start();
+            fail("Service should not start after disconnect");
+        } catch (IllegalStateException iseValid) {}
+    }
+
+    @Test
+    public void isRunningShouldWorkInEachState() throws Exception {
+        assertFalse(service.isRunning());
+
+        service.connect(inputReader, outputWriter);
+        assertFalse(service.isRunning());
+
+        service.start();
+        assertTrue(service.isRunning());
+
+        service.stop();
+        assertFalse(service.isRunning());
+
+        service.disconnect();
+        assertFalse(service.isRunning());
     }
 }

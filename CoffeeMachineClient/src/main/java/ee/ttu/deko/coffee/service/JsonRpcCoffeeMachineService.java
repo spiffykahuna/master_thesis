@@ -28,31 +28,62 @@ public class JsonRpcCoffeeMachineService extends AbstractCoffeeMachineService {
         requestProcessor = new SingleRPCRequest(messageHandler, this);
     }
 
+    /**
+     *
+     * @return  Returns ServiceContract with description of a service. Returns null on timeout or error.
+     */
     @Override
     public ServiceContract getServiceContract() {
         logger.debug("Service contract was requested");
+        ServiceContract contract = null;
+
         long id = nextId();
         RequestProcessor processor = requestProcessor.cloneProcessor();
 
         RPCRequest request = new RPCRequest("system.help", id);
 
-        logger.debug("Processing contract request");
+        logger.debug("Processing contract request: {}", request);
+
         RPCResponse response = processRPCRequest(processor, request);
 
-        logger.debug("Creating new service contract using result of response");
+        logger.debug("Request processor returned new responce {}", response);
+
+        if(response != null && (response.getError() == null)) {
+            logger.debug("Creating new service contract using result of response");
+
+            if(!request.getID().equals(response.getID())) {
+                logger.warn(
+                    "Request and response identificators do not match. Request id: {} Response id: {}"
+                    , request.getID(), response.getID()
+                );
+                return null;
+            }
+
+            try {
+                contract = new ServiceContract(response.getResult());
+            } catch(IllegalArgumentException iae) {
+                logger.warn("Cannot create service contract using response result. Result: {}", response.getResult());
+            }
+        } else {
+            logger.warn("Service timeout reached or error occurred. Request: {}", request);
+        }
+
+
         // TODO each method should handle rpc error ( id may be null)
         // TODO compare error codes (between JSONRPC2Error and my embedded server)
 
-        return new ServiceContract(response.getResult());
+        return contract;
     }
 
     private RPCResponse processRPCRequest(RequestProcessor processor, RPCRequest request) {
         RPCResponse response = null;
-        try{
-            response = (RPCResponse) processor.processRequest(request);
-        } catch (ClassCastException cce) {
-            logger.warn("Processor returned invalid response: {}", cce);
-            throw new RuntimeException("Processor returned invalid response.", cce);
+
+        Object processorResponce = processor.processRequest(request);
+        if(processorResponce instanceof RPCResponse) {
+            response = (RPCResponse) processorResponce;
+        } else {
+            logger.warn("Processor returned invalid response: {}", processorResponce);
+            response = null;
         }
         return response;
     }
@@ -98,6 +129,8 @@ public class JsonRpcCoffeeMachineService extends AbstractCoffeeMachineService {
         if(isRunning()) throw new IllegalStateException("Unable to disconnect service. Service is running. Please stop service first.");
         // TODO implement service disconnect
         isConnected = false;
+        reader = null;
+        writer = null;
     }
 
     @Override
@@ -111,7 +144,10 @@ public class JsonRpcCoffeeMachineService extends AbstractCoffeeMachineService {
 
     @Override
     public synchronized boolean isRunning() {
-        return (reader.isAlive() || writer.isAlive());
+        if(reader == null) return false;
+        if(writer == null) return false;
+
+        return (isConnected && (reader.isAlive() || writer.isAlive()));
     }
 
     @Override
