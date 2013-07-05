@@ -41,7 +41,6 @@ public class RPCResponseWaiter implements RPCServiceListener {
     public void onResponse(RPCResponse response) {
         if(response == null) return;
 
-        // TODO each method should handle rpc error ( id may be null)
         synchronized (lock) {
             Object requestId = request.getID();
             Object responseId = response.getID();

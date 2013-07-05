@@ -2,6 +2,7 @@ package ee.ttu.deko.coffee.service;
 
 import ee.ttu.deko.coffee.jsonrpc.RPCRequest;
 import ee.ttu.deko.coffee.jsonrpc.RPCResponse;
+import ee.ttu.deko.coffee.service.domain.MachineConfig;
 import ee.ttu.deko.coffee.service.domain.Product;
 import ee.ttu.deko.coffee.service.domain.ServiceContract;
 import ee.ttu.deko.coffee.service.message.JsonRPCMessageHandler;
@@ -13,6 +14,7 @@ import ee.ttu.deko.coffee.service.request.SingleRPCRequest;
 import java.io.Reader;
 import java.io.Writer;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
 
 public class JsonRpcCoffeeMachineService extends AbstractCoffeeMachineService {
@@ -34,45 +36,73 @@ public class JsonRpcCoffeeMachineService extends AbstractCoffeeMachineService {
      */
     @Override
     public ServiceContract getServiceContract() {
-        logger.debug("Service contract was requested");
+        logger.info("Service contract was requested");
         ServiceContract contract = null;
 
-        long id = nextId();
         RequestProcessor processor = requestProcessor.cloneProcessor();
 
-        RPCRequest request = new RPCRequest("system.help", id);
-
-        logger.debug("Processing contract request: {}", request);
-
-        RPCResponse response = processRPCRequest(processor, request);
-
-        logger.debug("Request processor returned new responce {}", response);
-
-        if(response != null && (response.getError() == null)) {
-            logger.debug("Creating new service contract using result of response");
-
-            if(!request.getID().equals(response.getID())) {
-                logger.warn(
-                    "Request and response identificators do not match. Request id: {} Response id: {}"
-                    , request.getID(), response.getID()
-                );
-                return null;
-            }
-
+        RPCResponse response = callRpcMethod("system.help", null);
+        if(response != null) {
             try {
                 contract = new ServiceContract(response.getResult());
             } catch(IllegalArgumentException iae) {
                 logger.warn("Cannot create service contract using response result. Result: {}", response.getResult());
             }
         } else {
-            logger.warn("Service timeout reached or error occurred. Request: {}", request);
+            logger.warn("Cannot get response for service contract request");
         }
-
 
         // TODO each method should handle rpc error ( id may be null)
         // TODO compare error codes (between JSONRPC2Error and my embedded server)
 
         return contract;
+    }
+
+    private RPCResponse callRpcMethod(String methodName, Object params) {
+        long id = nextId();
+        RPCResponse response = null;
+
+        RPCRequest request = new RPCRequest(methodName, id);
+
+        if(params != null) {
+            if(params instanceof Map) {
+                request.setNamedParams((Map<String, Object>) params);
+            } else if(params instanceof List) {
+                request.setPositionalParams((List<Object>) params);
+            } else {
+                logger.error(
+                        "Unknown request parameters object was specified. This should be a List<Object> or Map<String, Object>. Got {} {}"
+                        , params.getClass(), params
+                );
+            }
+        }
+
+        logger.debug("Processing new request: {}", request);
+
+        RequestProcessor processor = requestProcessor.cloneProcessor();
+        response = processRPCRequest(processor, request);
+
+        logger.debug("Request processor returned new responce {}", response);
+
+        if(response != null) {
+            logger.debug("Checking response...");
+
+            if(response.getError() != null) {
+                logger.warn("Response has error: {}", response.getError());
+                return null;
+            }
+
+            if(!request.getID().equals(response.getID())) {
+                logger.warn(
+                        "Request and response identificators do not match. Request id: {} Response id: {}"
+                        , request.getID(), response.getID()
+                );
+                return null;
+            }
+        } else {
+            logger.warn("Service timeout reached or error occurred. Request: {}", request);
+        }
+        return response;
     }
 
     private RPCResponse processRPCRequest(RequestProcessor processor, RPCRequest request) {
@@ -94,6 +124,20 @@ public class JsonRpcCoffeeMachineService extends AbstractCoffeeMachineService {
     }
 
     @Override
+    public Object getServiceInfo() {
+        return null;
+    }
+
+    @Override
+    public void configCoffeeMachine(MachineConfig config) {
+    }
+
+    @Override
+    public MachineConfig getCoffeeMachineConfig() {
+        return null;
+    }
+
+    @Override
     public synchronized List<Product> getProducts() {
         return null;  
     }
@@ -106,6 +150,15 @@ public class JsonRpcCoffeeMachineService extends AbstractCoffeeMachineService {
     @Override
     public synchronized void cancelProduct(Product product) {
         
+    }
+
+    @Override
+    public Product.Status getProductStatus(Product product) {
+        return null;
+    }
+
+    @Override
+    public void login(String password) {
     }
 
     @Override
@@ -127,7 +180,7 @@ public class JsonRpcCoffeeMachineService extends AbstractCoffeeMachineService {
     @Override
     public synchronized void disconnect() {
         if(isRunning()) throw new IllegalStateException("Unable to disconnect service. Service is running. Please stop service first.");
-        // TODO implement service disconnect
+
         isConnected = false;
         reader = null;
         writer = null;
