@@ -11,7 +11,11 @@
 #include "strbuffer.h"
 
 typedef enum _transport_type_t {
-	TRANSPORT_USB = 1
+	TRANSPORT_UART1 = 1,
+	TRANSPORT_UART2 = 2,
+	TRANSPORT_UART3 = 3,
+	TRANSPORT_UART4 = 4,
+	TRANSPORT_UART5 = 5
 } transport_type_t;
 
 typedef struct _packet_t {

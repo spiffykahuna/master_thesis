@@ -35,7 +35,7 @@ void send_packet_to_client(packet_t *packet) {
 	portBASE_TYPE xStatus;
 
 	switch(packet->transport) {
-	case TRANSPORT_USB:
+	case TRANSPORT_UART1:
 		do {
 			xStatus =  xQueueSendToBack( usbOutComeQueue, &packet, (portTickType) QUEUE_SEND_WAIT_TIMEOUT );
 			if(xStatus == pdPASS) { break; }
@@ -54,8 +54,8 @@ void send_packet_to_client(packet_t *packet) {
 inline
 void send_data_to_client(transport_type_t transport, char *data, size_t dataLength) {
 	switch(transport) {
-	case TRANSPORT_USB:
-			write_usb(data, dataLength);
+	case TRANSPORT_UART1:
+			UART1_send( (uint8_t*) data, dataLength);
 		break;
 
 	default:
@@ -77,16 +77,11 @@ void report_error_to_sender(transport_type_t transport, const char *msgFormat, .
 	//TODO uncomment here
 }
 
-inline
-int write_usb(char *data, size_t length) {
-	log_d(data);
-	return 1;
-}
 
 inline
 char * transport_type_to_str(transport_type_t transport) {
 	switch(transport) {
-	case TRANSPORT_USB:		return "TRANSPORT_USB";
+	case TRANSPORT_UART1:		return "TRANSPORT_USB";
 
 	default:				return "TRANSPORT_UNKNOWN";
 	}
@@ -113,7 +108,7 @@ int transport_lock(transport_type_t transport, transport_direction_t direction) 
 	switch(direction) {
 		case DIRECTION_INPUT:
 			switch(transport) {
-				case TRANSPORT_USB:		return wait_for_semaphore(xUSBReadSemaphore);
+				case TRANSPORT_UART1:		return wait_for_semaphore(xUSBReadSemaphore);
 
 
 
@@ -123,7 +118,7 @@ int transport_lock(transport_type_t transport, transport_direction_t direction) 
 
 		case DIRECTION_OUTPUT:
 			switch(transport) {
-				case TRANSPORT_USB:		return wait_for_semaphore(xUSBWriteMutex);
+				case TRANSPORT_UART1:		return wait_for_semaphore(xUSBWriteMutex);
 				default:				return pdFALSE;
 			}
 			break;
@@ -138,7 +133,7 @@ int transport_unlock(transport_type_t transport, transport_direction_t direction
 	switch(direction) {
 		case DIRECTION_INPUT:
 			switch(transport) {
-				case TRANSPORT_USB:		return xSemaphoreGive(xUSBReadSemaphore);
+				case TRANSPORT_UART1:		return xSemaphoreGive(xUSBReadSemaphore);
 
 
 
@@ -148,7 +143,7 @@ int transport_unlock(transport_type_t transport, transport_direction_t direction
 
 		case DIRECTION_OUTPUT:
 			switch(transport) {
-				case TRANSPORT_USB:		return xSemaphoreGive(xUSBWriteMutex);
+				case TRANSPORT_UART1:		return xSemaphoreGive(xUSBWriteMutex);
 				default:				return pdFALSE;
 			}
 			break;

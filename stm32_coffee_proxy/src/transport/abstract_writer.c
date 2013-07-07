@@ -23,15 +23,15 @@ void tskAbstractWriter(void *pvParameters) {
 		writer_params_t *config = (writer_params_t*) pvParameters;
 		write_callback_t write_func = config->write_func;
 
-		xQueueHandle dataQueue	= config->dataQueue;
+		xQueueHandle dataQueue	= config->dataOutputQueue;
 
 		while(1) {
 			if(uxQueueMessagesWaiting(dataQueue) > 0) {
-				xStatus = xQueueReceive( dataQueue, &dataPacket, config->queueTimeout );
+				xStatus = xQueueReceive( dataQueue, &dataPacket, config->dataInputQueueTimeout );
 				if( (xStatus == pdPASS) && dataPacket) {
 					if(dataPacket->transport != config->transport_type) {
 						strbuffer_t *errorMsg = strbuffer_new();
-						strbuffer_append(errorMsg, taskName);
+						strbuffer_append(errorMsg, (char*) taskName);
 						strbuffer_append(errorMsg, " : Received packed has different transport type. Expected => ");
 						strbuffer_append(errorMsg, transport_type_to_str(config->transport_type));
 						strbuffer_append(errorMsg, " Actual => ");
@@ -40,6 +40,8 @@ void tskAbstractWriter(void *pvParameters) {
 						logger(LEVEL_ERR, errorMsg->value);
 						strbuffer_destroy(&errorMsg);
 
+						// TODO if transport is wrong, we need to put this packet somewhere, for example a special queue
+						// System should put this packet to right place or destroy it
 						packet_destroy(&dataPacket);
 						continue;
 					};

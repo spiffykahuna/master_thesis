@@ -7,14 +7,10 @@
 /* Private macro -------------------------------------------------------------*/
 /* Private variables ---------------------------------------------------------*/
 /* Extern variables ----------------------------------------------------------*/
-extern __IO  uint8_t Receive_Buffer[VIRTUAL_COM_PORT_DATA_SIZE];
-extern __IO  uint32_t Receive_length ;
 
-//extern uint8_t Send_Buffer[VIRTUAL_COM_PORT_DATA_SIZE];
-uint32_t packet_sent=1;
-uint32_t packet_receive=1;
 
-extern xQueueHandle  usbIncomeQueue;
+
+extern xQueueHandle  msgIncomeQueue;
 extern xQueueHandle  requestQueue;
 extern xQueueHandle  responseQueue;
 
@@ -202,7 +198,7 @@ void tskHandleRequests(void *pvParameters) {
 								MSG_JSONRPC_ERRORS.general_error_json,
 								JSONRPC_SERVER_ERROR,				/* <-- code */
 								MSG_JSONRPC_ERRORS.server_error,	/* <-- message */
-								MSG_MAINTASKS.tskUSBReader.device_is_busy_timeout , /* <-- data */
+								MSG_MAINTASKS.tskUART1Reader.device_is_busy_timeout , /* <-- data */
 								idStr
 							);
 						}
@@ -228,8 +224,8 @@ void tskParseJson(void *pvParameters) {
 
 	portBASE_TYPE xStatus;
 	while(1) {
-		if(uxQueueMessagesWaiting(usbIncomeQueue) > 0) {
-			xStatus = xQueueReceive( usbIncomeQueue, &incomePacket, (portTickType) QUEUE_RECEIVE_WAIT_TIMEOUT );
+		if(uxQueueMessagesWaiting(msgIncomeQueue) > 0) {
+			xStatus = xQueueReceive( msgIncomeQueue, &incomePacket, (portTickType) QUEUE_RECEIVE_WAIT_TIMEOUT );
 			if( (xStatus == pdPASS) && incomePacket) {
 				logger_format(LEVEL_INFO, "%s :  Received packet. len = %d   transport=%s"
 						, taskName, incomePacket->jsonDoc->length, transport_type_to_str(incomePacket->transport)
@@ -249,11 +245,11 @@ void tskParseJson(void *pvParameters) {
 						json_object_del(requestJson, "params");
 
 						json_t* errorObj = create_error(JSONRPC_SERVER_ERROR, MSG_JSONRPC_ERRORS.server_error);
-						json_object_set_new(errorObj, "data", json_string(MSG_MAINTASKS.tskUSBReader.device_is_busy_timeout));
+						json_object_set_new(errorObj, "data", json_string(MSG_MAINTASKS.tskUART1Reader.device_is_busy_timeout));
 
 						json_object_set_new(requestJson, "error", errorObj);
 
-						logger_format(LEVEL_WARN, "%s %s", taskName, MSG_MAINTASKS.tskUSBReader.device_is_busy_timeout);
+						logger_format(LEVEL_WARN, "%s %s", taskName, MSG_MAINTASKS.tskUART1Reader.device_is_busy_timeout);
 
 						// send error back to client using output queue
 						xStatus = xQueueSendToBack( responseQueue, &requestJson, (portTickType) QUEUE_SEND_WAIT_TIMEOUT );
@@ -269,12 +265,12 @@ void tskParseJson(void *pvParameters) {
 									MSG_JSONRPC_ERRORS.general_error_json,
 									JSONRPC_SERVER_ERROR,				/* <-- code */
 									MSG_JSONRPC_ERRORS.server_error,	/* <-- message */
-									MSG_MAINTASKS.tskUSBReader.device_is_busy_timeout , /* <-- data */
+									MSG_MAINTASKS.tskUART1Reader.device_is_busy_timeout , /* <-- data */
 									id
 								);
 							}
 							if(id) vPortFree(id);
-							logger_format(LEVEL_WARN, "%s %s", taskName, MSG_MAINTASKS.tskUSBReader.device_is_busy_timeout);
+							logger_format(LEVEL_WARN, "%s %s", taskName, MSG_MAINTASKS.tskUART1Reader.device_is_busy_timeout);
 						}
 					}
 				}
@@ -289,22 +285,21 @@ void tskParseJson(void *pvParameters) {
 inline
 packet_t * createNewIncomePacketFromStr(strbuffer_t ** temp) {
 	packet_t *incomePacket = NULL;
-	incomePacket = packet_new(TRANSPORT_USB);
+	incomePacket = packet_new(TRANSPORT_UART1);
 	if(!incomePacket) {
 		report_error_to_sender(
-			TRANSPORT_USB,
+			TRANSPORT_UART1,
 			MSG_JSONRPC_ERRORS.general_error_json,
 			JSONRPC_SERVER_ERROR,				/* <-- code */
 			MSG_JSONRPC_ERRORS.server_error,	/* <-- message */
-			MSG_MAINTASKS.tskUSBReader.unable_to_alloc_new_json_packet , /* <-- data */
+			MSG_MAINTASKS.tskUART1Reader.unable_to_alloc_new_json_packet , /* <-- data */
 			"null" 	/* <-- id */
 		);
 		packet_destroy(&incomePacket);
 		strbuffer_destroy(temp);
 
-		logger_format(LEVEL_WARN, "%s %s", pcTaskGetTaskName(NULL), MSG_MAINTASKS.tskUSBReader.unable_to_alloc_new_json_packet);
+		logger_format(LEVEL_WARN, "%s %s", pcTaskGetTaskName(NULL), MSG_MAINTASKS.tskUART1Reader.unable_to_alloc_new_json_packet);
 
-		Receive_length = 0;
 		return NULL;
 	}
 	incomePacket->jsonDoc = strbuffer_new();
@@ -313,7 +308,7 @@ packet_t * createNewIncomePacketFromStr(strbuffer_t ** temp) {
 }
 
 
-void tskUSBReader(void *pvParameters) {
+void tskUART1Reader(void *pvParameters) {
 	signed char *taskName = pcTaskGetTaskName(NULL);
 
 	portBASE_TYPE xStatus;
@@ -323,121 +318,133 @@ void tskUSBReader(void *pvParameters) {
 	packet_t *incomePacket = NULL;
 
 	while (1) {
-		if (bDeviceState == CONFIGURED && packet_receive == 1) {
-			if( xSemaphoreTake( xUSBReadSemaphore, SYSTEM_TASK_DELAY ) == pdTRUE ) {
-				if(Receive_length  != 0) {
-					if(!temp) {
-						temp = strbuffer_new();
-					}
 
-					if(!temp) {
-						report_error_to_sender(
-							TRANSPORT_USB,						/* <-- which way to send  */
-							MSG_JSONRPC_ERRORS.general_error_json,	/* <-- format */
-							JSONRPC_SERVER_ERROR,				/* <-- code */
-							MSG_JSONRPC_ERRORS.server_error,	/* <-- message */
-							MSG_MAINTASKS.tskUSBReader.unable_to_alloc_new_json_packet , /* <-- data */
-							"null" 	/* <-- id */
-						);
+		if( xSemaphoreTake( xUSBReadSemaphore, SYSTEM_TASK_DELAY ) == pdTRUE ) {
+			while(UART1_has_bytes()) {
+				if(!temp) {
+					temp = strbuffer_new();
+				}
+
+				if(!temp) {
+					report_error_to_sender(
+						TRANSPORT_UART1,						/* <-- which way to send  */
+						MSG_JSONRPC_ERRORS.general_error_json,	/* <-- format */
+						JSONRPC_SERVER_ERROR,				/* <-- code */
+						MSG_JSONRPC_ERRORS.server_error,	/* <-- message */
+						MSG_MAINTASKS.tskUART1Reader.unable_to_alloc_new_json_packet , /* <-- data */
+						"null" 	/* <-- id */
+					);
+					strbuffer_destroy(&temp);
+
+					logger_format(LEVEL_WARN, "%s %s", taskName, MSG_MAINTASKS.tskUART1Reader.unable_to_alloc_new_json_packet);
+					break;
+				}
+
+				char newChar = (char) UART1_read();
+
+				if(strbuffer_append_byte(temp, newChar)) {
+					strbuffer_destroy(&temp);
+					report_error_to_sender(
+						TRANSPORT_UART1,
+						MSG_JSONRPC_ERRORS.general_error_json,
+						JSONRPC_SERVER_ERROR,				/* <-- code */
+						MSG_JSONRPC_ERRORS.server_error,	/* <-- message */
+						MSG_MAINTASKS.tskUART1Reader.unable_to_alloc_new_json_packet , /* <-- data */
+						"null" 	/* <-- id */
+					);
+					strbuffer_destroy(&temp);
+
+					logger_format(LEVEL_WARN, "%s %s", taskName, MSG_MAINTASKS.tskUART1Reader.unable_to_alloc_new_json_packet);
+
+					break;
+				}
+
+				terminator = strchr(temp->value, EOT_CHAR);
+				if( terminator != NULL) {
+					/* remove EOT character from the end */
+					strbuffer_pop(temp);
+					temp->value[temp->length] = '\0';
+
+					/* Check if user requested help message */
+					if( (strcmp(temp->value, "--help") == 0) ||
+						(strcmp(temp->value, "-h") == 0) )
+					{
 						strbuffer_destroy(&temp);
+						logger_format(LEVEL_WARN, "%s System help was requested", taskName);
 
-						logger_format(LEVEL_WARN, "%s %s", taskName, MSG_MAINTASKS.tskUSBReader.unable_to_alloc_new_json_packet);
-						Receive_length = 0;
+						strbuffer_t *callHelp = strbuffer_new();
+						strbuffer_append(callHelp, "{\"jsonrpc\":\"2.0\",\"method\":\"system.help\",\"id\": null}");
+						incomePacket = createNewIncomePacketFromStr(&callHelp);
+						strbuffer_destroy(&callHelp);
+						if(!incomePacket)
+							continue;
+						xStatus = 0;
+						while(xStatus != pdPASS) {
+							xStatus = xQueueSendToBack( msgIncomeQueue, &incomePacket, (portTickType) QUEUE_SEND_WAIT_TIMEOUT );
+						}
 						continue;
 					}
 
-					if(strbuffer_append_bytes(temp, Receive_Buffer, Receive_length)) {
+					incomePacket = createNewIncomePacketFromStr(&temp);
+					strbuffer_destroy(&temp);
+
+					if(!incomePacket)
+						break; // TODO error handling when unable to create new packet
+
+					xStatus = xQueueSendToBack( msgIncomeQueue, &incomePacket, (portTickType) QUEUE_SEND_WAIT_TIMEOUT );
+					if( xStatus != pdPASS )
+					{
+						packet_destroy(&incomePacket);
 						strbuffer_destroy(&temp);
 						report_error_to_sender(
-							TRANSPORT_USB,
+							TRANSPORT_UART1,
 							MSG_JSONRPC_ERRORS.general_error_json,
 							JSONRPC_SERVER_ERROR,				/* <-- code */
 							MSG_JSONRPC_ERRORS.server_error,	/* <-- message */
-							MSG_MAINTASKS.tskUSBReader.unable_to_alloc_new_json_packet , /* <-- data */
+							MSG_MAINTASKS.tskUART1Reader.device_is_busy_timeout , /* <-- data */
 							"null" 	/* <-- id */
 						);
-						strbuffer_destroy(&temp);
 
-						logger_format(LEVEL_WARN, "%s %s", taskName, MSG_MAINTASKS.tskUSBReader.unable_to_alloc_new_json_packet);
+						logger_format(LEVEL_WARN, "%s %s", taskName, MSG_MAINTASKS.tskUART1Reader.device_is_busy_timeout);
 
-						Receive_length = 0;
+
 						continue;
 					}
 
-					terminator = strchr(temp->value, EOT_CHAR);
-					if( terminator != NULL) {
-						/* remove EOT character from the end */
-						strbuffer_pop(temp);
-						temp->value[temp->length] = '\0';
+					logger_format(LEVEL_DEBUG, "%s Received new packet( len= %d )", taskName, temp->length);
 
-						/* Check if user requested help message */
-						if( (strcmp(temp->value, "--help") == 0) ||
-							(strcmp(temp->value, "-h") == 0) )
-						{
-							strbuffer_destroy(&temp);
-							logger_format(LEVEL_WARN, "%s System help was requested", taskName);
-
-							strbuffer_t *callHelp = strbuffer_new();
-							strbuffer_append(callHelp, "{\"jsonrpc\":\"2.0\",\"method\":\"system.help\",\"id\": null}");
-							incomePacket = createNewIncomePacketFromStr(&callHelp);
-							strbuffer_destroy(&callHelp);
-							if(!incomePacket)
-								continue;
-							xStatus = 0;
-							while(xStatus != pdPASS) {
-								xStatus = xQueueSendToBack( usbIncomeQueue, &incomePacket, (portTickType) QUEUE_SEND_WAIT_TIMEOUT );
-							}
-							continue;
-						}
-
-						incomePacket = createNewIncomePacketFromStr(&temp);
+					temp = NULL;
+				} else {
+					/* Overflow check */
+					if(temp->length > MAX_INCOME_MSG_SIZE) {
 						strbuffer_destroy(&temp);
-						if(!incomePacket)
-							continue;
-						xStatus = xQueueSendToBack( usbIncomeQueue, &incomePacket, (portTickType) QUEUE_SEND_WAIT_TIMEOUT );
-						if( xStatus != pdPASS )
-						{
-							packet_destroy(&incomePacket);
-							strbuffer_destroy(&temp);
-							report_error_to_sender(
-								TRANSPORT_USB,
-								MSG_JSONRPC_ERRORS.general_error_json,
-								JSONRPC_SERVER_ERROR,				/* <-- code */
-								MSG_JSONRPC_ERRORS.server_error,	/* <-- message */
-								MSG_MAINTASKS.tskUSBReader.device_is_busy_timeout , /* <-- data */
-								"null" 	/* <-- id */
-							);
-
-							logger_format(LEVEL_WARN, "%s %s", taskName, MSG_MAINTASKS.tskUSBReader.device_is_busy_timeout);
-
-							Receive_length = 0;
-							continue;
-						}
-
-						logger_format(LEVEL_DEBUG, "%s Received new packet( len= %d )", taskName, temp->length);
-
-						temp = NULL;
-					} else {
-						/* Overflow check */
-						if(temp->length > MAX_INCOME_MSG_SIZE) {
-							strbuffer_destroy(&temp);
-							report_error_to_sender(
-								TRANSPORT_USB,
-								MSG_JSONRPC_ERRORS.general_error_json,
-								JSONRPC_SERVER_ERROR,				/* <-- code */
-								MSG_JSONRPC_ERRORS.server_error,	/* <-- message */
-								MSG_MAINTASKS.tskUSBReader.incoming_buffer_overflow , /* <-- data */
-								"null" 	/* <-- id */
-							);
-							logger_format(LEVEL_WARN, "%s %s", taskName, MSG_MAINTASKS.tskUSBReader.incoming_buffer_overflow);
-						}
+						report_error_to_sender(
+							TRANSPORT_UART1,
+							MSG_JSONRPC_ERRORS.general_error_json,
+							JSONRPC_SERVER_ERROR,				/* <-- code */
+							MSG_JSONRPC_ERRORS.server_error,	/* <-- message */
+							MSG_MAINTASKS.tskUART1Reader.incoming_buffer_overflow , /* <-- data */
+							"null" 	/* <-- id */
+						);
+						logger_format(LEVEL_WARN, "%s %s", taskName, MSG_MAINTASKS.tskUART1Reader.incoming_buffer_overflow);
 					}
 				}
-				Receive_length = 0;
 			}
-			CDC_Receive_DATA();
 		}
 		taskYIELD();
+	}
+}
+
+/**
+ * This function will be called when new message arrives from UART1
+ */
+void UART1_MsgAvailable_Callback(void) {
+	static signed portBASE_TYPE xHigherPriorityTaskWoken;
+
+	xSemaphoreGiveFromISR( xUSBReadSemaphore, &xHigherPriorityTaskWoken );
+
+	if( xHigherPriorityTaskWoken == pdTRUE) {
+		portYIELD();
 	}
 }
 

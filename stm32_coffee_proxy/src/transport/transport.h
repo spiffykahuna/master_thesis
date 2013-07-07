@@ -13,15 +13,7 @@
 #include "packet.h"
 #include "abstract_writer.h"
 #include "string_utils.h"
-
-
-
-
-
-
-
-int write_usb(char *data, size_t length);
-
+#include "uart/uart.h"
 
 inline
 void send_packet_to_client(packet_t *packet);

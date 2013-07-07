@@ -15,7 +15,7 @@ typedef struct _msg_maintasks {
 		char * const device_is_busy_timeout;
 		char * const incoming_buffer_overflow;
 		char * const unable_to_alloc_new_json_packet;
-	} tskUSBReader;
+	} tskUART1Reader;
 	struct {
 		char * const invalid_json_document;
 		char * const invalid_jsonrpc_2_0;

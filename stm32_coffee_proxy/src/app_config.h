@@ -29,6 +29,11 @@
 /* end of transmission character */
 #define EOT_CHAR	10
 
+typedef enum
+{
+  FALSE = 0, TRUE  = !FALSE
+}
+bool;
 
 typedef enum _proxy_error_t {
 	PROXY_MEMORY_ALLOC_FAILED 				= 1,

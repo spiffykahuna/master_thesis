@@ -23,8 +23,8 @@ typedef int (*write_callback_t)(char *data, size_t dataLength);
 typedef struct _writer_params_t {
 	transport_type_t	transport_type;
 	write_callback_t	write_func;
-	xQueueHandle		dataQueue;
-	portTickType		queueTimeout;
+	xQueueHandle		dataOutputQueue;
+	portTickType		dataInputQueueTimeout;
 	xSemaphoreHandle	writeMutex;
 } writer_params_t;
 

@@ -13,15 +13,19 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f10x.h"
-#include "stm32_eval.h"
+//#include "stm32_eval.h"
 //#include "stm3210b_eval_lcd.h"
 
 #include "log.h"	/* <== specify logging function there*/
 
-#include "hw_config.h"
-#include "usb_lib.h"
-#include "usb_desc.h"
-#include "usb_pwr.h"
+//#include "hw_config.h"
+
+//
+//#include "usb_lib.h"
+//#include "usb_desc.h"
+//#include "usb_pwr.h"
+
+#include "transport/uart/uart.h"
 
 #include "app_config.h"
 #include "mainTasks.h"
@@ -31,21 +35,19 @@
 #include "strbuffer.h"
 //#include "json_parse/json.h"
 
-/* COM port and baud rate used by the echo task. */
-#define mainCOM0							( 0 )
-#define mainBAUD_RATE						( 115200 )
-
 /*-----------------------------------------------------------*/
+extern void HardwareSetup();
+
 
 extern void logger(log_level_t level, char *msg);
 extern log_func_t log_func;
 
-void ledsInit(void);
+//void ledsInit(void);
 void USART_init(void);
-void USB_initialize(void);
+//void USB_initialize(void);
 
 inline int initLogger(void);
-inline int initUSBTransport(void);
+inline int initTransport(void);
 inline int initSystemHandlers(void);
 
 
@@ -56,7 +58,7 @@ xSemaphoreHandle xLogMutex;
 xSemaphoreHandle xUSBReadSemaphore = NULL;
 xSemaphoreHandle xUSBWriteMutex = NULL;
 
-xQueueHandle  usbIncomeQueue = NULL;
+xQueueHandle  msgIncomeQueue = NULL;
 xQueueHandle  usbOutComeQueue = NULL;
 
 extern xQueueHandle  systemMsgQueue;
@@ -68,14 +70,14 @@ writer_params_t writerConfig;
 
 int main(void)
 {
-	SystemInit();
+	HardwareSetup();
 	/* Setup STM32 system (clock, PLL and Flash configuration) */
 	json_set_alloc_funcs(pvPortMalloc, vPortFree);
 
 
-	ledsInit();
-	//USART_init();
-	USB_initialize();
+//	ledsInit();
+	USART_init();
+//	USB_initialize();
 
 	int status = initLogger();
 	if( status != SUCCESS) {
@@ -88,7 +90,7 @@ int main(void)
 		return 1;
 	}
 
-	if(initUSBTransport() != SUCCESS) {
+	if(initTransport() != SUCCESS) {
 		logger(LEVEL_ERR, "Unable to create USB reader and writer. System stopped.\n\r");
 		return 1;
 	}
@@ -136,47 +138,53 @@ void assert_failed( unsigned char *pucFile, unsigned long ulLine )
 }
 
 
-void ledsInit(void)
-{
-/* Initialize LEDs, Key Button, LCD and COM port(USART) available on
-	 STM3210X-EVAL board ******************************************************/
-	STM_EVAL_LEDInit(LED1);
-	STM_EVAL_LEDInit(LED2);
-	STM_EVAL_LEDInit(LED3);
-	STM_EVAL_LEDInit(LED4);
-
-
-	/* Turn on leds available on STM3210X-EVAL **********************************/
-	STM_EVAL_LEDOn(LED1);
-	STM_EVAL_LEDOn(LED2);
-	STM_EVAL_LEDOn(LED3);
-	STM_EVAL_LEDOn(LED4);
-
-}
+//void ledsInit(void)
+//{
+///* Initialize LEDs, Key Button, LCD and COM port(USART) available on
+//	 STM3210X-EVAL board ******************************************************/
+//	STM_EVAL_LEDInit(LED1);
+//	STM_EVAL_LEDInit(LED2);
+//	STM_EVAL_LEDInit(LED3);
+//	STM_EVAL_LEDInit(LED4);
+//
+//
+//	/* Turn on leds available on STM3210X-EVAL **********************************/
+//	STM_EVAL_LEDOn(LED1);
+//	STM_EVAL_LEDOn(LED2);
+//	STM_EVAL_LEDOn(LED3);
+//	STM_EVAL_LEDOn(LED4);
+//
+//}
 
 void USART_init(void)
 {
-	USART_InitStructure.USART_BaudRate = 115200;
-	USART_InitStructure.USART_WordLength = USART_WordLength_8b;
-	USART_InitStructure.USART_StopBits = USART_StopBits_1;
-	USART_InitStructure.USART_Parity = USART_Parity_No;
-	USART_InitStructure.USART_HardwareFlowControl = USART_HardwareFlowControl_None;
-	USART_InitStructure.USART_Mode = USART_Mode_Rx | USART_Mode_Tx;
+//	USART_InitStructure.USART_BaudRate = 115200;
+//	USART_InitStructure.USART_WordLength = USART_WordLength_8b;
+//	USART_InitStructure.USART_StopBits = USART_StopBits_1;
+//	USART_InitStructure.USART_Parity = USART_Parity_No;
+//	USART_InitStructure.USART_HardwareFlowControl = USART_HardwareFlowControl_None;
+//	USART_InitStructure.USART_Mode = USART_Mode_Rx | USART_Mode_Tx;
+//
+//	STM_EVAL_COMInit(COM1, &USART_InitStructure);
 
-	STM_EVAL_COMInit(COM1, &USART_InitStructure);
+	UART1_Init();
+//	UART2_Init();
+	UART3_Init();
+	UART4_Init();
+	UART5_Init();
 
 }
 
-void USB_initialize(void)
-{
-	Set_System();
-	Set_USBClock();
-	USB_Interrupts_Config();
-	USB_Init();
-}
+//void USB_initialize(void)
+//{
+//	Set_System();
+//	Set_USBClock();
+//	USB_Interrupts_Config();
+//	USB_Init();
+//}
 
 inline
-int initUSBTransport(void) {
+int initTransport(void) {
 	portBASE_TYPE xStatus;
 	vSemaphoreCreateBinary( xUSBReadSemaphore );
 	if( xUSBReadSemaphore == NULL ) {
@@ -188,8 +196,8 @@ int initUSBTransport(void) {
 		return ERROR;
 	};
 
-	usbIncomeQueue = xQueueCreate( INCOME_MSG_QUEUE_SIZE, sizeof(packet_t *) );
-	if( usbIncomeQueue == NULL ) {
+	msgIncomeQueue = xQueueCreate( INCOME_MSG_QUEUE_SIZE, sizeof(packet_t *) );
+	if( msgIncomeQueue == NULL ) {
 		logger(LEVEL_ERR, "Unable to create USB incoming queue\n\r");
 		return ERROR;
 	};
@@ -200,20 +208,20 @@ int initUSBTransport(void) {
 		return ERROR;
 	};
 
-	xStatus  = xTaskCreate( tskUSBReader, ( signed char * ) "tskUSBReader", configMINIMAL_STACK_SIZE + configMINIMAL_STACK_SIZE , NULL, PRIORITY_USB_READER_TASK, NULL );
+	xStatus  = xTaskCreate( tskUART1Reader, ( signed char * ) "tskUART1Reader", configMINIMAL_STACK_SIZE + configMINIMAL_STACK_SIZE , NULL, PRIORITY_USB_READER_TASK, NULL );
 	if(xStatus != pdPASS) {
 		logger(LEVEL_ERR, "Unable to create USB reader task\n\r");
 		return ERROR;
 	}
 
 
-	writerConfig.transport_type = TRANSPORT_USB;
-	writerConfig.dataQueue = usbOutComeQueue;
-	writerConfig.queueTimeout = QUEUE_RECEIVE_WAIT_TIMEOUT;
-	writerConfig.write_func = log_usb;
+	writerConfig.transport_type = TRANSPORT_UART1;
+	writerConfig.dataOutputQueue = usbOutComeQueue;
+	writerConfig.dataInputQueueTimeout = QUEUE_RECEIVE_WAIT_TIMEOUT;
+	writerConfig.write_func = UART1_send_chars;
 	writerConfig.writeMutex = xUSBWriteMutex;
 
-	xStatus  = xTaskCreate( tskAbstractWriter, ( signed char * ) "tskUSBWriter", configMINIMAL_STACK_SIZE , (void *) &writerConfig, PRIORITY_USB_WRITER_TASK, NULL );
+	xStatus  = xTaskCreate( tskAbstractWriter, ( signed char * ) "tskUART1Writer", configMINIMAL_STACK_SIZE , (void *) &writerConfig, PRIORITY_USB_WRITER_TASK, NULL );
 	if(xStatus != pdPASS) {
 		logger(LEVEL_ERR, "Unable to create USB reader task\n\r");
 		return ERROR;

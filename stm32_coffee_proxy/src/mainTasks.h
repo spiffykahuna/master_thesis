@@ -2,7 +2,6 @@
 #include <string.h>
 #include <stdio.h>
 
-#include "stm32_eval.h"
 
 #include "app_config.h"
 
@@ -11,11 +10,6 @@
 #include "task.h"
 #include "queue.h"
 
-
-#include "hw_config.h"
-#include "usb_lib.h"
-#include "usb_desc.h"
-#include "usb_pwr.h"
 
 #include "log.h"
 
@@ -45,7 +39,7 @@ extern void tskLedBlinkTask(void *);
 
 extern void tskParseJson(void *);
 
-extern void tskUSBReader(void *);
+extern void tskUART1Reader(void *);
 
 void tskHandleRequests(void*);
 void tskHandleResponses(void *);

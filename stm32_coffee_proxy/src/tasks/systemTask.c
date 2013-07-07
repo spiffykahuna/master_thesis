@@ -21,9 +21,9 @@ void tskSystem(void *pvParameters) {
 				switch(sysMsg->msgType) {
 				case MSG_TYPE_LOGGING:
 					if(sysMsg->logMsg && sysMsg->logMsg->value) {
-						if(transport_lock(TRANSPORT_USB, DIRECTION_OUTPUT) == pdPASS) {
+						if(transport_lock(TRANSPORT_UART1, DIRECTION_OUTPUT) == pdPASS) {
 							log_func(sysMsg->logMsg->value);
-							transport_unlock(TRANSPORT_USB, DIRECTION_OUTPUT);
+							transport_unlock(TRANSPORT_UART1, DIRECTION_OUTPUT);
 						}
 					}
 					break;
@@ -72,9 +72,9 @@ void tskSystem(void *pvParameters) {
 
 
 		snprintf(tempSize, 32, "%s FREE: %d\n\r", taskName, xPortGetFreeHeapSize());
-		if(transport_lock(TRANSPORT_USB, DIRECTION_OUTPUT) == pdPASS) {
+		if(transport_lock(TRANSPORT_UART1, DIRECTION_OUTPUT) == pdPASS) {
 			log_func(tempSize);
-			transport_unlock(TRANSPORT_USB, DIRECTION_OUTPUT);
+			transport_unlock(TRANSPORT_UART1, DIRECTION_OUTPUT);
 		}
 //
 //		memset(tempSize, 0, BUFF_SIZE);

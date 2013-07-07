@@ -8,7 +8,7 @@ extern xSemaphoreHandle xLogMutex;
 extern xQueueHandle  systemMsgQueue;
 
 extern __IO uint32_t packet_sent;
-__IO uint8_t Send_Buffer[VIRTUAL_COM_PORT_DATA_SIZE] ;
+//__IO uint8_t Send_Buffer[VIRTUAL_COM_PORT_DATA_SIZE] ;
 //extern __IO  uint32_t packet_receive;
 //
 //extern __IO  uint8_t Receive_Buffer[VIRTUAL_COM_PORT_DATA_SIZE];
@@ -17,44 +17,20 @@ __IO uint8_t Send_Buffer[VIRTUAL_COM_PORT_DATA_SIZE] ;
 static char logBuffer[STRING_BUFFER_SIZE];
 
 
-log_func_t log_func = log_d;	/* <== specify logging function here*/
+log_func_t log_func = log_to_UART3;	/* <== specify logging function here*/
 
 inline
 void sendUsbPacket(char* str, size_t size) {
 	while (packet_sent != 1) {
 		vTaskDelay(5 / portTICK_RATE_MS);
 	}
-	CDC_Send_DATA((uint8_t*) str, size);
+//	CDC_Send_DATA((uint8_t*) str, size);
 }
 
-int log_d(char *str)
+int log_to_UART3(char *str)
 {
-
-	size_t size = strlen(str);
-	size_t i = 0;
-
-//	xSemaphoreTake( xLogMutex, SYSTEM_TASK_DELAY );
-//	{
-
-	 if (bDeviceState == CONFIGURED)
-	 {
-
-		 if(size < VIRTUAL_COM_PORT_DATA_SIZE) {
-			sendUsbPacket(str, size);
-		 } else {
-
-			 for(i = 0; i < size; ++i) {
-
-				 if( i != 0 && (i % (VIRTUAL_COM_PORT_DATA_SIZE - 1)) == 0) {
-					 sendUsbPacket(str, (VIRTUAL_COM_PORT_DATA_SIZE - 1));
-					 str += (VIRTUAL_COM_PORT_DATA_SIZE - 1);
-				 }
-			 }
-			 sendUsbPacket(str, strlen(str));
-		 }
-	 }
-//	}
-//	xSemaphoreGive( xLogMutex );
+	size_t length = strlen(str);
+	UART3_send((uint8_t*) str, length);
 	return SUCCESS;
 }
 
@@ -101,12 +77,6 @@ void logger(log_level_t level, char *msg) {
 			xStatus = xQueueSendToBack( systemMsgQueue, &systemMsg, (portTickType) QUEUE_SEND_WAIT_TIMEOUT );
 		}
 	}
-}
-
-inline
-int log_usb(char *msg, size_t msgLength ) {
-	log_d(msg);
-	return SUCCESS;
 }
 
 void logger_format(log_level_t level, char *msgFormat, ...) {

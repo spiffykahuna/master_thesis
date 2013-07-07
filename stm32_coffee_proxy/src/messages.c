@@ -7,10 +7,10 @@
 #include "maintasks.h"
 
 const msg_maintasks MSG_MAINTASKS = {
-	.tskUSBReader.unable_to_alloc_n_bytes   		= "Unable to allocate %d bytes for received string.",
-	.tskUSBReader.device_is_busy_timeout 	  		= "Unable to handle request. Device is busy. Timeout reached.\n",
-	.tskUSBReader.incoming_buffer_overflow  		= "Incoming message is too big. Max message length should be less than " MAX_INCOME_MSG_SIZE_MSG " .\n",
-	.tskUSBReader.unable_to_alloc_new_json_packet	= "{\"jsonrpc\": \"2.0\", \"error\": \{\"code\": -32500, \"message\": \"Application error\", \"data\" : \"Error: Unable to allocate memory for new json packet.\" }, \"id\": null}\n",
+	.tskUART1Reader.unable_to_alloc_n_bytes   		= "Unable to allocate %d bytes for received string.",
+	.tskUART1Reader.device_is_busy_timeout 	  		= "Unable to handle request. Device is busy. Timeout reached.\n",
+	.tskUART1Reader.incoming_buffer_overflow  		= "Incoming message is too big. Max message length should be less than " MAX_INCOME_MSG_SIZE_MSG " .\n",
+	.tskUART1Reader.unable_to_alloc_new_json_packet	= "{\"jsonrpc\": \"2.0\", \"error\": \{\"code\": -32500, \"message\": \"Application error\", \"data\" : \"Error: Unable to allocate memory for new json packet.\" }, \"id\": null}\n",
 
 	.parseJsonPacket.invalid_json_document 			= "Unable to parse incoming json document\n",
 	.parseJsonPacket.invalid_jsonrpc_2_0   			= "Provided json document is not compatible with json-rpc version 2.0\n"
