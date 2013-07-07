@@ -6,3 +6,6 @@ json*
 .project
 Debug/
 *.log
+
+src/timers.c
+src/timers.h
