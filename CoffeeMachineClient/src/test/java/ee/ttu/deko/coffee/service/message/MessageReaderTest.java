@@ -8,6 +8,7 @@ import org.junit.Test;
 
 import java.io.Reader;
 import java.io.StringReader;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -52,8 +53,8 @@ public class MessageReaderTest {
     public void messageHandlerReceivesRightMessages() throws Exception {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < 10; i++) {
-            String msg = String.format("Message %d", i);
-            sb.append(msg).append("\n");
+            String msg = String.format("Message %d\n", i);
+            sb.append(toNetString(msg));
             validList.add(msg);
         }
 
@@ -69,17 +70,48 @@ public class MessageReaderTest {
     }
 
     @Test
+    public void readerAcceptsStringsWithCharactersBetweenMessages() throws Exception {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 9; i < 126; i++) {
+            if(i > 47 && i < 58) continue;
+            String msg = String.format("Message %d", i);
+            sb.append(toNetString(msg)).append(Character.valueOf((char) i));
+            validList.add(msg);
+        }
+
+        inputReader = new StringReader(sb.toString());
+
+        TestHandler handler = new TestHandler();
+        MessageReader  reader = new MessageReader(inputReader, handler);
+
+        execReader(reader);
+
+        assertEquals(validList.size(), (Object) handler.handleCounter);
+        assertEquals(validList, handler.msgList);
+
+    }
+
+    private String toNetString(String msg) throws UnsupportedEncodingException {
+        StringBuilder sb = new StringBuilder(msg.length() + 4);
+        sb.append(msg.getBytes("UTF-8").length)
+                .append(':')
+                .append(msg)
+                .append(',');
+        return sb.toString();
+    }
+
+    @Test
     public void readerFiltersCarriageReturnCharacters() throws Exception {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < 10; i++) {
-            String msg = String.format("Message %d", i);
-            sb.append(msg).append("\n\r");
+            String msg = String.format("Message %d\n", i);
+            sb.append(toNetString(msg + "\r"));
             validList.add(msg);
         }
         for (int i = 0; i < 10; i++) {
             String msg = String.format("Message %d", i);
-            sb.append(msg).append("\r\n");
-            validList.add(msg);
+            sb.append(toNetString(msg + "\r\n"));
+            validList.add(msg + "\n");
         }
 
         inputReader = new StringReader(sb.toString());

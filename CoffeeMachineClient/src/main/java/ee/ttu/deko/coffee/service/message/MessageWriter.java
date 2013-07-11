@@ -81,6 +81,7 @@ public class MessageWriter implements  Runnable, RPCServiceListener{
     private void doRun() throws InterruptedException {
         logger.info("Starting write loop");
         List<JSONRPC2Message> newMessages = new ArrayList<JSONRPC2Message>();
+        boolean doubleBreak = false;
 
         for (; !isClosed ;) {
             if (isNeededToStop()) break;
@@ -89,8 +90,6 @@ public class MessageWriter implements  Runnable, RPCServiceListener{
             if(requests.size() > 0) {
                 int itemsReceived = requests.drainTo(newMessages);
                 if(itemsReceived > 0) {
-                    boolean doubleBreak = false;
-
                     for(JSONRPC2Message message: newMessages) {
                         if (isNeededToStop()) { doubleBreak = true; break;}
 
@@ -132,11 +131,33 @@ public class MessageWriter implements  Runnable, RPCServiceListener{
 
         if((data != null) && (!data.isEmpty())) {
             try {
-                outputWriter.write(data);
+                outputWriter.write(toNetString(data));
             } catch (IOException e) {
                 logger.error(String.format("Unable to write data. Data %s", data) , e);
             }
         }
+    }
+
+    /**
+     *  This method is converts input string parameter to netstring(<a href="http://cr.yp.to/proto/netstrings.txt">http://cr.yp.to/proto/netstrings.txt</a>)
+     *  You cannot just convert string like this: String.format("%d:%s,", data.length(), data);
+     *  Usually outputWriter is OutputStreamWriter, that converts characters into bytes.
+     *  Java uses two byte encoding for a one char. Output consumer should know that.
+     *  UTF-8 is more elegant way how to transmit encoded data.
+     *  Therefore we put size of unicode byte array into netstring.
+      */
+    public static String toNetString(String data) {
+        StringBuilder sb = new StringBuilder(data.length() + 4);
+        try {
+            sb.append(data.getBytes("UTF-8").length)
+                .append(':')
+                .append(data)
+                .append(',');
+        } catch (Exception e) {
+            logger.error("Unable to convert data to netstring.", e);
+            return "";
+        }
+        return sb.toString();
     }
 
     @Override
