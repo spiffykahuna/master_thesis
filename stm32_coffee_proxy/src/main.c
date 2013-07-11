@@ -67,6 +67,7 @@ xQueueHandle  requestQueue;
 xQueueHandle  responseQueue;
 
 writer_params_t writerConfig;
+reader_params_t readerConfig;
 
 int main(void)
 {
@@ -208,7 +209,15 @@ int initTransport(void) {
 		return ERROR;
 	};
 
-	xStatus  = xTaskCreate( tskUART1Reader, ( signed char * ) "tskUART1Reader", configMINIMAL_STACK_SIZE + configMINIMAL_STACK_SIZE , NULL, PRIORITY_USB_READER_TASK, NULL );
+
+	readerConfig.transport_type = TRANSPORT_UART1;
+	readerConfig.dataInputQueue = msgIncomeQueue;
+	readerConfig.dataInputQueueTimeout = QUEUE_SEND_WAIT_TIMEOUT;
+	readerConfig.dataReadSemaphore = xUSBReadSemaphore;
+	readerConfig.stream_has_byte = UART1_has_bytes;
+	readerConfig.read_char_func = UART1_read_char;
+
+	xStatus  = xTaskCreate( tskAbstractReader, ( signed char * ) "tskUART1Reader", configMINIMAL_STACK_SIZE + configMINIMAL_STACK_SIZE , (void *) &readerConfig, PRIORITY_USB_READER_TASK, NULL );
 	if(xStatus != pdPASS) {
 		logger(LEVEL_ERR, "Unable to create USB reader task\n\r");
 		return ERROR;

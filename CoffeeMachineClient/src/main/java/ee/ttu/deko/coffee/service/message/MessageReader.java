@@ -5,6 +5,8 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.Reader;
+import java.io.UnsupportedEncodingException;
+import java.util.Iterator;
 
 public class MessageReader implements Runnable {
     private final static Logger logger = LoggerFactory.getLogger(MessageReader.class);
@@ -18,12 +20,20 @@ public class MessageReader implements Runnable {
     private StringBuilder messageBuffer = new StringBuilder();
     private boolean isStarted;
 
+    private enum ReaderState{
+        WAITING_FOR_INPUT,
+        READING_MESSAGE_SIZE,
+        READING_MESSAGE_VALUE, READING_MESSAGE_TERMINATOR, HANDLING_NEW_MESSAGE,
+    }
+    private ReaderState state;
+
     public MessageReader(Reader inputReader, MessageHandler messageHandler) {
         if(inputReader == null) throw new IllegalArgumentException("Unable to create reader. Stream is null");
         if(messageHandler == null) throw new IllegalArgumentException("Unable to create reader. Message handler is null");
 
         this.inputReader = inputReader;
         this.messageHandler = messageHandler;
+        this.state = ReaderState.WAITING_FOR_INPUT;
     }
 
     public synchronized void start() {
@@ -46,6 +56,8 @@ public class MessageReader implements Runnable {
 
     private void doRun() throws IOException, InterruptedException  {
         logger.info("Starting read loop");
+        char newChar;
+        int messageLength = -1;
         for (; !isClosed ;) {
 
             synchronized (this) {
@@ -55,38 +67,87 @@ public class MessageReader implements Runnable {
                 if(isClosed)                    break;
             }
 
-            int newChar = inputReader.read();
-            if (newChar < 0) {
-                // EOF
-                logger.debug("End of stream appeared");
-                break;
-            }
 
-            messageBuffer.append((char) newChar);
-            if(hasNewLine(messageBuffer)) {
-                logger.debug("Processing new line...");
-                processNewMessage(messageBuffer);
+            // State machine for receiving netstrings
+            switch(state) {
+                case WAITING_FOR_INPUT:
+                    newChar = readChar();
+                    if(Character.isDigit(newChar)) {
+                        messageBuffer.append(newChar);
+                        state = ReaderState.READING_MESSAGE_SIZE;
+                    }
+                    break;
+
+                case READING_MESSAGE_SIZE:
+                    newChar = readChar();
+                    if(Character.isDigit(newChar)) {
+                        messageBuffer.append(newChar);
+                        state = ReaderState.READING_MESSAGE_SIZE;
+                    } else if(Character.valueOf(newChar).equals(':')) {
+                        messageLength = -1;
+                        try{
+                            messageLength = Integer.parseInt(messageBuffer.toString());
+                        } catch(NumberFormatException nfe) {
+                            logger.warn("Unable to parse message size: value = {}", messageBuffer.toString());
+                        }
+                        if(messageLength > -1) {
+                            messageBuffer.setLength(0);
+                            state = ReaderState.READING_MESSAGE_VALUE;
+                        }
+                    }
+                    break;
+
+                case READING_MESSAGE_VALUE:
+                    if(messageLength > 0) {
+                        newChar = readChar();
+                        messageBuffer.append(newChar);
+                        --messageLength;
+                    } else if(messageLength == 0) {
+                        state = ReaderState.READING_MESSAGE_TERMINATOR;
+                    } else {
+                        logger.warn("Reader is bound of message. Current position = {}", messageLength );
+                        state =  ReaderState.WAITING_FOR_INPUT;
+                    }
+                    break;
+
+                case READING_MESSAGE_TERMINATOR:
+                    newChar = readChar();
+                    if(Character.valueOf(newChar).equals(',')) {
+                        state = ReaderState.HANDLING_NEW_MESSAGE;
+                    } else {
+                        logger.warn("Unable to get message terminator. Got {} instead of ',' ", newChar);
+                        state = ReaderState.WAITING_FOR_INPUT;
+                    }
+                    break;
+
+                case HANDLING_NEW_MESSAGE:
+                    String msg = messageBuffer.toString().replace("\r", "");
+                    if(msg != null && !msg.isEmpty()) {
+                        logger.info("Received new message: {}", msg);
+                        handleMessage(msg);
+
+                        if(messageBuffer.capacity() > 1024) {
+                            messageBuffer = new StringBuilder();
+                        } else {
+                            messageBuffer.setLength(0);
+                        }
+                    }
+                    state = ReaderState.WAITING_FOR_INPUT;
+
+                    break;
+
+                default:
+                    logger.warn("Unreachable reader state: {}", state.name());
+                    continue;
             }
-        }
-        // process buffer before exiting thread
-        if(hasNewLine(messageBuffer)) {
-            logger.debug("Processing new line...");
-            processNewMessage(messageBuffer);
         }
         logger.info("Reader loop was stopped.");
     }
 
-    private boolean hasNewLine(StringBuilder messageBuffer) {
-        return  messageBuffer.indexOf("\n") > -1;
-    }
-
-    private void processNewMessage(StringBuilder messageBuffer) {
-        int idx;
-        while ((idx = messageBuffer.indexOf("\n")) > -1) {
-            String msg = messageBuffer.substring(0, idx).replace("\r", "");
-            handleMessage(msg);
-            messageBuffer.delete(0, idx + 1);
-        }
+    private char readChar() throws IOException {
+        int newChar = inputReader.read();
+        if(newChar == -1) throw new IOException("End of stream occurred. (User generated exception)");
+        return (char) newChar;
     }
 
     private void handleMessage(String msg) {
@@ -105,10 +166,6 @@ public class MessageReader implements Runnable {
     }
 
     public boolean isAlive() {
-        if(readThread != null) {
-            return readThread.isAlive();
-        } else {
-            return false;
-        }
+        return readThread != null && readThread.isAlive();
     }
 }

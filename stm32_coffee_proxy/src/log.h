@@ -26,6 +26,8 @@
 
 #include "transport/uart/uart.h"
 
+#define LOG_TRANSPORT TRANSPORT_UART1
+
 typedef enum  {
 	LEVEL_OFF 		= 0,
 	LEVEL_FATAL 	= 1,

@@ -152,9 +152,9 @@ json_t * handle_request(json_t **requestJson) {
 	system_flush_messages();
 
 	if(methodName[0] != '\0') {
-		if(METHOD_IS("subtract", methodName)) { responseJson = subtract(requestJson);}
-		if(METHOD_IS("system.help", methodName)) { responseJson = getSystemHelp(requestJson);}
-
+		if(METHOD_IS("subtract", methodName)) 		{ responseJson = subtract(requestJson);}
+		if(METHOD_IS("system.help", methodName)) 	{ responseJson = getSystemHelp(requestJson);}
+		if(METHOD_IS("get_info", methodName))		{ responseJson = getInfo(requestJson);}
 
 	} else {
 		json_decref(*requestJson);

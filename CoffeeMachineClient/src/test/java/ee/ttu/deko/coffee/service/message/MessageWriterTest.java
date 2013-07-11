@@ -13,12 +13,8 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 import static org.hamcrest.core.StringContains.containsString;
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.*;
 
 public class MessageWriterTest {
     Reader outputReader;
@@ -75,7 +71,7 @@ public class MessageWriterTest {
             writer.onRequest(request);
             return request.toString().length();
         }
-    };
+    }
 
     @Before
     public void setUp() throws Exception {
@@ -177,7 +173,7 @@ public class MessageWriterTest {
     @Test
     public void writeAfterStop() throws Exception {
         messageWriter.start();
-        String output = "";
+        String output;
         int len = 0;
         for (int i = 0; i < 100; i++) {
             len = service.writeSomeMsg("some_data");
@@ -228,7 +224,7 @@ public class MessageWriterTest {
             add("two");
         }});
 
-        int dataLen = notification.toString().length();
+        int dataLen = MessageWriter.toNetString(notification.toString()).length();
         messageWriter.start();
 
         messageWriter.onNotification(notification);
@@ -237,8 +233,6 @@ public class MessageWriterTest {
 
         assertEquals(dataLen, output.length());
         assertThat(output, containsString(notification.toString()));
-
-
     }
 
     @Test
@@ -250,5 +244,18 @@ public class MessageWriterTest {
             messageWriter.onResponse(null);
             messageWriter.onUnknownMessage(null);
         }
+    }
+
+    @Test
+    public void writerWritesProperNetStrings() throws Exception {
+        RPCRequest request = new RPCRequest("some_method_with_ünicode", 1);   /* two byte character  ü */
+        String netString = MessageWriter.toNetString(request.toString());
+        int netLength = Integer.parseInt(netString.substring(0, netString.indexOf(':')));
+        assertNotEquals(request.toString().length(), netLength);
+
+        request = new RPCRequest("some_method_without_unicode", 1);
+        netString = MessageWriter.toNetString(request.toString());
+        netLength = Integer.parseInt(netString.substring(0, netString.indexOf(':')));
+        assertEquals(request.toString().length(), netLength);
     }
 }
