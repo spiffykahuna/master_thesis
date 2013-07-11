@@ -41,6 +41,8 @@ inline void UART1_send_byte(uint8_t byte);
 
 uint8_t UART1_read();
 
+inline char UART1_read_char();
+
 int UART1_has_bytes();
 
 

@@ -12,6 +12,7 @@
 #include "transport_domain.h"
 #include "packet.h"
 #include "abstract_writer.h"
+#include "abstract_reader.h"
 #include "string_utils.h"
 #include "uart/uart.h"
 

@@ -16,8 +16,8 @@ rm *.sty
 
 #rm wordcount.tex
 
-cp ../tex/*.tex ./
-cp ../resource/*.sty ./
+cp -r ../tex/** ./
+cp -r ../resource/*.sty ./
 pdflatex -interaction=scrollmode --src-specials -shell-escape "$1".tex
 bibtex "$1"
 pdflatex -interaction=scrollmode --src-specials -shell-escape "$1".tex

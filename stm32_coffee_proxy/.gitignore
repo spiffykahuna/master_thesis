@@ -5,6 +5,7 @@ json*
 .cproject
 .project
 Debug/
+Default/
 *.log
 src/timers.c
 src/timers.h

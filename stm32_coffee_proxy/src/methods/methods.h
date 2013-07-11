@@ -9,6 +9,7 @@
 #define METHODS_H_
 
 #include "mainTasks.h"
+#include "get_info.h"
 
 inline void delete_rpc_method(json_t *requestJson);
 

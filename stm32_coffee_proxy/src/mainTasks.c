@@ -198,7 +198,7 @@ void tskHandleRequests(void *pvParameters) {
 								MSG_JSONRPC_ERRORS.general_error_json,
 								JSONRPC_SERVER_ERROR,				/* <-- code */
 								MSG_JSONRPC_ERRORS.server_error,	/* <-- message */
-								MSG_MAINTASKS.tskUART1Reader.device_is_busy_timeout , /* <-- data */
+								MSG_MAINTASKS.tskAbstractReader.device_is_busy_timeout , /* <-- data */
 								idStr
 							);
 						}
@@ -245,11 +245,11 @@ void tskParseJson(void *pvParameters) {
 						json_object_del(requestJson, "params");
 
 						json_t* errorObj = create_error(JSONRPC_SERVER_ERROR, MSG_JSONRPC_ERRORS.server_error);
-						json_object_set_new(errorObj, "data", json_string(MSG_MAINTASKS.tskUART1Reader.device_is_busy_timeout));
+						json_object_set_new(errorObj, "data", json_string(MSG_MAINTASKS.tskAbstractReader.device_is_busy_timeout));
 
 						json_object_set_new(requestJson, "error", errorObj);
 
-						logger_format(LEVEL_WARN, "%s %s", taskName, MSG_MAINTASKS.tskUART1Reader.device_is_busy_timeout);
+						logger_format(LEVEL_WARN, "%s %s", taskName, MSG_MAINTASKS.tskAbstractReader.device_is_busy_timeout);
 
 						// send error back to client using output queue
 						xStatus = xQueueSendToBack( responseQueue, &requestJson, (portTickType) QUEUE_SEND_WAIT_TIMEOUT );
@@ -265,12 +265,12 @@ void tskParseJson(void *pvParameters) {
 									MSG_JSONRPC_ERRORS.general_error_json,
 									JSONRPC_SERVER_ERROR,				/* <-- code */
 									MSG_JSONRPC_ERRORS.server_error,	/* <-- message */
-									MSG_MAINTASKS.tskUART1Reader.device_is_busy_timeout , /* <-- data */
+									MSG_MAINTASKS.tskAbstractReader.device_is_busy_timeout , /* <-- data */
 									id
 								);
 							}
 							if(id) vPortFree(id);
-							logger_format(LEVEL_WARN, "%s %s", taskName, MSG_MAINTASKS.tskUART1Reader.device_is_busy_timeout);
+							logger_format(LEVEL_WARN, "%s %s", taskName, MSG_MAINTASKS.tskAbstractReader.device_is_busy_timeout);
 						}
 					}
 				}
@@ -282,30 +282,30 @@ void tskParseJson(void *pvParameters) {
 }
 
 
-inline
-packet_t * createNewIncomePacketFromStr(strbuffer_t ** temp) {
-	packet_t *incomePacket = NULL;
-	incomePacket = packet_new(TRANSPORT_UART1);
-	if(!incomePacket) {
-		report_error_to_sender(
-			TRANSPORT_UART1,
-			MSG_JSONRPC_ERRORS.general_error_json,
-			JSONRPC_SERVER_ERROR,				/* <-- code */
-			MSG_JSONRPC_ERRORS.server_error,	/* <-- message */
-			MSG_MAINTASKS.tskUART1Reader.unable_to_alloc_new_json_packet , /* <-- data */
-			"null" 	/* <-- id */
-		);
-		packet_destroy(&incomePacket);
-		strbuffer_destroy(temp);
-
-		logger_format(LEVEL_WARN, "%s %s", pcTaskGetTaskName(NULL), MSG_MAINTASKS.tskUART1Reader.unable_to_alloc_new_json_packet);
-
-		return NULL;
-	}
-	incomePacket->jsonDoc = strbuffer_new();
-	strbuffer_append(incomePacket->jsonDoc, (*temp)->value);
-	return incomePacket;
-}
+//inline
+//packet_t * createNewIncomePacketFromStr(strbuffer_t ** temp) {
+//	packet_t *incomePacket = NULL;
+//	incomePacket = packet_new(TRANSPORT_UART1);
+//	if(!incomePacket) {
+//		report_error_to_sender(
+//			TRANSPORT_UART1,
+//			MSG_JSONRPC_ERRORS.general_error_json,
+//			JSONRPC_SERVER_ERROR,				/* <-- code */
+//			MSG_JSONRPC_ERRORS.server_error,	/* <-- message */
+//			MSG_MAINTASKS.tskAbstractReader.unable_to_alloc_new_json_packet , /* <-- data */
+//			"null" 	/* <-- id */
+//		);
+//		packet_destroy(&incomePacket);
+//		strbuffer_destroy(temp);
+//
+//		logger_format(LEVEL_WARN, "%s %s", pcTaskGetTaskName(NULL), MSG_MAINTASKS.tskAbstractReader.unable_to_alloc_new_json_packet);
+//
+//		return NULL;
+//	}
+//	incomePacket->jsonDoc = strbuffer_new();
+//	strbuffer_append(incomePacket->jsonDoc, (*temp)->value);
+//	return incomePacket;
+//}
 
 
 void tskUART1Reader(void *pvParameters) {
@@ -331,12 +331,12 @@ void tskUART1Reader(void *pvParameters) {
 						MSG_JSONRPC_ERRORS.general_error_json,	/* <-- format */
 						JSONRPC_SERVER_ERROR,				/* <-- code */
 						MSG_JSONRPC_ERRORS.server_error,	/* <-- message */
-						MSG_MAINTASKS.tskUART1Reader.unable_to_alloc_new_json_packet , /* <-- data */
+						MSG_MAINTASKS.tskAbstractReader.unable_to_alloc_new_json_packet , /* <-- data */
 						"null" 	/* <-- id */
 					);
 					strbuffer_destroy(&temp);
 
-					logger_format(LEVEL_WARN, "%s %s", taskName, MSG_MAINTASKS.tskUART1Reader.unable_to_alloc_new_json_packet);
+					logger_format(LEVEL_WARN, "%s %s", taskName, MSG_MAINTASKS.tskAbstractReader.unable_to_alloc_new_json_packet);
 					break;
 				}
 
@@ -349,12 +349,12 @@ void tskUART1Reader(void *pvParameters) {
 						MSG_JSONRPC_ERRORS.general_error_json,
 						JSONRPC_SERVER_ERROR,				/* <-- code */
 						MSG_JSONRPC_ERRORS.server_error,	/* <-- message */
-						MSG_MAINTASKS.tskUART1Reader.unable_to_alloc_new_json_packet , /* <-- data */
+						MSG_MAINTASKS.tskAbstractReader.unable_to_alloc_new_json_packet , /* <-- data */
 						"null" 	/* <-- id */
 					);
 					strbuffer_destroy(&temp);
 
-					logger_format(LEVEL_WARN, "%s %s", taskName, MSG_MAINTASKS.tskUART1Reader.unable_to_alloc_new_json_packet);
+					logger_format(LEVEL_WARN, "%s %s", taskName, MSG_MAINTASKS.tskAbstractReader.unable_to_alloc_new_json_packet);
 
 					break;
 				}
@@ -401,11 +401,11 @@ void tskUART1Reader(void *pvParameters) {
 							MSG_JSONRPC_ERRORS.general_error_json,
 							JSONRPC_SERVER_ERROR,				/* <-- code */
 							MSG_JSONRPC_ERRORS.server_error,	/* <-- message */
-							MSG_MAINTASKS.tskUART1Reader.device_is_busy_timeout , /* <-- data */
+							MSG_MAINTASKS.tskAbstractReader.device_is_busy_timeout , /* <-- data */
 							"null" 	/* <-- id */
 						);
 
-						logger_format(LEVEL_WARN, "%s %s", taskName, MSG_MAINTASKS.tskUART1Reader.device_is_busy_timeout);
+						logger_format(LEVEL_WARN, "%s %s", taskName, MSG_MAINTASKS.tskAbstractReader.device_is_busy_timeout);
 
 
 						continue;
@@ -423,10 +423,10 @@ void tskUART1Reader(void *pvParameters) {
 							MSG_JSONRPC_ERRORS.general_error_json,
 							JSONRPC_SERVER_ERROR,				/* <-- code */
 							MSG_JSONRPC_ERRORS.server_error,	/* <-- message */
-							MSG_MAINTASKS.tskUART1Reader.incoming_buffer_overflow , /* <-- data */
+							MSG_MAINTASKS.tskAbstractReader.incoming_buffer_overflow , /* <-- data */
 							"null" 	/* <-- id */
 						);
-						logger_format(LEVEL_WARN, "%s %s", taskName, MSG_MAINTASKS.tskUART1Reader.incoming_buffer_overflow);
+						logger_format(LEVEL_WARN, "%s %s", taskName, MSG_MAINTASKS.tskAbstractReader.incoming_buffer_overflow);
 					}
 				}
 			}

@@ -285,6 +285,10 @@ uint8_t UART1_read() {
 	return byte;
 }
 
+inline char UART1_read_char() {
+	return (char) UART1_read();
+}
+
 int UART1_has_bytes() {
 	return !uart_fifo_is_empty(&uartRxFifo);
 }
