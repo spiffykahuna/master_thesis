@@ -12,7 +12,7 @@ extern xQueueHandle  msgIncomeQueue;
 extern xQueueHandle  requestQueue;
 extern xQueueHandle  responseQueue;
 
-extern xSemaphoreHandle xUSBReadSemaphore;
+extern xSemaphoreHandle xUART1ReadSemaphore;
 
 extern const msg_maintasks MSG_MAINTASKS;
 extern const msg_jsonrpc_errors MSG_JSONRPC_ERRORS;
@@ -316,7 +316,7 @@ void tskUART1Reader(void *pvParameters) {
 
 	while (1) {
 
-		if( xSemaphoreTake( xUSBReadSemaphore, SYSTEM_TASK_DELAY ) == pdTRUE ) {
+		if( xSemaphoreTake( xUART1ReadSemaphore, SYSTEM_TASK_DELAY ) == pdTRUE ) {
 			while(UART1_has_bytes()) {
 				if(!temp) {
 					temp = strbuffer_new();
@@ -438,7 +438,7 @@ void tskUART1Reader(void *pvParameters) {
 void UART1_MsgAvailable_Callback(void) {
 	static signed portBASE_TYPE xHigherPriorityTaskWoken;
 
-	xSemaphoreGiveFromISR( xUSBReadSemaphore, &xHigherPriorityTaskWoken );
+	xSemaphoreGiveFromISR( xUART1ReadSemaphore, &xHigherPriorityTaskWoken );
 
 	if( xHigherPriorityTaskWoken == pdTRUE) {
 		portYIELD();

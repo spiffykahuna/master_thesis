@@ -11,8 +11,8 @@
 char error_space[ERROR_BUFFER_SIZE];
 
 extern xQueueHandle  usbOutComeQueue;
-extern xSemaphoreHandle xUSBWriteMutex;
-extern xSemaphoreHandle xUSBReadSemaphore;
+extern xSemaphoreHandle xUART1WriteMutex;
+extern xSemaphoreHandle xUART1ReadSemaphore;
 
 //inline
 //char * format_error_code(proxy_error_t errorCode) {
@@ -108,7 +108,7 @@ int transport_lock(transport_type_t transport, transport_direction_t direction) 
 	switch(direction) {
 		case DIRECTION_INPUT:
 			switch(transport) {
-				case TRANSPORT_UART1:		return wait_for_semaphore(xUSBReadSemaphore);
+				case TRANSPORT_UART1:		return wait_for_semaphore(xUART1ReadSemaphore);
 
 
 
@@ -118,7 +118,7 @@ int transport_lock(transport_type_t transport, transport_direction_t direction) 
 
 		case DIRECTION_OUTPUT:
 			switch(transport) {
-				case TRANSPORT_UART1:		return wait_for_semaphore(xUSBWriteMutex);
+				case TRANSPORT_UART1:		return wait_for_semaphore(xUART1WriteMutex);
 				default:				return pdFALSE;
 			}
 			break;
@@ -133,7 +133,7 @@ int transport_unlock(transport_type_t transport, transport_direction_t direction
 	switch(direction) {
 		case DIRECTION_INPUT:
 			switch(transport) {
-				case TRANSPORT_UART1:		return xSemaphoreGive(xUSBReadSemaphore);
+				case TRANSPORT_UART1:		return xSemaphoreGive(xUART1ReadSemaphore);
 
 
 
@@ -143,7 +143,7 @@ int transport_unlock(transport_type_t transport, transport_direction_t direction
 
 		case DIRECTION_OUTPUT:
 			switch(transport) {
-				case TRANSPORT_UART1:		return xSemaphoreGive(xUSBWriteMutex);
+				case TRANSPORT_UART1:		return xSemaphoreGive(xUART1WriteMutex);
 				default:				return pdFALSE;
 			}
 			break;

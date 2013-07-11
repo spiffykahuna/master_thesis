@@ -1,5 +1,10 @@
 #include "abstract_reader.h"
 
+extern const msg_maintasks MSG_MAINTASKS;
+extern const msg_jsonrpc_errors MSG_JSONRPC_ERRORS;
+
+extern xQueueHandle  msgIncomeQueue;
+
 inline
 packet_t * createNewIncomePacketFromStr(strbuffer_t ** temp, reader_params_t *config);
 
@@ -74,7 +79,7 @@ void tskAbstractReader(void *pvParameters) {
 
 							strbuffer_t *callHelp = strbuffer_new();
 							strbuffer_append(callHelp, "{\"jsonrpc\":\"2.0\",\"method\":\"system.help\",\"id\": null}");
-							incomePacket = createNewIncomePacketFromStr(&callHelp);
+							incomePacket = createNewIncomePacketFromStr(&callHelp, config);
 							strbuffer_destroy(&callHelp);
 							if(!incomePacket)
 								continue;

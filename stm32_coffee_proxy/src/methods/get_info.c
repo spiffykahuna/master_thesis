@@ -1,5 +1,7 @@
 #include "get_info.h"
 
+//extern const msg_maintasks MSG_MAINTASKS;
+extern const msg_jsonrpc_errors MSG_JSONRPC_ERRORS;
 
 json_t * getInfo(json_t **requestJson) {
 	json_t *responseJson = NULL;

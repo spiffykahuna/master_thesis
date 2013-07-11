@@ -13,19 +13,8 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f10x.h"
-//#include "stm32_eval.h"
-//#include "stm3210b_eval_lcd.h"
 
 #include "log.h"	/* <== specify logging function there*/
-
-//#include "hw_config.h"
-
-//
-//#include "usb_lib.h"
-//#include "usb_desc.h"
-//#include "usb_pwr.h"
-
-#include "transport/uart/uart.h"
 
 #include "app_config.h"
 #include "mainTasks.h"
@@ -33,7 +22,10 @@
 
 #include "jansson.h"
 #include "strbuffer.h"
-//#include "json_parse/json.h"
+
+#include "transport/transport.h"
+
+
 
 /*-----------------------------------------------------------*/
 extern void HardwareSetup();
@@ -55,8 +47,8 @@ USART_InitTypeDef USART_InitStructure;
 
 xSemaphoreHandle xLogMutex;
 
-xSemaphoreHandle xUSBReadSemaphore = NULL;
-xSemaphoreHandle xUSBWriteMutex = NULL;
+xSemaphoreHandle xUART1ReadSemaphore = NULL;
+xSemaphoreHandle xUART1WriteMutex = NULL;
 
 xQueueHandle  msgIncomeQueue = NULL;
 xQueueHandle  usbOutComeQueue = NULL;
@@ -75,10 +67,7 @@ int main(void)
 	/* Setup STM32 system (clock, PLL and Flash configuration) */
 	json_set_alloc_funcs(pvPortMalloc, vPortFree);
 
-
-//	ledsInit();
 	USART_init();
-//	USB_initialize();
 
 	int status = initLogger();
 	if( status != SUCCESS) {
@@ -138,62 +127,25 @@ void assert_failed( unsigned char *pucFile, unsigned long ulLine )
 	for( ;; );
 }
 
-
-//void ledsInit(void)
-//{
-///* Initialize LEDs, Key Button, LCD and COM port(USART) available on
-//	 STM3210X-EVAL board ******************************************************/
-//	STM_EVAL_LEDInit(LED1);
-//	STM_EVAL_LEDInit(LED2);
-//	STM_EVAL_LEDInit(LED3);
-//	STM_EVAL_LEDInit(LED4);
-//
-//
-//	/* Turn on leds available on STM3210X-EVAL **********************************/
-//	STM_EVAL_LEDOn(LED1);
-//	STM_EVAL_LEDOn(LED2);
-//	STM_EVAL_LEDOn(LED3);
-//	STM_EVAL_LEDOn(LED4);
-//
-//}
-
 void USART_init(void)
 {
-//	USART_InitStructure.USART_BaudRate = 115200;
-//	USART_InitStructure.USART_WordLength = USART_WordLength_8b;
-//	USART_InitStructure.USART_StopBits = USART_StopBits_1;
-//	USART_InitStructure.USART_Parity = USART_Parity_No;
-//	USART_InitStructure.USART_HardwareFlowControl = USART_HardwareFlowControl_None;
-//	USART_InitStructure.USART_Mode = USART_Mode_Rx | USART_Mode_Tx;
-//
-//	STM_EVAL_COMInit(COM1, &USART_InitStructure);
-
 	UART1_Init();
 //	UART2_Init();
 	UART3_Init();
 	UART4_Init();
 	UART5_Init();
-
 }
-
-//void USB_initialize(void)
-//{
-//	Set_System();
-//	Set_USBClock();
-//	USB_Interrupts_Config();
-//	USB_Init();
-//}
 
 inline
 int initTransport(void) {
 	portBASE_TYPE xStatus;
-	vSemaphoreCreateBinary( xUSBReadSemaphore );
-	if( xUSBReadSemaphore == NULL ) {
+	vSemaphoreCreateBinary( xUART1ReadSemaphore );
+	if( xUART1ReadSemaphore == NULL ) {
 		return ERROR;
 	};
 
-	xUSBWriteMutex = xSemaphoreCreateMutex( );
-	if( xUSBWriteMutex == NULL ) {
+	xUART1WriteMutex = xSemaphoreCreateMutex( );
+	if( xUART1WriteMutex == NULL ) {
 		return ERROR;
 	};
 
@@ -213,11 +165,11 @@ int initTransport(void) {
 	readerConfig.transport_type = TRANSPORT_UART1;
 	readerConfig.dataInputQueue = msgIncomeQueue;
 	readerConfig.dataInputQueueTimeout = QUEUE_SEND_WAIT_TIMEOUT;
-	readerConfig.dataReadSemaphore = xUSBReadSemaphore;
+	readerConfig.dataReadSemaphore = xUART1ReadSemaphore;
 	readerConfig.stream_has_byte = UART1_has_bytes;
 	readerConfig.read_char_func = UART1_read_char;
 
-	xStatus  = xTaskCreate( tskAbstractReader, ( signed char * ) "tskUART1Reader", configMINIMAL_STACK_SIZE + configMINIMAL_STACK_SIZE , (void *) &readerConfig, PRIORITY_USB_READER_TASK, NULL );
+	xStatus  = xTaskCreate( tskAbstractReader, ( signed char * ) "tskUART1Reader", configMINIMAL_STACK_SIZE + configMINIMAL_STACK_SIZE , (void *) &readerConfig, PRIORITY_UART_READER_TASK, NULL );
 	if(xStatus != pdPASS) {
 		logger(LEVEL_ERR, "Unable to create USB reader task\n\r");
 		return ERROR;
@@ -228,9 +180,9 @@ int initTransport(void) {
 	writerConfig.dataOutputQueue = usbOutComeQueue;
 	writerConfig.dataInputQueueTimeout = QUEUE_RECEIVE_WAIT_TIMEOUT;
 	writerConfig.write_func = UART1_send_chars;
-	writerConfig.writeMutex = xUSBWriteMutex;
+	writerConfig.writeMutex = xUART1WriteMutex;
 
-	xStatus  = xTaskCreate( tskAbstractWriter, ( signed char * ) "tskUART1Writer", configMINIMAL_STACK_SIZE , (void *) &writerConfig, PRIORITY_USB_WRITER_TASK, NULL );
+	xStatus  = xTaskCreate( tskAbstractWriter, ( signed char * ) "tskUART1Writer", configMINIMAL_STACK_SIZE , (void *) &writerConfig, PRIORITY_UART_WRITER_TASK, NULL );
 	if(xStatus != pdPASS) {
 		logger(LEVEL_ERR, "Unable to create USB reader task\n\r");
 		return ERROR;

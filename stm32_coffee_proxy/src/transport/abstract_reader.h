@@ -11,6 +11,8 @@
 #include "log.h"
 #include "strbuffer.h"
 
+#include "messages.h"
+
 typedef char (*stream_read_char_function_t)();
 typedef int (*stream_has_byte_function_t)();
 
@@ -24,7 +26,7 @@ typedef struct _reader_params_t {
 } reader_params_t;
 
 
-void tskAbstractWriter(void *pvParameters);
+void tskAbstractReader(void *pvParameters);
 
 
 #endif /* ABSTRACT_READER_H_ */
