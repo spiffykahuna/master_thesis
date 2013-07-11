@@ -44,7 +44,7 @@ void send_packet_to_client(packet_t *packet) {
 		break;
 
 	default:
-		/* TODO choose default transport or logging interface here */
+		logger_format(LEVEL_ERR, "%s method send_packet_to_client -> Received unknown transport type: %d", pcTaskGetTaskName(NULL), packet->transport);
 		break;
 	}
 }
@@ -59,7 +59,7 @@ void send_data_to_client(transport_type_t transport, char *data, size_t dataLeng
 		break;
 
 	default:
-		/* TODO choose default transport or logging interface here */
+		logger_format(LEVEL_ERR, "%s method send_packet_to_client -> Received unknown transport type: %d", pcTaskGetTaskName(NULL), transport);
 		break;
 	}
 }

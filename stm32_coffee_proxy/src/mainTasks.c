@@ -8,8 +8,6 @@
 /* Private variables ---------------------------------------------------------*/
 /* Extern variables ----------------------------------------------------------*/
 
-
-
 extern xQueueHandle  msgIncomeQueue;
 extern xQueueHandle  requestQueue;
 extern xQueueHandle  responseQueue;
@@ -74,8 +72,7 @@ json_t * parseJsonPacket(packet_t ** jsonPacket) {
 	root = json_loads((*jsonPacket)->jsonDoc->value, 0, &error);
 	//packet_destroy(jsonPacket);
 	if(root != NULL) {
-		/*	TODO
-			decode array or object
+		/*	TODO decode array or object
 			array --> batch (optional, but will be implemented only  if there will be enough resources mcu flash)
 			if batch proceed requests one by one and put the batch flag
 		*/
@@ -203,7 +200,7 @@ void tskHandleRequests(void *pvParameters) {
 							);
 						}
 						if(idStr) vPortFree(idStr);
-						logger_format(LEVEL_INFO, "%s :  Unable to add response to queue. id = %d   method = %s", taskName, (int) id, methodName );
+						logger_format(LEVEL_INFO, "%s :  Unable to add response to queue. Request id = %d", taskName, (int) id );
 					}
 
 				}
@@ -307,7 +304,7 @@ packet_t * createNewIncomePacketFromStr(strbuffer_t ** temp) {
 	return incomePacket;
 }
 
-
+// TODO make this reader abstract
 void tskUART1Reader(void *pvParameters) {
 	signed char *taskName = pcTaskGetTaskName(NULL);
 
@@ -436,7 +433,7 @@ void tskUART1Reader(void *pvParameters) {
 }
 
 /**
- * This function will be called when new message arrives from UART1
+ * This function will be called when new message arrives from UART1 (when UART line idle interrupt happens)
  */
 void UART1_MsgAvailable_Callback(void) {
 	static signed portBASE_TYPE xHigherPriorityTaskWoken;
@@ -447,6 +444,5 @@ void UART1_MsgAvailable_Callback(void) {
 		portYIELD();
 	}
 }
-
 
 
