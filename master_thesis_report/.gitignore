@@ -1,2 +1,6 @@
 tmp/
 .externalToolBuilders/
+.settings
+.log
+.project
+.texlipse
