@@ -63,25 +63,25 @@ reader_params_t readerConfig;
 
 int main(void)
 {
-	HardwareSetup();
 	/* Setup STM32 system (clock, PLL and Flash configuration) */
+	HardwareSetup();
+
 	json_set_alloc_funcs(pvPortMalloc, vPortFree);
 
 	USART_init();
 
 	int status = initLogger();
 	if( status != SUCCESS) {
-		logger(LEVEL_ERR, "Unable to initialize system logger. System stopped.\n\r");
 		return 1;
 	}
 
 	if(initSystemHandlers() != SUCCESS) {
-		logger(LEVEL_ERR, "Unable to initialize system handlers. System stopped.\n\r");
+		logger(LEVEL_ERR, "Unable to initialize system handlers. System has stopped.\n\r");
 		return 1;
 	}
 
 	if(initTransport() != SUCCESS) {
-		logger(LEVEL_ERR, "Unable to create USB reader and writer. System stopped.\n\r");
+		logger(LEVEL_ERR, "Unable to create USB reader and writer. System has stopped.\n\r");
 		return 1;
 	}
 
@@ -136,6 +136,7 @@ void USART_init(void)
 	UART5_Init();
 }
 
+
 inline
 int initTransport(void) {
 	portBASE_TYPE xStatus;
@@ -155,7 +156,7 @@ int initTransport(void) {
 		return ERROR;
 	};
 
-	usbOutComeQueue = xQueueCreate( OUTCOME_MSG_QUEUE_SIZE, sizeof(packet_t *) );
+-->	usbOutComeQueue = xQueueCreate( OUTCOME_MSG_QUEUE_SIZE, sizeof(packet_t *) );
 	if( usbOutComeQueue == NULL ) {
 		logger(LEVEL_ERR, "Unable to create USB outcoming queue\n\r");
 		return ERROR;
@@ -180,7 +181,7 @@ int initTransport(void) {
 	writerConfig.dataOutputQueue = usbOutComeQueue;
 	writerConfig.dataInputQueueTimeout = QUEUE_RECEIVE_WAIT_TIMEOUT;
 	writerConfig.write_func = UART1_send_chars;
-	writerConfig.writeMutex = xUART1WriteMutex;
+	writerConfig.writeMutex = xUART1WriteMutex; //TODO do we really need it?
 
 	xStatus  = xTaskCreate( tskAbstractWriter, ( signed char * ) "tskUART1Writer", configMINIMAL_STACK_SIZE , (void *) &writerConfig, PRIORITY_UART_WRITER_TASK, NULL );
 	if(xStatus != pdPASS) {
@@ -238,13 +239,8 @@ int initSystemHandlers(void) {
 
 inline
 int initLogger(void) {
-
 	xLogMutex = xSemaphoreCreateMutex( );
-	if( xLogMutex == NULL ) {
-		logger(LEVEL_ERR, "Unable to create log mutex\n\r");
-		return ERROR;
-	};
-
-	return SUCCESS;
+	setSystemLogLevel(LEVEL_DEBUG);
+	return xLogMutex != NULL ? SUCCESS : ERROR;
 }
 

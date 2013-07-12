@@ -25,7 +25,6 @@ typedef struct _reader_params_t {
 	xSemaphoreHandle				dataReadSemaphore;
 } reader_params_t;
 
-
 void tskAbstractReader(void *pvParameters);
 
 

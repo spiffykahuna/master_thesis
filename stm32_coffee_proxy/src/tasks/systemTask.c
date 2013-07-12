@@ -123,8 +123,8 @@ int system_msg_add_to_queue(system_msg_t *sysMsg) {
 	portBASE_TYPE xStatus = 0;
 
 	if(systemMsgQueue != NULL) {
-		retries = 5;
-		while(retries--) {
+		retries = 5; //TODO another magic constant
+		while((xStatus != pdPASS) && (retries-- > 0)) {
 			xStatus = xQueueSendToBack( systemMsgQueue, &sysMsg, (portTickType) QUEUE_SEND_WAIT_TIMEOUT );
 		}
 	} else {
@@ -136,11 +136,7 @@ int system_msg_add_to_queue(system_msg_t *sysMsg) {
 
 inline
 void system_flush_messages() {
-	while(1) {
-		if(uxQueueMessagesWaiting(systemMsgQueue) > 0) {
-			vTaskDelay( SYSTEM_TASK_DELAY );
-		} else {
-			break;
-		}
+	while(uxQueueMessagesWaiting(systemMsgQueue) > 0) {
+		vTaskDelay( SYSTEM_TASK_DELAY );
 	}
 }

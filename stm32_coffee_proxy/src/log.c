@@ -3,98 +3,96 @@
 #include <stdlib.h>
 #include "log.h"
 
+inline strbuffer_t * log_if_level_set(log_level_t level, char *msg);
+
 extern xSemaphoreHandle xLogMutex;
-
-extern xQueueHandle  systemMsgQueue;
-
-extern __IO uint32_t packet_sent;
-//__IO uint8_t Send_Buffer[VIRTUAL_COM_PORT_DATA_SIZE] ;
-//extern __IO  uint32_t packet_receive;
-//
-//extern __IO  uint8_t Receive_Buffer[VIRTUAL_COM_PORT_DATA_SIZE];
-//extern __IO  uint32_t Receive_length ;
+log_level_t systemLogLevel;
 
 static char logBuffer[STRING_BUFFER_SIZE];
 
-
 log_func_t log_func = log_to_UART3;	/* <== specify logging function here*/
 
-inline
-void sendUsbPacket(char* str, size_t size) {
-	while (packet_sent != 1) {
-		vTaskDelay(5 / portTICK_RATE_MS);
-	}
-//	CDC_Send_DATA((uint8_t*) str, size);
-}
-
-int log_to_UART3(char *str)
-{
+int log_to_UART3(char *str) {
 	size_t length = strlen(str);
 	UART3_send((uint8_t*) str, length);
 	return SUCCESS;
 }
 
 void logger(log_level_t level, char *msg) {
-	char temp[32];
 
-	strbuffer_t *logMsg = strbuffer_new();
+	strbuffer_t *logMsg = NULL;
+
+	switch(level) {
+	case LEVEL_OFF:
+		return; /* no message here */
+	case LEVEL_FATAL:
+		logMsg = log_if_level_set(level, msg, "FATAL : ");
+		break;
+
+	case LEVEL_ERR:
+		logMsg = log_if_level_set(level, msg, "ERROR : ");
+		break;
+	case LEVEL_WARN:
+		logMsg = log_if_level_set(level, msg, "WARN : ");
+		break;
+	case LEVEL_INFO:
+		logMsg = log_if_level_set(level, msg, "INFO : ");
+		break;
+	case LEVEL_DEBUG:
+		logMsg = log_if_level_set(level, msg, "DEBUG : ");
+		break;
+	case LEVEL_TRACE:
+		logMsg = log_if_level_set(level, msg, "TRACE : ");
+		break;
+	}
+
 	if(logMsg) {
-		snprintf(temp, 32, "%d   %d   ", (int) xTaskGetTickCount(), (int) xPortGetFreeHeapSize());
-		strbuffer_append(logMsg, temp);
-
-		switch(level) {
-		case LEVEL_OFF:
-			return; /* no message here */
-		case LEVEL_FATAL:
-			strbuffer_append(logMsg, "FATAL : ");
-			break;
-
-		case LEVEL_ERR:
-			strbuffer_append(logMsg, "ERROR : ");
-			break;
-		case LEVEL_WARN:
-			strbuffer_append(logMsg, "WARN : ");
-			break;
-		case LEVEL_INFO:
-			strbuffer_append(logMsg, "INFO : ");
-			break;
-		case LEVEL_DEBUG:
-			strbuffer_append(logMsg, "DEBUG : ");
-			break;
-		case LEVEL_TRACE:
-			strbuffer_append(logMsg, "TRACE : ");
-			break;
-		}
-
-		strbuffer_append(logMsg, msg);
-		strbuffer_append(logMsg, "\n");
-
 		system_msg_t *systemMsg = system_msg_new(MSG_TYPE_LOGGING);
 		systemMsg->logMsg = logMsg;
 
-		portBASE_TYPE xStatus = 0;
-		while( xStatus != pdPASS) {
-			xStatus = xQueueSendToBack( systemMsgQueue, &systemMsg, (portTickType) QUEUE_SEND_WAIT_TIMEOUT );
-		}
+		system_msg_add_to_queue(systemMsg);
 	}
 }
 
 void logger_format(log_level_t level, char *msgFormat, ...) {
 
 	va_list args;
+	if(level > LEVEL_OFF) {
+		if(wait_for_semaphore(xLogMutex) == pdPASS) {
+			// format error
+				memset(logBuffer, 0, STRING_BUFFER_SIZE);
+				va_start (args, msgFormat );
+				vsnprintf(logBuffer, STRING_BUFFER_SIZE, msgFormat, args);
+				va_end(args);
 
-	if(wait_for_semaphore(xLogMutex) == pdPASS) {
-		// format error
-			memset(logBuffer, 0, STRING_BUFFER_SIZE);
-			va_start (args, msgFormat );
-			vsnprintf(logBuffer, STRING_BUFFER_SIZE, msgFormat, args);
-			va_end(args);
-
-		logger(level, logBuffer);
-		xSemaphoreGive(xLogMutex);
+			logger(level, logBuffer);
+			xSemaphoreGive(xLogMutex);
+		}
 	}
 }
 
-// TODO proper logging everywhere ( on method start, finish, between on )
+inline char * getCurrentSystemState() {
+	static char temp[64];
+	snprintf(temp, 64, "%d %d %s : ", (int) xTaskGetTickCount(), (int) xPortGetFreeHeapSize(), pcTaskGetTaskName(NULL));
+	return temp;
+}
 
+inline strbuffer_t *  log_if_level_set(log_level_t level, char *msg, const char *levelMessage) {
+	if(level > systemLogLevel) return NULL;
 
+	strbuffer_t *logMsg = strbuffer_new();
+
+	strbuffer_append(logMsg, getCurrentSystemState());
+	strbuffer_append(logMsg, levelMessage);
+	strbuffer_append(logMsg, *msg);
+	strbuffer_append(logMsg, "\n");
+
+	return logMsg;
+}
+
+// TODO proper logging everywhere ( on method start, finish, between on different events)
+void setSystemLogLevel(log_level_t level) {
+	if(level >= LEVEL_OFF && level <= LEVEL_TRACE) {
+		systemLogLevel = level;
+	}
+}

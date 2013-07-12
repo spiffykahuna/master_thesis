@@ -1,10 +1,3 @@
-/*
- * transport.c
- *
- *  Created on: May 19, 2013
- *      Author: Kasutaja
- */
-
 #include <stdarg.h>
 #include "transport.h"
 
@@ -13,22 +6,6 @@ char error_space[ERROR_BUFFER_SIZE];
 extern xQueueHandle  usbOutComeQueue;
 extern xSemaphoreHandle xUART1WriteMutex;
 extern xSemaphoreHandle xUART1ReadSemaphore;
-
-//inline
-//char * format_error_code(proxy_error_t errorCode) {
-//	extern const msg_error MSG_ERROR;
-//	switch(errorCode) {
-//	case PROXY_MEMORY_ALLOC_FAILED:			return MSG_ERROR.PROXY_MEMORY_ALLOC_FAILED;
-//	case PROXY_DEVICE_IS_BUSY:				return MSG_ERROR.PROXY_DEVICE_IS_BUSY;
-//	case PROXY_INCOMING_BUFFER_OVERFLOW: 	return MSG_ERROR.PROXY_INCOMING_BUFFER_OVERFLOW;
-//	case PROXY_INVALID_INCOME_PACKET:		return MSG_ERROR.PROXY_INVALID_INCOME_PACKET;
-//	case PROXY_INVALID_JSONRPC_2_0:			return MSG_ERROR.PROXY_INVALID_JSONRPC_2_0;
-//
-//	default:								return MSG_ERROR.UNKNOWN;
-//	}
-//}
-
-
 
 inline
 void send_packet_to_client(packet_t *packet) {
@@ -49,7 +26,6 @@ void send_packet_to_client(packet_t *packet) {
 	}
 }
 
-
 /* this function transmit data directly to the destination avoiding queue mechanism */
 inline
 void send_data_to_client(transport_type_t transport, char *data, size_t dataLength) {
@@ -59,13 +35,17 @@ void send_data_to_client(transport_type_t transport, char *data, size_t dataLeng
 		break;
 
 	default:
-		logger_format(LEVEL_ERR, "%s method send_packet_to_client -> Received unknown transport type: %d", pcTaskGetTaskName(NULL), transport);
+		logger_format(LEVEL_ERR, "method send_packet_to_client -> Received unknown transport type: %d", transport);
 		break;
 	}
 }
 
 void report_error_to_sender(transport_type_t transport, const char *msgFormat, ...) {
 	va_list args;
+
+	//TODO error should be valid json message. BUT!!! we may get here because there is no more any additional dynamic memory available.
+	// error json should be made using static buffers
+	// TODO error should be also valid netstring message
 
 	// format error
 	memset(error_space, 0, ERROR_BUFFER_SIZE);
@@ -74,14 +54,14 @@ void report_error_to_sender(transport_type_t transport, const char *msgFormat, .
 	va_end (args);
 
 	send_data_to_client(transport, error_space, strlen(error_space));
-	//TODO uncomment here
+
 }
 
 
 inline
 char * transport_type_to_str(transport_type_t transport) {
 	switch(transport) {
-	case TRANSPORT_UART1:		return "TRANSPORT_USB";
+	case TRANSPORT_UART1:		return "TRANSPORT_UART1";
 
 	default:				return "TRANSPORT_UNKNOWN";
 	}
