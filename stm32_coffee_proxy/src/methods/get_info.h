@@ -5,6 +5,7 @@
 #include "messages.h"
 #include "system/error.h"
 
+
 json_t * getInfo(const json_t *requestJson);
 
 #endif /* GET_INFO_H_ */

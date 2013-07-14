@@ -17,6 +17,8 @@ inline void delete_rpc_method(json_t *requestJson);
 inline
 void add_jsonrpc2_0_version(json_t *requestJson);
 
+inline json_t * jsonrpc_response(const json_t* rpcRequest, json_t *resultOrError, int error);
+
 void handle_request(packet_t *requestPacket);
 
 #endif /* METHODS_H_ */

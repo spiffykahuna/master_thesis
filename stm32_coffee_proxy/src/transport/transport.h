@@ -20,7 +20,10 @@
 inline
 void send_packet_to_client(packet_t *packet);
 
-void report_error_to_sender(transport_type_t transport,const char *msgFormat, ...);
+inline
+void send_data_to_client(transport_type_t transport, char *data, size_t dataLength);
+
+//void report_error_to_sender(transport_type_t transport,const char *msgFormat, ...);
 
 const char * transport_type_to_str(transport_type_t transport);
 

@@ -53,8 +53,6 @@ void tskAbstractWriter(void *pvParameters) {
 							logger(LEVEL_ERR, errorMsg->value);
 							strbuffer_destroy(&errorMsg);
 
-							// TODO if transport is wrong, we need to put this packet somewhere, for example a special queue
-							// System should put this packet to right place or destroy it
 							packet_destroy(&dataPacket);
 							continue;
 						};

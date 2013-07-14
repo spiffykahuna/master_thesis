@@ -80,6 +80,11 @@ json_t * subtract(const json_t *requestJson) {
 	return responseJson;
 }
 
+json_t * get_free_memory(const json_t *requestJson) {
+	logger(LEVEL_INFO, int_to_string(xPortGetFreeHeapSize()));
+	return jsonrpc_response(requestJson, json_integer((json_int_t) xPortGetFreeHeapSize()), FALSE);
+}
+
 json_t * getSystemHelp(const json_t *requestJson, transport_type_t transport) {
 
 
@@ -213,6 +218,8 @@ void handle_request(packet_t *requestPacket) {
 	if(METHOD_IS("subtract", methodName)) 		{ responseJson = subtract(rpcRequest); methodFound = 1;}
 	if(METHOD_IS("system.help", methodName)) 	{ responseJson = getSystemHelp(rpcRequest, requestPacket->transport); methodFound = 1;}
 	if(METHOD_IS("get_info", methodName))		{ responseJson = getInfo(rpcRequest); methodFound = 1;}
+
+	if(METHOD_IS("get_free_memory", methodName))		{ responseJson = get_free_memory(rpcRequest); methodFound = 1;}
 
 	if(responseJson) {
 

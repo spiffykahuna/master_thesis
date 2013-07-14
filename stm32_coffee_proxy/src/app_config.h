@@ -28,6 +28,8 @@
 #define SYSTEM_MSG_QUEUE_SIZE		(INCOME_MSG_QUEUE_SIZE * 2)
 #define SYSTEM_MSG_QUEUE_ADD_RETRIES	5
 
+#define QUEUE_ADD_RETRIES			5
+
 /* end of transmission character */
 #define EOT_CHAR	10
 

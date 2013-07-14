@@ -201,7 +201,6 @@ int initTransport(void) {
 	writerConfig.dataOutputQueue = msgOutComeQueue;
 	writerConfig.dataInputQueueTimeout = QUEUE_RECEIVE_WAIT_TIMEOUT;
 	writerConfig.write_func = UART1_send_chars;
-	writerConfig.writeMutex = xUART1WriteMutex; //TODO do we really need it?
 	writerConfig.dataPacketType = PKG_TYPE_OUTGOING_MESSAGE_STRING;
 
 	xStatus  = xTaskCreate( tskAbstractWriter, ( signed char * ) "tskUART1Writer", configMINIMAL_STACK_SIZE , (void *) &writerConfig, PRIORITY_UART_WRITER_TASK, NULL );

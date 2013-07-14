@@ -61,22 +61,22 @@ void send_data_to_client(transport_type_t transport, char *data, size_t dataLeng
 	}
 }
 
-void report_error_to_sender(transport_type_t transport, const char *msgFormat, ...) {
-	va_list args;
-
-	//TODO error should be valid json message. BUT!!! we may get here because there is no more any additional dynamic memory available.
-	// error json should be made using static buffers
-	// TODO error should be also valid netstring message
-
-	// format error
-	memset(error_space, 0, ERROR_BUFFER_SIZE);
-	va_start (args, msgFormat );
-	vsnprintf(error_space, ERROR_BUFFER_SIZE, msgFormat, args);
-	va_end (args);
-
-	send_data_to_client(transport, error_space, strlen(error_space));
-
-}
+//void report_error_to_sender(transport_type_t transport, const char *msgFormat, ...) {
+//	va_list args;
+//
+//
+//	// error json should be made using static buffers
+//
+//
+//	// format error
+//	memset(error_space, 0, ERROR_BUFFER_SIZE);
+//	va_start (args, msgFormat );
+//	vsnprintf(error_space, ERROR_BUFFER_SIZE, msgFormat, args);
+//	va_end (args);
+//
+//	send_data_to_client(transport, error_space, strlen(error_space));
+//
+//}
 
 
 

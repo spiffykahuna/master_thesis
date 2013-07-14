@@ -4,8 +4,6 @@
 extern const msg_maintasks MSG_MAINTASKS;
 extern const msg_jsonrpc_errors MSG_JSONRPC_ERRORS;
 
-extern xQueueHandle  msgIncomeQueue;
-
 typedef enum _reader_state_t {
 	WAITING_FOR_INPUT,
 	READING_MESSAGE_SIZE,
@@ -28,6 +26,8 @@ void tskAbstractReader(void *pvParameters) {
 	char newChar;
 	int messageLength;
 
+	char *errorString;
+	strbuffer_t *errorBuffer;
 	strbuffer_t *logMsg;
 
 	reader_state_t state = WAITING_FOR_INPUT;
@@ -45,14 +45,18 @@ void tskAbstractReader(void *pvParameters) {
 						messageBuffer = strbuffer_new();
 
 						if(!messageBuffer) {
-//							report_error_to_sender(
-//								config->transport_type,						/* <-- which way to send  */
-//								MSG_JSONRPC_ERRORS.general_error_json,		/* <-- format */
-//								JSONRPC_SERVER_ERROR,						/* <-- code */
-//								MSG_JSONRPC_ERRORS.server_error,			/* <-- message */
-//								MSG_MAINTASKS.tskAbstractReader.unable_to_alloc_new_json_packet , /* <-- data */
-//								"null" 	/* <-- id */
-//							);
+							errorString = format_jsonrpc_error(JSONRPC_SERVER_ERROR, MSG_JSONRPC_ERRORS.server_error, "internal server error", 0);
+							errorBuffer = strbuffer_new();
+							strbuffer_append(errorBuffer, errorString);
+
+							packet_t *errorPacket = packet_new();
+
+							errorPacket->type = PKG_TYPE_OUTGOING_MESSAGE_STRING;
+							errorPacket->payload.stringData = errorBuffer;
+							errorPacket->transport = config->transport_type;
+
+							sendOutputMessage(errorPacket);
+
 							strbuffer_destroy(&messageBuffer);
 
 							logger(LEVEL_WARN, MSG_MAINTASKS.tskAbstractReader.unable_to_alloc_new_json_packet);
@@ -97,14 +101,18 @@ void tskAbstractReader(void *pvParameters) {
 									state = READING_MESSAGE_VALUE;
 								} else if(messageLength > MAX_INCOME_MSG_SIZE) {
 									strbuffer_destroy(&messageBuffer);
-									report_error_to_sender(
-										config->transport_type,
-										MSG_JSONRPC_ERRORS.general_error_json,
-										JSONRPC_SERVER_ERROR,				/* <-- code */
-										MSG_JSONRPC_ERRORS.server_error,	/* <-- message */
-										MSG_MAINTASKS.tskAbstractReader.incoming_buffer_overflow , /* <-- data */
-										"null" 	/* <-- id */
-									);
+
+									errorString = format_jsonrpc_error(JSONRPC_SERVER_ERROR, MSG_JSONRPC_ERRORS.server_error, "internal server error", 0);
+									errorBuffer = strbuffer_new();
+									strbuffer_append(errorBuffer, errorString);
+
+									packet_t *errorPacket = packet_new();
+
+									errorPacket->type = PKG_TYPE_OUTGOING_MESSAGE_STRING;
+									errorPacket->payload.stringData = errorBuffer;
+									errorPacket->transport = config->transport_type;
+
+									sendOutputMessage(errorPacket);
 
 									logMsg = strbuffer_new();
 									strbuffer_append(logMsg, MSG_MAINTASKS.tskAbstractReader.incoming_buffer_overflow);
@@ -342,10 +350,30 @@ inline int isDigit(char character) {
 
 inline int handleMessage(strbuffer_t *msg, reader_params_t *config) {
 	portBASE_TYPE xStatus;
+	char * errorString;
+	strbuffer_t *errorBuffer;
+	packet_t * errorPacket;
+
 	packet_t *incomePacket = createNewIncomePacketFromStr(&msg, config);
 
-	if(!incomePacket)
-		return FALSE; // TODO error handling when unable to create new packet
+
+	if(!incomePacket) {
+		errorString = format_jsonrpc_error(JSONRPC_SERVER_ERROR, MSG_JSONRPC_ERRORS.server_error, "internal server error", 0);
+		errorBuffer = strbuffer_new();
+		strbuffer_append(errorBuffer, errorString);
+
+		errorPacket = packet_new();
+
+		errorPacket->type = PKG_TYPE_OUTGOING_MESSAGE_STRING;
+		errorPacket->payload.stringData = errorBuffer;
+		errorPacket->transport = config->transport_type;
+
+		sendOutputMessage(errorPacket);
+
+		logger(LEVEL_WARN, "Unable to create incoming packet from string");
+		return FALSE;
+	}
+
 
 	strbuffer_destroy(&msg);
 
@@ -356,7 +384,7 @@ inline int handleMessage(strbuffer_t *msg, reader_params_t *config) {
 	logger(LEVEL_DEBUG, logMsg->value);
 	strbuffer_destroy(&logMsg);
 
-	int repeats = 5; // TODO maybe put repeat count into config
+	int repeats = QUEUE_ADD_RETRIES;
 	do {
 		xStatus = xQueueSendToBack( config->dataInputQueue, &incomePacket, config->dataInputQueueTimeout );
 	} while( xStatus != pdPASS && (repeats-- > 0) );
@@ -365,12 +393,11 @@ inline int handleMessage(strbuffer_t *msg, reader_params_t *config) {
 		packet_destroy(&incomePacket);
 		strbuffer_destroy(&msg);
 
-
-		char * errorString = format_jsonrpc_error(JSONRPC_SERVER_ERROR, MSG_JSONRPC_ERRORS.server_error, "internal server error", 0);
-		strbuffer_t *errorBuffer = strbuffer_new();
+		errorString = format_jsonrpc_error(JSONRPC_SERVER_ERROR, MSG_JSONRPC_ERRORS.server_error, "internal server error", 0);
+		errorBuffer = strbuffer_new();
 		strbuffer_append(errorBuffer, errorString);
 
-		packet_t * errorPacket = packet_new();
+		errorPacket = packet_new();
 
 		errorPacket->type = PKG_TYPE_OUTGOING_MESSAGE_STRING;
 		errorPacket->payload.stringData = errorBuffer;

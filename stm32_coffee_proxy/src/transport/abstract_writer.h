@@ -25,7 +25,6 @@ typedef struct _writer_params_t {
 	write_callback_t	write_func;
 	xQueueHandle		dataOutputQueue;
 	portTickType		dataInputQueueTimeout;
-	xSemaphoreHandle	writeMutex;
 	packet_type_t		dataPacketType;
 } writer_params_t;
 

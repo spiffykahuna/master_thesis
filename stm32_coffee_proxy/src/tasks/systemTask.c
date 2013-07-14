@@ -123,7 +123,7 @@ int system_msg_add_to_queue(system_msg_t *sysMsg) {
 	portBASE_TYPE xStatus = 0;
 
 	if(systemMsgQueue != NULL && sysMsg) {
-		retries = SYSTEM_MSG_QUEUE_ADD_RETRIES; //TODO another magic constant
+		retries = SYSTEM_MSG_QUEUE_ADD_RETRIES;
 		while((xStatus != pdPASS) && (retries-- >= 0)) {
 			xStatus = xQueueSendToBack( systemMsgQueue, &sysMsg, (portTickType) QUEUE_SEND_WAIT_TIMEOUT );
 			if(xStatus != pdPASS) { vTaskDelay(SYSTEM_TASK_DELAY); }
