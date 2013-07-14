@@ -11,6 +11,7 @@
 #include "app_config.h"
 #include "transport_domain.h"
 #include "packet.h"
+
 #include "abstract_writer.h"
 #include "abstract_reader.h"
 #include "string_utils.h"
@@ -21,8 +22,7 @@ void send_packet_to_client(packet_t *packet);
 
 void report_error_to_sender(transport_type_t transport,const char *msgFormat, ...);
 
-inline
-char * transport_type_to_str(transport_type_t transport);
+const char * transport_type_to_str(transport_type_t transport);
 
 inline
 int wait_for_semaphore(xSemaphoreHandle semaphore);

@@ -10,12 +10,13 @@
 
 #include "mainTasks.h"
 #include "get_info.h"
+#include "transport/transport.h"
 
 inline void delete_rpc_method(json_t *requestJson);
 
 inline
 void add_jsonrpc2_0_version(json_t *requestJson);
 
-json_t * handle_request(json_t **requestJson);
+void handle_request(packet_t *requestPacket);
 
 #endif /* METHODS_H_ */

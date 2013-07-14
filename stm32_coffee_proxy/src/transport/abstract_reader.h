@@ -12,6 +12,7 @@
 #include "strbuffer.h"
 
 #include "messages.h"
+#include "mainTasks.h"
 
 typedef char (*stream_read_char_function_t)();
 typedef int (*stream_has_byte_function_t)();

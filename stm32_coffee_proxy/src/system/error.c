@@ -7,6 +7,8 @@
 
 #include "error.h"
 
+char error_space[ERROR_BUFFER_SIZE];
+extern const msg_jsonrpc_errors MSG_JSONRPC_ERRORS;
 
 inline
 json_t * create_error(int errorCode, char* errorMsg) {
@@ -28,3 +30,19 @@ json_t * create_response_error(int errorCode, char* errorMsg) {
 	json_object_set_new(responseJson, "error", errorObj);
 	return responseJson;
 }
+
+char * format_jsonrpc_error(proxy_error_t errorNum, char* errorMsg, char* errorData, json_int_t id) {
+
+	snprintf(error_space, ERROR_BUFFER_SIZE,
+			MSG_JSONRPC_ERRORS.general_error_json,
+			errorNum,
+			errorMsg,
+			errorData,
+			id
+	);
+	return error_space;
+}
+
+
+
+

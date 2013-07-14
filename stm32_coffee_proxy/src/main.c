@@ -50,13 +50,16 @@ xSemaphoreHandle xLogMutex;
 xSemaphoreHandle xUART1ReadSemaphore = NULL;
 xSemaphoreHandle xUART1WriteMutex = NULL;
 
+xSemaphoreHandle xUART3ReadSemaphore = NULL;
+xSemaphoreHandle xUART3WriteMutex = NULL;
+
 xQueueHandle  msgIncomeQueue = NULL;
-xQueueHandle  usbOutComeQueue = NULL;
+xQueueHandle  msgOutComeQueue = NULL;
 
 extern xQueueHandle  systemMsgQueue;
 
 xQueueHandle  requestQueue;
-xQueueHandle  responseQueue;
+//xQueueHandle  responseQueue;
 
 writer_params_t writerConfig;
 reader_params_t readerConfig;
@@ -127,6 +130,13 @@ void assert_failed( unsigned char *pucFile, unsigned long ulLine )
 	for( ;; );
 }
 
+void HardFault_Handler(void) {
+	static char buffer[64];
+	snprintf(buffer, 64,"HARD FAULT IN TASK: %s \r\n", pcTaskGetTaskName(NULL) );
+	log_func(buffer);
+	for( ;; );
+}
+
 void USART_init(void)
 {
 	UART1_Init();
@@ -150,14 +160,24 @@ int initTransport(void) {
 		return ERROR;
 	};
 
+	vSemaphoreCreateBinary( xUART3ReadSemaphore );
+		if( xUART3ReadSemaphore == NULL ) {
+			return ERROR;
+		};
+
+	xUART3WriteMutex = xSemaphoreCreateMutex( );
+	if( xUART3WriteMutex == NULL ) {
+		return ERROR;
+	};
+
 	msgIncomeQueue = xQueueCreate( INCOME_MSG_QUEUE_SIZE, sizeof(packet_t *) );
 	if( msgIncomeQueue == NULL ) {
 		logger(LEVEL_ERR, "Unable to create USB incoming queue\n\r");
 		return ERROR;
 	};
 
--->	usbOutComeQueue = xQueueCreate( OUTCOME_MSG_QUEUE_SIZE, sizeof(packet_t *) );
-	if( usbOutComeQueue == NULL ) {
+    msgOutComeQueue = xQueueCreate( OUTCOME_MSG_QUEUE_SIZE, sizeof(packet_t *) );
+	if( msgOutComeQueue == NULL ) {
 		logger(LEVEL_ERR, "Unable to create USB outcoming queue\n\r");
 		return ERROR;
 	};
@@ -178,10 +198,11 @@ int initTransport(void) {
 
 
 	writerConfig.transport_type = TRANSPORT_UART1;
-	writerConfig.dataOutputQueue = usbOutComeQueue;
+	writerConfig.dataOutputQueue = msgOutComeQueue;
 	writerConfig.dataInputQueueTimeout = QUEUE_RECEIVE_WAIT_TIMEOUT;
 	writerConfig.write_func = UART1_send_chars;
 	writerConfig.writeMutex = xUART1WriteMutex; //TODO do we really need it?
+	writerConfig.dataPacketType = PKG_TYPE_OUTGOING_MESSAGE_STRING;
 
 	xStatus  = xTaskCreate( tskAbstractWriter, ( signed char * ) "tskUART1Writer", configMINIMAL_STACK_SIZE , (void *) &writerConfig, PRIORITY_UART_WRITER_TASK, NULL );
 	if(xStatus != pdPASS) {
@@ -202,11 +223,11 @@ int initSystemHandlers(void) {
 		return ERROR;
 	};
 
-	responseQueue = xQueueCreate( RESPONSE_QUEUE_SIZE, sizeof(json_t *) );
-	if( responseQueue == NULL ) {
-		logger(LEVEL_ERR, "Unable to create response queue\n\r");
-		return ERROR;
-	};
+//	responseQueue = xQueueCreate( RESPONSE_QUEUE_SIZE, sizeof(json_t *) );
+//	if( responseQueue == NULL ) {
+//		logger(LEVEL_ERR, "Unable to create response queue\n\r");
+//		return ERROR;
+//	};
 
 	systemMsgQueue = xQueueCreate( SYSTEM_MSG_QUEUE_SIZE, sizeof(system_msg_t *) );
 	if( systemMsgQueue == NULL ) {
@@ -219,20 +240,20 @@ int initSystemHandlers(void) {
 		return ERROR;
 	}
 
-	xStatus = xTaskCreate( tskParseJson, ( signed char * ) "tskParseJson", configMINIMAL_STACK_SIZE + 400, NULL, PRIORITY_PARSE_JSON_TASK, NULL );
+	xStatus = xTaskCreate( tskParseJson, ( signed char * ) "tskParseJson", configMINIMAL_STACK_SIZE + 600, NULL, PRIORITY_PARSE_JSON_TASK, NULL );
 	if(xStatus != pdPASS) {
 		return ERROR;
 	}
 
-	xStatus = xTaskCreate( tskHandleRequests, ( signed char * ) "tskHandleRequests", configMINIMAL_STACK_SIZE, NULL, PRIORITY_HANDLE_REQUESTS_TASK, NULL );
+	xStatus = xTaskCreate( tskHandleRequests, ( signed char * ) "tskHandleRequests", configMINIMAL_STACK_SIZE + 400, NULL, PRIORITY_HANDLE_REQUESTS_TASK, NULL );
 	if(xStatus != pdPASS) {
 		return ERROR;
 	}
 
-	xStatus = xTaskCreate( tskHandleResponses, ( signed char * ) "tskHandleResponses", configMINIMAL_STACK_SIZE, NULL, PRIORITY_HANDLE_RESPONSES_TASK, NULL );
-	if(xStatus != pdPASS) {
-		return ERROR;
-	}
+//	xStatus = xTaskCreate( tskHandleResponses, ( signed char * ) "tskHandleResponses", configMINIMAL_STACK_SIZE, NULL, PRIORITY_HANDLE_RESPONSES_TASK, NULL );
+//	if(xStatus != pdPASS) {
+//		return ERROR;
+//	}
 
 	return SUCCESS;
 }

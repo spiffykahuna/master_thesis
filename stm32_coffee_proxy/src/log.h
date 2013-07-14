@@ -26,7 +26,7 @@
 
 #include "transport/uart/uart.h"
 
-#define LOG_TRANSPORT TRANSPORT_UART1
+#define LOG_TRANSPORT TRANSPORT_UART3
 
 typedef enum  {
 	LEVEL_OFF 		= 0,
@@ -44,8 +44,10 @@ int log_to_UART3(char* /*str*/);
 
 void logger(log_level_t level, char *msg);
 
-void logger_format(log_level_t level, char *msgFormat, ...);
+//void logger_format(log_level_t level, char *msgFormat, ...);
 
 void setSystemLogLevel(log_level_t level);
+
+char * getCurrentSystemStateInfo();
 
 #endif  /*__LOG_H*/

@@ -122,10 +122,25 @@ int system_msg_add_to_queue(system_msg_t *sysMsg) {
 	int retries;
 	portBASE_TYPE xStatus = 0;
 
-	if(systemMsgQueue != NULL) {
-		retries = 5; //TODO another magic constant
-		while((xStatus != pdPASS) && (retries-- > 0)) {
+	if(systemMsgQueue != NULL && sysMsg) {
+		retries = SYSTEM_MSG_QUEUE_ADD_RETRIES; //TODO another magic constant
+		while((xStatus != pdPASS) && (retries-- >= 0)) {
 			xStatus = xQueueSendToBack( systemMsgQueue, &sysMsg, (portTickType) QUEUE_SEND_WAIT_TIMEOUT );
+			if(xStatus != pdPASS) { vTaskDelay(SYSTEM_TASK_DELAY); }
+		}
+
+		if((xStatus != pdPASS) && (retries < 0)) {
+			strbuffer_t *error = strbuffer_new();
+			strbuffer_append(error, getCurrentSystemStateInfo());
+			strbuffer_append(error, " LEVEL_WARN Unable to add message to system queue after ");
+			strbuffer_append(error, int_to_string(SYSTEM_MSG_QUEUE_ADD_RETRIES));
+			strbuffer_append(error, " retries");
+
+			if(transport_lock(LOG_TRANSPORT, DIRECTION_OUTPUT) == pdPASS) {
+				log_func(error->value);
+				transport_unlock(LOG_TRANSPORT, DIRECTION_OUTPUT);
+			}
+			strbuffer_destroy(&error);
 		}
 	} else {
 		return FALSE;

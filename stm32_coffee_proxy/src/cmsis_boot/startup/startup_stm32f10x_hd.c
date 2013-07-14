@@ -18,6 +18,10 @@
 
 #include "stm32f10x.h"
 #include "stm32f10x_rcc.h"
+
+#include "FreeRTOS.h"
+#include "task.h"
+
 /*----------Stack Configuration-----------------------------------------------*/  
 #define STACK_SIZE       0x00000200     /*!< The Stack size suggest using even number    0x00000100 */
 __attribute__ ((section(".co_stack")))
@@ -332,10 +336,15 @@ void Default_Reset_Handler(void)
   * @param  None
   * @retval None  
   */
-static void Default_Handler(void) 
+static void Default_Handler(void)
 {
   /* Go into an infinite loop. */
 	int i;
+
+	static char buffer[64];
+	snprintf(buffer, 64,"SOMETHING WRONG IN TASK: %s \r\n", pcTaskGetTaskName(NULL) );
+	log_func(buffer);
+	for( ;; );
   while (1)
   {
 

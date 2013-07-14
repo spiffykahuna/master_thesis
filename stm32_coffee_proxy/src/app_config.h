@@ -16,6 +16,7 @@
 #define ERROR_BUFFER_SIZE 			512
 #define MAX_INCOME_MSG_SIZE 		1024
 #define MAX_INCOME_MSG_SIZE_MSG 	"1024"	/* <== used in error message */
+#define LOGGER_MEMORY_LIMIT			4096
 
 /* QUEUES */
 #define INCOME_MSG_QUEUE_SIZE		10
@@ -25,6 +26,7 @@
 #define RESPONSE_QUEUE_SIZE			20
 
 #define SYSTEM_MSG_QUEUE_SIZE		(INCOME_MSG_QUEUE_SIZE * 2)
+#define SYSTEM_MSG_QUEUE_ADD_RETRIES	5
 
 /* end of transmission character */
 #define EOT_CHAR	10

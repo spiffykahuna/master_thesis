@@ -3,7 +3,7 @@
 //extern const msg_maintasks MSG_MAINTASKS;
 extern const msg_jsonrpc_errors MSG_JSONRPC_ERRORS;
 
-json_t * getInfo(json_t **requestJson) {
+json_t * getInfo(const json_t *requestJson) {
 	json_t *responseJson = NULL;
 
 	json_t * arguments = NULL;
@@ -14,10 +14,10 @@ json_t * getInfo(json_t **requestJson) {
 	double difference   = 0.0;
 
 	responseJson = json_object();
-	json_object_set(responseJson, "id",  json_object_get(*requestJson, "id"));
+	json_object_set(responseJson, "id",  json_object_get(requestJson, "id"));
 
 
-	arguments = json_object_get(*requestJson, "params");
+	arguments = json_object_get(requestJson, "params");
 	if(arguments &&
 		(json_is_array(arguments)) &&
 		(json_array_size(arguments) == 2)) {
@@ -40,6 +40,6 @@ json_t * getInfo(json_t **requestJson) {
 		json_object_set_new(responseJson, "error", errorObj);
 	}
 
-	json_decref(*requestJson);
+
 	return responseJson;
 }

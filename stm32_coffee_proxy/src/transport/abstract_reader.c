@@ -11,25 +11,24 @@ typedef enum _reader_state_t {
 	READING_MESSAGE_SIZE,
 	READING_MESSAGE_VALUE,
 	READING_MESSAGE_TERMINATOR,
-	HANDLING_NEW_MESSAGE,
 } reader_state_t;
 
 inline
 packet_t * createNewIncomePacketFromStr(strbuffer_t ** temp, reader_params_t *config);
 
 inline int isDigit(char character);
-inline int handleMessage(strbuffer_t *msg);
+inline int handleMessage(strbuffer_t *msg, reader_params_t *config);
 
 void tskAbstractReader(void *pvParameters) {
-	signed char *taskName = pcTaskGetTaskName(NULL);
 
-	portBASE_TYPE xStatus;
+
+
 	strbuffer_t *messageBuffer = NULL;
-	char *terminator;
 
-	packet_t *incomePacket = NULL;
 	char newChar;
 	int messageLength;
+
+	strbuffer_t *logMsg;
 
 	reader_state_t state = WAITING_FOR_INPUT;
 
@@ -46,32 +45,34 @@ void tskAbstractReader(void *pvParameters) {
 						messageBuffer = strbuffer_new();
 
 						if(!messageBuffer) {
-							report_error_to_sender(
-								config->transport_type,						/* <-- which way to send  */
-								MSG_JSONRPC_ERRORS.general_error_json,		/* <-- format */
-								JSONRPC_SERVER_ERROR,						/* <-- code */
-								MSG_JSONRPC_ERRORS.server_error,			/* <-- message */
-								MSG_MAINTASKS.tskAbstractReader.unable_to_alloc_new_json_packet , /* <-- data */
-								"null" 	/* <-- id */
-							);
+//							report_error_to_sender(
+//								config->transport_type,						/* <-- which way to send  */
+//								MSG_JSONRPC_ERRORS.general_error_json,		/* <-- format */
+//								JSONRPC_SERVER_ERROR,						/* <-- code */
+//								MSG_JSONRPC_ERRORS.server_error,			/* <-- message */
+//								MSG_MAINTASKS.tskAbstractReader.unable_to_alloc_new_json_packet , /* <-- data */
+//								"null" 	/* <-- id */
+//							);
 							strbuffer_destroy(&messageBuffer);
 
-							logger_format(LEVEL_WARN, "%s %s", taskName, MSG_MAINTASKS.tskAbstractReader.unable_to_alloc_new_json_packet);
+							logger(LEVEL_WARN, MSG_MAINTASKS.tskAbstractReader.unable_to_alloc_new_json_packet);
 							break;
 						}
 					}
 
 
 
-					 // State machine for receiving netstrings
+					// State machine for receiving netstrings
 					switch(state) {
 						case WAITING_FOR_INPUT:
 							newChar = stream_read_char();
 							if(isDigit(newChar)) {
 								strbuffer_append_byte(messageBuffer, newChar);
 								state = READING_MESSAGE_SIZE;
+
 								if(messageBuffer->length > MAX_INCOME_MSG_SIZE/2) {
 									strbuffer_destroy(&messageBuffer);
+									state =  WAITING_FOR_INPUT;
 								}
 							}
 							break;
@@ -81,11 +82,18 @@ void tskAbstractReader(void *pvParameters) {
 							if(isDigit(newChar)) {
 								strbuffer_append_byte(messageBuffer, newChar);
 								state = READING_MESSAGE_SIZE;
+
+								if(messageBuffer->length > MAX_INCOME_MSG_SIZE/2) {
+									strbuffer_destroy(&messageBuffer);
+									state =  WAITING_FOR_INPUT;
+								}
+
+
 							} else if(newChar == ':') {
 								messageLength = strtol(messageBuffer->value, NULL, 10);
 
 								if((messageLength > 0) && (messageLength <= MAX_INCOME_MSG_SIZE)) {
-									strbuffer_clear(messageBuffer);
+									strbuffer_destroy(&messageBuffer);
 									state = READING_MESSAGE_VALUE;
 								} else if(messageLength > MAX_INCOME_MSG_SIZE) {
 									strbuffer_destroy(&messageBuffer);
@@ -97,8 +105,29 @@ void tskAbstractReader(void *pvParameters) {
 										MSG_MAINTASKS.tskAbstractReader.incoming_buffer_overflow , /* <-- data */
 										"null" 	/* <-- id */
 									);
-									logger_format(LEVEL_WARN, "%s %s", taskName, MSG_MAINTASKS.tskAbstractReader.incoming_buffer_overflow);
+
+									logMsg = strbuffer_new();
+									strbuffer_append(logMsg, MSG_MAINTASKS.tskAbstractReader.incoming_buffer_overflow);
+									strbuffer_append(logMsg, " Length=");
+									strbuffer_append(logMsg, int_to_string(messageLength));
+									logger(LEVEL_WARN, logMsg->value);
+									strbuffer_destroy(&logMsg);
+
+
 								}
+							} else {
+								strbuffer_destroy(&messageBuffer);
+
+								// TODO make this check on java library too
+								logMsg = strbuffer_new();
+								strbuffer_append(logMsg, "Reader read wrong character after receiving message size. Expected ':' got '");
+								strbuffer_append_byte(logMsg, newChar);
+								strbuffer_append(logMsg, "'");
+								logger(LEVEL_DEBUG, logMsg->value);
+								strbuffer_destroy(&logMsg);
+
+
+								state =  WAITING_FOR_INPUT;
 							}
 							break;
 
@@ -110,8 +139,14 @@ void tskAbstractReader(void *pvParameters) {
 							} else if(messageLength == 0) {
 								state = READING_MESSAGE_TERMINATOR;
 							} else {
-								strbuffer_close(messageBuffer);
-								logger_format(LEVEL_WARN, "Reader is bound of message. Current position = %d", messageLength);
+								strbuffer_destroy(&messageBuffer);
+
+								logMsg = strbuffer_new();
+								strbuffer_append(logMsg, "Reader is bound of message. Current position = ");
+								strbuffer_append(logMsg, int_to_string(messageLength));
+								logger(LEVEL_WARN, logMsg->value);
+								strbuffer_destroy(&logMsg);
+
 								state =  WAITING_FOR_INPUT;
 							}
 							break;
@@ -119,27 +154,38 @@ void tskAbstractReader(void *pvParameters) {
 						case READING_MESSAGE_TERMINATOR:
 							newChar = stream_read_char();
 							if(newChar == ',') {
-								state = HANDLING_NEW_MESSAGE;
+								if(messageBuffer != NULL && messageBuffer->length > 0) {
+
+									logMsg = strbuffer_new();
+									strbuffer_append(logMsg, "Received new message: len = ");
+									strbuffer_append(logMsg, int_to_string(messageBuffer->length));
+									logger(LEVEL_INFO, logMsg->value);
+									strbuffer_destroy(&logMsg);
+
+									handleMessage(messageBuffer, config);
+								}
 							} else {
-								logger_format(LEVEL_WARN, "Unable to get message terminator. Got %c instead of ',' ", newChar);
-								state = WAITING_FOR_INPUT;
+								logMsg = strbuffer_new();
+								strbuffer_append(logMsg, "Unable to get message terminator. Got ");
+								strbuffer_append_byte(logMsg, newChar);
+								strbuffer_append(logMsg, " instead of ',' ");
+								logger(LEVEL_DEBUG, logMsg->value);
+								strbuffer_destroy(&logMsg);
+
 							}
-							break;
-
-						case HANDLING_NEW_MESSAGE:
-							if(messageBuffer != NULL && messageBuffer->length > 0) {
-								logger_format(LEVEL_INFO, "Received new message: len = %d", messageBuffer->length);
-
-								handleMessage(messageBuffer, config);
-
-								strbuffer_destroy(&messageBuffer);
-							}
+							strbuffer_destroy(&messageBuffer);
 							state = WAITING_FOR_INPUT;
-
 							break;
 
 						default:
-							logger_format(LEVEL_WARN, "Unreachable reader state: %d", state);
+							logMsg = strbuffer_new();
+							strbuffer_append(logMsg, "Unreachable reader state: ");
+							strbuffer_append(logMsg, int_to_string(state));
+							logger(LEVEL_WARN, logMsg->value);
+							strbuffer_destroy(&logMsg);
+
+							if(messageBuffer) strbuffer_destroy(&messageBuffer);
+							state = WAITING_FOR_INPUT;
 							continue;
 					}
 
@@ -261,26 +307,32 @@ void tskAbstractReader(void *pvParameters) {
 
 inline
 packet_t * createNewIncomePacketFromStr(strbuffer_t ** temp, reader_params_t *config) {
-	packet_t *incomePacket = NULL;
-	incomePacket = packet_new(TRANSPORT_UART1);
+	packet_t *incomePacket = packet_new();
 	if(!incomePacket) {
-		report_error_to_sender(
-			config->transport_type,
-			MSG_JSONRPC_ERRORS.general_error_json,
-			JSONRPC_SERVER_ERROR,				/* <-- code */
-			MSG_JSONRPC_ERRORS.server_error,	/* <-- message */
-			MSG_MAINTASKS.tskAbstractReader.unable_to_alloc_new_json_packet , /* <-- data */
-			"null" 	/* <-- id */
-		);
+		char * errorString = format_jsonrpc_error(JSONRPC_SERVER_ERROR, MSG_JSONRPC_ERRORS.server_error, "internal server error", 0);
+		strbuffer_t *errorBuffer = strbuffer_new();
+		strbuffer_append(errorBuffer, errorString);
+
+		packet_t * errorPacket = packet_new();
+
+		errorPacket->type = PKG_TYPE_OUTGOING_MESSAGE_STRING;
+		errorPacket->payload.stringData = errorBuffer;
+		errorPacket->transport = config->transport_type;
+
+		sendOutputMessage(errorPacket);
+
 		packet_destroy(&incomePacket);
 		strbuffer_destroy(temp);
 
-		logger_format(LEVEL_WARN, "%s %s", pcTaskGetTaskName(NULL), MSG_MAINTASKS.tskAbstractReader.unable_to_alloc_new_json_packet);
+		logger(LEVEL_WARN, MSG_MAINTASKS.tskAbstractReader.unable_to_alloc_new_json_packet);
 
 		return NULL;
 	}
-	incomePacket->jsonDoc = strbuffer_new();
-	strbuffer_append(incomePacket->jsonDoc, (*temp)->value);
+	incomePacket->type = PKG_TYPE_INCOME_MESSAGE_STRING;
+	incomePacket->transport = config->transport_type;
+
+	incomePacket->payload.stringData = strbuffer_new();
+	strbuffer_append(incomePacket->payload.stringData, (*temp)->value);
 	return incomePacket;
 }
 
@@ -297,26 +349,38 @@ inline int handleMessage(strbuffer_t *msg, reader_params_t *config) {
 
 	strbuffer_destroy(&msg);
 
+	strbuffer_t *logMsg = strbuffer_new();
+	strbuffer_append(logMsg, "Adding new packet to queue( len = ");
+	strbuffer_append(logMsg, int_to_string((incomePacket->payload.stringData)->length));
+	strbuffer_append(logMsg, " )");
+	logger(LEVEL_DEBUG, logMsg->value);
+	strbuffer_destroy(&logMsg);
+
 	int repeats = 5; // TODO maybe put repeat count into config
 	do {
 		xStatus = xQueueSendToBack( config->dataInputQueue, &incomePacket, config->dataInputQueueTimeout );
-	} while( xStatus != pdPASS || (repeats-- > 0) );
+	} while( xStatus != pdPASS && (repeats-- > 0) );
 
 	if(xStatus != pdPASS) {
 		packet_destroy(&incomePacket);
 		strbuffer_destroy(&msg);
-		report_error_to_sender(
-			config->transport_type,
-			MSG_JSONRPC_ERRORS.general_error_json,
-			JSONRPC_SERVER_ERROR,				/* <-- code */
-			MSG_JSONRPC_ERRORS.server_error,	/* <-- message */
-			MSG_MAINTASKS.tskAbstractReader.device_is_busy_timeout , /* <-- data */
-			"null" 	/* <-- id */
-		);
 
-		logger_format(LEVEL_WARN, "%s %s", pcTaskGetTaskName(NULL), MSG_MAINTASKS.tskAbstractReader.device_is_busy_timeout);
+
+		char * errorString = format_jsonrpc_error(JSONRPC_SERVER_ERROR, MSG_JSONRPC_ERRORS.server_error, "internal server error", 0);
+		strbuffer_t *errorBuffer = strbuffer_new();
+		strbuffer_append(errorBuffer, errorString);
+
+		packet_t * errorPacket = packet_new();
+
+		errorPacket->type = PKG_TYPE_OUTGOING_MESSAGE_STRING;
+		errorPacket->payload.stringData = errorBuffer;
+		errorPacket->transport = config->transport_type;
+
+		sendOutputMessage(errorPacket);
+
+		logger(LEVEL_WARN, MSG_MAINTASKS.tskAbstractReader.device_is_busy_timeout);
 	}
 
-	logger_format(LEVEL_DEBUG, "%s Received new packet( len = %d )", pcTaskGetTaskName(NULL), msg->length);
 
+	return TRUE;
 }

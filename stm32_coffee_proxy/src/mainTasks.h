@@ -44,3 +44,6 @@ extern void tskUART1Reader(void *);
 void tskHandleRequests(void*);
 void tskHandleResponses(void *);
 
+int sendOutputMessage(packet_t *msgPacket);
+int add_new_rpc_request(packet_t *incomePacket);
+

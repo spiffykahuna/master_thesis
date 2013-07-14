@@ -13,7 +13,10 @@
 #include "transport.h"
 
 
-inline packet_t * packet_new(transport_type_t transport);
+inline packet_t* packet_new();
 inline void packet_destroy(packet_t **packet);
+
+inline void packet_lock(packet_t *packet);
+inline void packet_unlock(packet_t *packet);
 
 #endif /* PACKET_H_ */
