@@ -98,7 +98,7 @@ If you start searching you will probably find similar list:
 \end{itemize}
 
 Choosing suitable protocol is not trivial problem. There is no any case general
-protocol.  Most of them are designed to interconnect big computers inside
+protocol.  Most of them are designed to interconnect big computers inside a
 network. Mostly they operate on transport and application level and use TCP/IP
 protocol stack.
 
@@ -118,7 +118,7 @@ catch this data.
 Second group of protocols was invented because the first group was unable to
 provide proper level of security. Link between client and server (two parties)
 does not contain pure information about the secret. Parties use cryptography and
-send encrypted messages to each other. Finally they authenticate each other
+send encrypted messages to each other. Finally they authenticate each other when there is enough information gathered to validate the authority.
 
 Last group uses trusted third party authority to check each other. There is
 assumption that all three parties should have connection between each other. Embedded device during
@@ -126,8 +126,23 @@ client authentification needs to connect some server and ask for a secret. Third
 party should always have a high authority, two other parties should trust him.
 This scheme should be used in case of high security requirements.
 
-You may use second groups as long as your system does not have a deal with
-money. Payment systems should use authentification protocols with high security.
+
+
+Choosing of right authentication protocol in general should depend on application. Sometimes, there even will be enough to send plain text passwords over the network. Engineer should analyze all hazards during system design process.
+
+Lifecycle of an embedded system is more longer than livecycle of average personal computer. Application specific controller  may run for decades and it will be still functional.
+Choosed security algorithm may be not secure enough after some years. Some vulnerabilities can be discovered during that period. 
+Computational power of modern processors raises every year and  secure encryption may be cracked during some seconds in the future.
+There is no 100% secure system, everything is breakable. 
+
+Your system security should have such encryption, that provides proper security level to your application data and can not be cracked quickly.
+
+Another aspect is the complexity of cryptography algorithms. Embedded devices are usually small low power devices with limited computation abilities. Not every algorithm suits well. It should be quick and in same time be secure.
+
+Code footprint here.
+
+Challenge-Handshake Authentication Protocol will be used in this work
+
 
 
 
