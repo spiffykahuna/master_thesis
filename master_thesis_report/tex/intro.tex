@@ -1,6 +1,6 @@
 \newpage
 \section{Introduction}
-\subsection{Outline}
+
 \subsection{Contributions}
 
 
@@ -40,16 +40,68 @@ used in almost every field. It is very accurate, fast and can accomplish
 many tasks easily. In early days computers were only used by the government
 and army to solve different high computational tasks. After invention of
 low-cost microprocessors, computers became available to every person. Nowadays  
-there are billions of personal computers and they are almost at every home. In
-addition to that there are systems, called embedded systems, that are
-implemented for a particular purpose.
+there are billions of personal computers and they are almost at every home.
+
+Present day computers may be divided into two groups: very big and very small systems. In one group are mainly servers and
+server farms, and in the other are mainly embedded systems. 
+The gap between these groups becomes more wider, because of the availability of new small and low-power devices, which computational power raises constantly.
+Lot of people prefer now to buy a tiny laptop instead of traditional workstations with a monitor and computer case under the table.
+There is also a more smaller group of devices, that are implemented for a particular purpose - embedded computers.  
 Every home has several examples of embedded computers.
 Any appliance that has a digital clock, for instance, has a small embedded microcontroller that performs no other task than to display the clock.
 Modern cars have embedded computers onboard that control such things as ignition timing and anti-lock brakes using input from a number of different sensors.
 
 
+Today, there is very little or no communication between embedded devices and large servers in the web.
+The problem is not only in the communication infrastructure, because the current communication technologies are able to provide different wired and/or wireless connections.
+The problem is how we design and implement embedded systems. While we
+try to keep big systems as open as possible (since it is their primary role), we tend to seclude and isolate embedded systems without providing easy ways to add a
+custom interface to them. Embedded systems are still mainly seen as vendor-specific and task-oriented products, and not as components that can be easily manipulated and reused.
+
+If all classes of devices could speak the same language, they could 
+talk directly to each other in ways natural to the application without artificial technical barriers. This would allow easily 
+creating seamless applications that aggregate the capabilities of all 
+the electronics. The interoperation adds value to all the devices.
 
 
+One of the methods how this communication can be performed is the concept of web services.
+World Wide Web Consortium (W3C) defines a "Web service" as: 
+\begin{quote}
+A Web service is a software system designed to support interoperable machine-to-machine interaction over a network.
+It has an interface described in a machine-processable format (specifically WSDL).
+Other systems interact with the Web service in a manner prescribed by its description using SOAP-messages, typically conveyed using HTTP with an XML serialization in conjunction with other Web-related standards. 
+\end{quote}
 
+Services are unassociated, loosely coupled units of functionality.
+Not only large server system are capable of providing such functionality.
+They can also be applicable in the resource-constrained embedded devices.
+
+This work would introduce the concepts how service oriented architecture can be in the  context  of  embedded  systems.
+This contains some research of already available techologies and the implementation of small system prototype, which uses service approach.
+
+\subsection{Impact}
+The impact of the research in this thesis has been started during the accomplishment of internship at the univercity. 
+I was worked for some company and my task was to develop \gls{HMI} interface to some embedded system.
+We were using wireless communication between the control unit and the machine it was controlling.
+Control unit was a smartphone that was sending commands through Bluetooth protocol.
+On the other side there was a coffee machine that was receiveng and executing that commands.
+
+
+At the same time i was studying how large enterprise systems communicate to each other. I was reading about web services and related techologies.
+Then was born an idea that there could also be a "small" device network. 
+
+This was a research project and developed prototype could potentially become a real product.
+In that case it needs to be connected to existing infrastructure.
+Coffee machine could provide different remote services: remote coffee product prepearing, coffee machine maintenance and acquisition of statistical data, remote payment.
+This could look like traditional coffee automatic machines at the streets that accept cash.
+
+I stated to mine the information about different control possibilities.
+This is how this research became a topic of my master thesis. 
+
+\subsection{Outline}
+
+First section will introduce the concept of web services.
+Then i will write about how all this technologies could be ported to a small device.
+Next goes the implementation of a small remote service. There are described implementation details of a server and client library.
 
 Devices Profile for Web Services
