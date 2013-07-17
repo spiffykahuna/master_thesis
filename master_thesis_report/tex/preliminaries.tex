@@ -1,13 +1,110 @@
 \newpage
 \section{Preliminaries}
 
-\subsection{Service oriented architecture}
-The  Service  Oriented  Architecture  (SOA)  may  be  defined  as  a 
-paradigm that allows the construction of loosely-coupled software components,  which  provide  services  to  clients  and  may  be 
-dynamically  located  and  invoked  using  a  well-known communication protocol. 
+Internet technology is the environment in which billions of people and trillions of
+devices are interconnected in various ways.
+As part of this evolution, Internet becomes the basic carrier
+for interconnecting electronic devices – used in industrial
+automation, automotive electronics, telecommunications
+equipment, building controls, home automation, medical
+instrumentation, etc. – mostly in the same way as the Internet came
+to the desktops before. More and more devices getting connected to World Wide
+Web. Variety of factors have incluenced  this evolutions \cite{4221180}:
+\begin{itemize}
+\item The availability of affordable, high-performance, low-power
+electronic components for the consumer devices. Improved technology can assist
+building  advanced functionality into embedded devices and enabling new ways of
+coupling between them.
+\item Even low cost embedded devices have some wired or wireless interface to local area
+networks of the Ethernet type. TCP/IP family protocols are becoming the standard
+vehicle for exchanging information between networked devices.
+\item The emergence of platform independent data interchange mechanisms based on
+Extensible Markup Language (XML) data formatting gives lots of opportunities for developing high-level data interchange and
+communication standards at the device level.
+\item The paradigm of Web Services  helps to connect various
+independent applications using lightweight communications. Clients that are
+connected to the service and the service itself may be written using different
+programming languages and be executed on different platforms.
+\item Presence of Internet allows existing of small embedded controllers and
+large production servers in the same network, with a possibility to change
+information.
+\end{itemize}
 
-Each service implements one action, such as filling out an online application for an account, or viewing an online bank statement, or placing an online booking or airline ticket order.
-Rather than services embedding calls to each other in their source code, they use defined protocols that describe how services pass and parse messages using description metadata.
+
+The integration of different classes of devices, which employ different
+networking technologies, is still an open research area. One of the possible
+solutions is the use of SOA software architecture design pattern.
+
+
+
+\subsection{Service oriented architecture}
+\begin{quote}
+Service-oriented computing is a computing paradigm that uses services as basic building blocks for
+application development.
+\cite {lws_milanovic.pdf}
+\end{quote} 
+
+The purpose of \gls{SOA} is to allow easy cooperation of a large number of
+computers that are connected over a network.
+Every computer can run one or more services, each of them implements one
+separate action. This may be a simple business task. Clients can make calls
+and receive required data or post some event messages.
+
+Services are self-describing and open components. There is a service interface,
+that is based on the exchange of messages and documents using standart formats.
+Interface internals ( operating system, hardware platform, programming language)
+are hidden from client. Client uses only a service specification scheme, also
+called contract. Consumers can get required piece of funcionality by mapping problem
+solution steps to a service calls. This scheme provides quick access and easy integration of software components.
+
+
+Service architecture have been successfully adopted in
+business environments. Different information systems, that were created inside
+companies for automation of business processes,  are now turned into services
+which may easily interact with each other. For example, Estonian goverment uses
+services to transmit data between information systems of different departments.
+There are also some free services available. Some Internet search companies like
+Google, Bing, Yandex provide lots of alternatives how to retrieve data without
+using regular browser( search , geolocation and maps,  spell check \gls{API}s )
+
+There are available many techologies which can be used to implement
+\gls{SOA}\cite{wikipedia:SOA}:
+\begin{itemize}
+  \item Web Services
+  \item{SOAP} Simple Object Access Protocol, is a protocol specification for exchanging structured information in the implementation of Web Services in computer networks.
+  \item{RPC} Remote procedure call is an inter-process communication that allows
+  a computer program to cause a subroutine or procedure to execute in another address space (commonly on another computer on a shared network) without the programmer explicitly coding the details for this remote interaction. 
+  \item{REST} Representational state transfer is a style of software architecture for distributed systems such as the World Wide Web. REST has emerged as a predominant web API design model.
+  \item{DCOM} Distributed Component Object Model is a proprietary Microsoft technology for communication among software components distributed across networked computers. 
+  \item{CORBA}  Common Object Request Broker Architecture enables separate pieces of software written in different
+    languages and running on different computers to work with each other like a single application or set of services. Web services
+  \item{DDS} Data Distribution Service for Real-Time Systems (DDS) is an Object
+  Management Group (OMG) machine-to-machine middleware standard that aims to
+  enable scalable, real-time, dependable, high performance and interoperable data exchanges between publishers and subscribers. 
+  \item{Java RMI} Java Remote Method Invocation is a Java API that performs the
+  object-oriented equivalent of remote procedure calls (RPC), with support for direct transfer of serialized Java objects and distributed garbage collection.
+  \item{Jini}  also called Apache River, is a network architecture for the construction of distributed systems in the form of modular co-operating services.
+  \item{WCF} The Windows Communication Foundation (or WCF), previously known as
+  "Indigo", is a runtime and a set of APIs (application programming interface)
+  in the .NET Framework for building connected, service-oriented applications.
+  \item{Apache Thrift} is used as a remote procedure call (RPC) framework and
+  was developed at Facebook for "scalable cross-language services development".
+  \item \ldots
+\end{itemize}
+
+This list can be continued. Most of these technologies are inspired by idea
+of \gls{RPC}
+
+Web Services are the most popular technology for implementing
+service-oriented software nowadays.
+
+
+
+ The benefit of SOA is
+to allow simultaneous use and easy mutual data exchange between programs of different vendors without additional programming or making changes to the services.
+
+\subsection{SOA and Embedded Systems}
+
 
 \subsubsection{Authentication and Authorization in embedded systems}
 \paragraph{Need of security}
