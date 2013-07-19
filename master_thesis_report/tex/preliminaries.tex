@@ -68,7 +68,7 @@ Google, Bing, Yandex provide lots of alternatives how to retrieve data without
 using regular browser( search , geolocation and maps,  spell check \gls{API}s )
 
 There are available many techologies which can be used to implement
-\gls{SOA}\cite{wikipedia:SOA}:
+\gls{SOA}~\cite{wikipedia:SOA}:
 \begin{itemize}
   \item Web Services
   \item{SOAP} Simple Object Access Protocol, is a protocol specification for exchanging structured information in the implementation of Web Services in computer networks.
@@ -93,15 +93,123 @@ There are available many techologies which can be used to implement
 \end{itemize}
 
 This list can be continued. Most of these technologies are inspired by idea
-of \gls{RPC}
+of \gls{RPC}. An \gls{RPC} is initiated by the client, which sends a request
+message to a known remote server to execute a specified procedure with specified
+parameters. The remote server sends a response to the client, and the application continues its process.
 
 Web Services are the most popular technology for implementing
-service-oriented software nowadays.
+service-oriented software nowadays. Next section will focus on this framework
+and on the main features that any \gls{SOA} implementation should have.
+ 
+\subsection{Web Services architecture}
+\subsubsection{Web Services Model}
+The Web Services architecture is based on the interactions between three
+roles \cite{Kreger2001-WSC}:
+service provider, service registry and service requestor. 
+This integration has of three operations: publish, find and
+bind. The service provider has an implementation of service. Provider defines a
+service description and publishes it to a service requestor or service registry.
+The service requestor uses a find operation to retrieve the service
+description locally or from the service registry and uses the service description to bind with the
+service provider and invoke or interact with the Web service implementation.
+\autoref{fig:ws_model} illustrates these service roles and their operations.
+
+
+\begin{center}
+ \begin{figure}[H]
+	\includegraphics[width=\textwidth]{../images/preliminaries/ws_model.png}
+	\caption{Web Services roles, operations and artifacts \cite{Kreger2001-WSC}}
+	\label{fig:ws_model}
+ \end{figure}
+\end{center}
+
+Service registry is a place where service providers can publish
+descriptions of their services. Service requestors can find service descriptions
+and get binding information from them. Binding can be static and dynamic.
+Registry is needed more for dynamic binding where client can get service info at
+the runtime, extract necessary functional methods and execute them on the
+server. During static binding service description may be directly delivered to
+the client at the development phase, for example using usual file, \gls{FTP}
+server, Web site, email or any other file transfer protocol.
+There are also available special protocols, named Service discovery protocols
+(SDP), that allow automatic detection of devices and services on a network. One
+of them is the \gls{UDDI} protocol, which is also was mentioned on
+\autoref{fig:ws_model}. \gls{UDDI} is shortly described in
+\nameref{sec:ws_protocol_stack} section.
+
+\paragraph{\textbf{Artifacts of a Web Service}}
+\newline
+Web service consists of two parts~\cite{Kreger2001-WSC}:
+\begin{itemize} 
+\item \label{itm:service_description_artifact} 
+\textbf{Service Description}~~~The
+service description contains the details of the interface and implementation of the service. This includes its data types, operations, binding
+information and network location. There could also be a categorization and
+other metadata about service discovery and utilization. It may contain some
+Quality of service (QoS) requirements. 
+
+ \item \textbf{Service}
+ ~~~This is the implementation of a service - a software module deployed on network accessible platforms provided by the service provider.
+ Service may also be a client of other services. Implementation details
+ are encapsulated inside a service, and client does not know the details how
+ server processes his request.
+\end{itemize}
 
 
 
- The benefit of SOA is
-to allow simultaneous use and easy mutual data exchange between programs of different vendors without additional programming or making changes to the services.
+\subsubsection{Web Services Protocol Stack}
+\label{sec:ws_protocol_stack}
+
+WS architecture uses many layered and interrelated technologies.
+\autoref{fig:ws_protocol_stack} provides one illustration of some of these technology families.
+
+\begin{center}
+ \begin{figure}[h]
+	\includegraphics[width=\textwidth]{../images/preliminaries/ws_protocol_stack.png}
+	\caption{Web Services Architecture Stack \cite{ws_arch} }
+	\label{fig:ws_protocol_stack}
+ \end{figure}
+\end{center}
+
+We can describe these different layers as follows:
+\begin{itemize}
+  \item \textbf{Communications} - This layer represents a transport between
+  communication parties( service provider, client, service registry). This layer
+  can be any network protocol like: \gls{HTTP}, \gls{FTP}, \gls{SMTP} or any
+  other suitable transport protocol. If Web service is used in the Internet, the
+  transport protocol in most cases will be \gls{HTTP}. In internal networks there is the opportunity to agree upon the use of alternative
+network technologies.
+
+\item \textbf{Messages} - In order to communicate with a service, client should
+send a message. Messages are \gls{XML} documents with different structure.
+\gls{SOAP} protocol defines how these messages should be structured.
+\gls{SOAP} is implementation independent and may be composed using any
+programming language. Protocol specification and message descriptions can be
+found in document SOAP Version 1.2 Part 1: Messaging Framework (Second
+Edition)\cite{soap_protocol_spec}.
+
+\item \textbf{Descriptions} - This layer contains the definition of service
+interface (see also \autoref{itm:service_description_artifact}). Web Services
+use \gls{WSDL} language for describing the functionality offered by a service.
+\gls{WSDL} file is the contract of service, which contains information about how
+the service can be called, what parameters it expects, and what data structures it returns.
+It is similar to method signatures in different programming languages.
+
+\item \textbf{Processes} - This part contains specifications and protocols
+about how service could be published and discovered. Web services are meaningful
+only if potential users may find information sufficient to permit their execution.
+Service as a software module has its own lifecycle, it needs to be deployed and deleted somehow.
+Traditional Web Services use \gls{UDDI}  mechanism to register and locate web
+service applications. \gls{UDDI} was originally proposed as a core Web service
+standard.
+  
+  
+ 
+\end{itemize}
+
+\subsubsection{Basic Service Description and Service Contract}
+\label{sec:ws_service_contract}
+Basic Service Description
 
 \subsection{SOA and Embedded Systems}
 
