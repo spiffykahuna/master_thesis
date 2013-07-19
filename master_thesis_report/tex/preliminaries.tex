@@ -68,11 +68,8 @@ Google, Bing, Yandex provide lots of alternatives how to retrieve data without
 using regular browser( search , geolocation and maps,  spell check \gls{API}s )
 
 There are available many techologies which can be used to implement
-<<<<<<< HEAD
-\gls{SOA}\cite{wikipedia:SOA}:
-=======
 \gls{SOA}~\cite{wikipedia:SOA}:
->>>>>>> 567fdec1f5ab7455a44d59eafa765315f9179fcb
+
 \begin{itemize}
   \item Web Services
   \item{SOAP} Simple Object Access Protocol, is a protocol specification for exchanging structured information in the implementation of Web Services in computer networks.
@@ -97,7 +94,7 @@ There are available many techologies which can be used to implement
 \end{itemize}
 
 This list can be continued. Most of these technologies are inspired by idea
-<<<<<<< HEAD
+
 of \gls{RPC}
 
 Web Services are the most popular technology for implementing
@@ -107,7 +104,7 @@ service-oriented software nowadays.
 
  The benefit of SOA is
 to allow simultaneous use and easy mutual data exchange between programs of different vendors without additional programming or making changes to the services.
-=======
+
 of \gls{RPC}. An \gls{RPC} is initiated by the client, which sends a request
 message to a known remote server to execute a specified procedure with specified
 parameters. The remote server sends a response to the client, and the application continues its process.
@@ -217,15 +214,88 @@ Service as a software module has its own lifecycle, it needs to be deployed and 
 Traditional Web Services use \gls{UDDI}  mechanism to register and locate web
 service applications. \gls{UDDI} was originally proposed as a core Web service
 standard.
-  
-  
- 
+
+\item \textbf{Security} -
+
+\item \textbf{Management} -
 \end{itemize}
 
 \subsubsection{Basic Service Description and Service Contract}
 \label{sec:ws_service_contract}
-Basic Service Description
->>>>>>> 567fdec1f5ab7455a44d59eafa765315f9179fcb
+\gls{WSDL} file is an \gls{XML} document which has specification of  service contract.
+As it was mentioned earlier(\autoref{itm:service_description_artifact}) contract should be shipped with a component and should  tell the
+client what input does service expect, and what output it will produce if specified input conditions are met. 
+Contract may be a primary specification and it should be enough for a client to start using a service.
+This is similar to library header file in C language. 
+You have a ready and compiled library shipped with a header file, where are all method declarations and definitions of data strutures. 
+If header file is verbose enough, there is no need to use the documentation. You can place this component into your system very easily.
+
+
+
+Regular \gls{WDSL} document contains some necessary elements ~\cite{wsdl_language_spec, wikipedia:WSDL}:
+
+
+\begin{table}[h]
+	\centering	
+	\begin{tabular}[h]{|l|l|}
+		\hline
+		\textbf{WSDL 2.0 Term} & 
+		\textbf{Description} 	
+	    	\tabularnewline
+		\hline
+			Service &
+			The service element describes \textit{where} to access the service. 
+			A WSDL 2.0 service specifies a single interface that the service will support,
+			and a list of endpoint locations where that service can be accessed.
+			
+			
+	    	\tabularnewline	    	
+	    	\hline
+			Endpoint & 
+			Defines the address or connection point to a Web service. 
+			It is typically represented by a simple HTTP URL string.
+			Each endpoint must also reference a previously defined binding to indicate 
+			what protocols and transmission formats are to be used at that endpoint.
+				
+	    	\tabularnewline
+
+	    	\hline
+			Binding &		
+			Specifies concrete message format and transmission protocol details for an interface, and must supply such details for every operation and fault in the interface.
+	    	\tabularnewline
+
+	    	\hline
+			Interface &
+			Defines a Web service, the operations that can be performed, and the messages that are used to perform the operation.
+			Defines the abstract interface of a Web service as a set of abstract \textit{operations},
+			each operation representing a simple interaction between the client and the service. 
+			Each operation specifies the types of messages that the service can send or receive as part of that operation.
+			Each operation also specifies a message exchange \textit{pattern} that indicates the sequence in which the associated messages are to be transmitted between the parties. 
+	    	\tabularnewline
+
+		\hline
+			Message Types &
+			The types element describes the kinds of messages that the service will send and receive.
+			The XML Schema\footnote{XML schema is the XML document, that specifies structure of other XML document and describes data types and constraints,
+			that other document might have. 
+			You can create a schema for necessary XML data structure and verify if processed message corresponds to schema you have already defined}
+			language (also known as XSD) is used (inline or referenced) for this purpose.
+	    	\tabularnewline
+
+
+		\hline
+	  
+	\end{tabular} 
+	\caption{Objects in WSDL 2.0~\cite{wsdl_language_spec, wikipedia:WSDL} }
+	\label{tbl:wdsl_members}
+\end{table} 
+
+
+Document may also contain optional element named \textit{documentation}.
+There may be human readable service documentation, with   purpose and use of the service, the meanings of all messages, constraints their use, and the sequence in which operations should be invoked.
+To be documentation more complete, you may specify an external link to any additional documentation.
+
+SOMETHING ELSE ABOUT CONTRACTS
 
 \subsection{SOA and Embedded Systems}
 
