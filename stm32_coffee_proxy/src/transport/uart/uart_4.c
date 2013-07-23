@@ -62,6 +62,10 @@ void UART4_IRQHandler(void)
   			}
   		}
   		UART4_MsgAvailable = 1;
+
+#ifdef UART4_MSG_AVAILABLE_CALLBACK
+  		UART4_MsgAvailable_Callback();
+#endif
   	}
 }
 

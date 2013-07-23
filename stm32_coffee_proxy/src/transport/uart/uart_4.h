@@ -39,4 +39,7 @@ uint8_t UART4_read();
 
 int UART4_has_bytes();
 
+#define UART4_MSG_AVAILABLE_CALLBACK
+void UART4_MsgAvailable_Callback(void);
+
 #endif /* UART_4_H_ */

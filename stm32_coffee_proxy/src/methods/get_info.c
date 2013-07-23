@@ -17,6 +17,9 @@ json_t * getInfo(const json_t *requestJson) {
 		double difference   = 0.0;
 
 
+		char * response = get_version();
+
+
 		arguments = json_object_get(requestJson, "params");
 		if(arguments &&
 			(json_is_array(arguments)) &&
@@ -34,7 +37,7 @@ json_t * getInfo(const json_t *requestJson) {
 			json_t* result = json_object();
 
 			json_object_set_new(result, "value", numberObj);
-			json_object_set_new(result, "version", json_string(version));
+			json_object_set_new(result, "version", json_string(response));
 
 
 			responseJson = jsonrpc_response(requestJson, result, FALSE);

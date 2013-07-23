@@ -9,3 +9,4 @@ Default/
 *.log
 src/timers.c
 src/timers.h
+coffee_machine_lib_impl/
