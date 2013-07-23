@@ -214,14 +214,10 @@ Service as a software module has its own lifecycle, it needs to be deployed and 
 Traditional Web Services use \gls{UDDI}  mechanism to register and locate web
 service applications. \gls{UDDI} was originally proposed as a core Web service
 standard.
-<<<<<<< HEAD
- 
-=======
 
 \item \textbf{Security} -
 
 \item \textbf{Management} -
->>>>>>> 598d0d163e44a3ede03fc09c18b9a7f519a19979
 \end{itemize}
 
 \subsubsection{Basic Service Description and Service Contract}
@@ -236,50 +232,50 @@ If header file is verbose enough, there is no need to use the documentation. You
 
 
 
-Regular \gls{WDSL} document contains some necessary elements ~\cite{wsdl_language_spec, wikipedia:WSDL}:
+Regular \gls{WSDL} document contains some necessary elements ~\cite{wsdl_language_spec, wikipedia:WSDL}:
 
 
 \begin{table}[h]
 	\centering	
-	\begin{tabular}[h]{|l|l|}
+	\begin{tabular}[h]{|l|p{10cm}|}
 		\hline
 		\textbf{WSDL 2.0 Term} & 
 		\textbf{Description} 	
 	    	\tabularnewline
 		\hline
 			Service &
-			The service element describes \textit{where} to access the service. 
-			A WSDL 2.0 service specifies a single interface that the service will support,
+			The service element describes \textit{where} to access the service.\newline A
+			WSDL 2.0 service specifies a single interface that the service will support,
 			and a list of endpoint locations where that service can be accessed.
-			
-			
 	    	\tabularnewline	    	
 	    	\hline
 			Endpoint & 
-			Defines the address or connection point to a Web service. 
-			It is typically represented by a simple HTTP URL string.
-			Each endpoint must also reference a previously defined binding to indicate 
-			what protocols and transmission formats are to be used at that endpoint.
-				
+			Defines the address or connection point to a Web service.
+			It is typically represented by a simple HTTP URL string.			
+			Each endpoint must also reference a previously defined binding to indicate			
+			what protocols and transmission formats are to be used at that endpoint.				
 	    	\tabularnewline
 
 	    	\hline
 			Binding &		
-			Specifies concrete message format and transmission protocol details for an interface, and must supply such details for every operation and fault in the interface.
+			Specifies concrete message format and transmission protocol details			 
+			for an interface, and must supply such details for every operation			 
+			and fault in the interface.
 	    	\tabularnewline
 
 	    	\hline
 			Interface &
-			Defines a Web service, the operations that can be performed, and the messages that are used to perform the operation.
-			Defines the abstract interface of a Web service as a set of abstract \textit{operations},
-			each operation representing a simple interaction between the client and the service. 
-			Each operation specifies the types of messages that the service can send or receive as part of that operation.
+			Defines a Web service, the operations that can be performed,			
+			and the messages that are used to perform the operation.			
+			Defines the abstract interface of a Web service as a set of abstract \textit{operations},			
+			each operation representing a simple interaction between the client and the service.			
+			Each operation specifies the types of messages that the service can send or receive as part of that operation.			
 			Each operation also specifies a message exchange \textit{pattern} that indicates the sequence in which the associated messages are to be transmitted between the parties. 
 	    	\tabularnewline
 
 		\hline
 			Message Types &
-			The types element describes the kinds of messages that the service will send and receive.
+			The types element describes the kinds of messages that the service will send and receive.			
 			The XML Schema\footnote{XML schema is the XML document, that specifies structure of other XML document and describes data types and constraints,
 			that other document might have. 
 			You can create a schema for necessary XML data structure and verify if processed message corresponds to schema you have already defined}
@@ -298,6 +294,11 @@ Regular \gls{WDSL} document contains some necessary elements ~\cite{wsdl_languag
 Document may also contain optional element named \textit{documentation}.
 There may be human readable service documentation, with   purpose and use of the service, the meanings of all messages, constraints their use, and the sequence in which operations should be invoked.
 To be documentation more complete, you may specify an external link to any additional documentation.
+
+
+You can see the example of WSDL service contract in the appendix 
+\autoref{sec:appendix_service_contracts}. This is example from the \gls{WSDL}
+standart. It 
 
 SOMETHING ELSE ABOUT CONTRACTS
 
