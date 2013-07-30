@@ -113,282 +113,47 @@ parameters. The remote server sends a response to the client, and the applicatio
 Web Services are the most popular technology for implementing
 service-oriented software nowadays. Next section will focus on this framework
 and on the main features that any \gls{SOA} implementation should have.
- 
-\subsection{Web Services architecture}
-\subsubsection{Web Services Model}
-The Web Services architecture is based on the interactions between three
-roles \cite{Kreger2001-WSC}:
-service provider, service registry and service requestor. 
-This integration has of three operations: publish, find and
-bind. The service provider has an implementation of service. Provider defines a
-service description and publishes it to a service requestor or service registry.
-The service requestor uses a find operation to retrieve the service
-description locally or from the service registry and uses the service description to bind with the
-service provider and invoke or interact with the Web service implementation.
-\autoref{fig:ws_model} illustrates these service roles and their operations.
 
+\input{preliminaries/ws_arch.tex}
+\input{preliminaries/rest.tex}
 
-\begin{center}
- \begin{figure}[H]
-	\includegraphics[width=\textwidth]{../images/preliminaries/ws_model.png}
-	\caption{Web Services roles, operations and artifacts \cite{Kreger2001-WSC}}
-	\label{fig:ws_model}
- \end{figure}
-\end{center}
+DDDDDDDDDDDDDDDDDDDDDDDDDDD
+Service
+-
+Oriented Architecture can be implemented in different ways. General focus is on
+whatever architecture gets the job done. SOAP and REST have their strengths and weaknesses
+and will be highly suitable to some
+applications and positively terrible for others. The decision of
+which to use depends entirely on the circumstances of the application.
 
-Service registry is a place where service providers can publish
-descriptions of their services. Service requestors can find service descriptions
-and get binding information from them. Binding can be static and dynamic.
-Registry is needed more for dynamic binding where client can get service info at
-the runtime, extract necessary functional methods and execute them on the
-server. During static binding service description may be directly delivered to
-the client at the development phase, for example using usual file, \gls{FTP}
-server, Web site, email or any other file transfer protocol.
-There are also available special protocols, named Service discovery protocols
-(SDP), that allow automatic detection of devices and services on a network. One
-of them is the \gls{UDDI} protocol, which is also was mentioned on
-\autoref{fig:ws_model}. \gls{UDDI} is shortly described in
-\nameref{sec:ws_protocol_stack} section.
-
-\paragraph{\textbf{Artifacts of a Web Service}}
-\newline
-Web service consists of two parts~\cite{Kreger2001-WSC}:
-\begin{itemize} 
-\item \label{itm:service_description_artifact} 
-\textbf{Service Description}~~~The
-service description contains the details of the interface and implementation of the service. This includes its data types, operations, binding
-information and network location. There could also be a categorization and
-other metadata about service discovery and utilization. It may contain some
-Quality of service (QoS) requirements. 
-
- \item \textbf{Service}
- ~~~This is the implementation of a service - a software module deployed on network accessible platforms provided by the service provider.
- Service may also be a client of other services. Implementation details
- are encapsulated inside a service, and client does not know the details how
- server processes his request.
-\end{itemize}
-
-
-
-\subsubsection{Web Services Protocol Stack}
-\label{sec:ws_protocol_stack}
-
-WS architecture uses many layered and interrelated technologies.
-\autoref{fig:ws_protocol_stack} provides one illustration of some of these technology families.
-
-\begin{center}
- \begin{figure}[h]
-	\includegraphics[width=\textwidth]{../images/preliminaries/ws_protocol_stack.png}
-	\caption{Web Services Architecture Stack \cite{ws_arch} }
-	\label{fig:ws_protocol_stack}
- \end{figure}
-\end{center}
-
-We can describe these different layers as follows:
-\begin{itemize}
-  \item \textbf{Communications} - This layer represents a transport between
-  communication parties( service provider, client, service registry). This layer
-  can be any network protocol like: \gls{HTTP}, \gls{FTP}, \gls{SMTP} or any
-  other suitable transport protocol. If Web service is used in the Internet, the
-  transport protocol in most cases will be \gls{HTTP}. In internal networks there is the opportunity to agree upon the use of alternative
-network technologies.
-
-\item \textbf{Messages} - In order to communicate with a service, client should
-send a message. Messages are \gls{XML} documents with different structure.
-\gls{SOAP} protocol defines how these messages should be structured.
-\gls{SOAP} is implementation independent and may be composed using any
-programming language. Protocol specification and message descriptions can be
-found in document SOAP Version 1.2 Part 1: Messaging Framework (Second
-Edition)\cite{soap_protocol_spec}.
-
-\item \textbf{Descriptions} - This layer contains the definition of service
-interface (see also \autoref{itm:service_description_artifact}). Web Services
-use \gls{WSDL} language for describing the functionality offered by a service.
-\gls{WSDL} file is the contract of service, which contains information about how
-the service can be called, what parameters it expects, and what data structures it returns.
-It is similar to method signatures in different programming languages.
-
-\item \textbf{Processes} - This part contains specifications and protocols
-about how service could be published and discovered. Web services are meaningful
-only if potential users may find information sufficient to permit their execution.
-Service as a software module has its own lifecycle, it needs to be deployed and deleted somehow.
-Traditional Web Services use \gls{UDDI}  mechanism to register and locate web
-service applications. \gls{UDDI} was originally proposed as a core Web service
-standard.
-
-\item \textbf{Security} - Threats to Web services include threats to the host
-system, the application and the entire network infrastructure. To solve problems
-like authentication, role-based access control, message level security there is
-need for a range of XML-based security mechanisms.
-
-Web services architecture uses WS-Security\footnote{WS-Security (Web Services
-Security, short WSS) is an extension to SOAP to apply security to web services.
-It is a member of the WS-* family of web service specifications and was
-published by OASIS(Organization for the Advancement of Structured Information
-Standards, https://www.oasis-open.org/). \cite{wikipedia:WS-Security}}
-~protocol to solve security problems.
-This protocol specifies how \gls{SOAP} messages may be secured.
- 
-
-
-\item \textbf{Management} -
-Web service management tasks are~\cite{ws_arch}: monitoring, controlling,
-reporting of service state information. 
-
-Web services architecture uses WS-Management~\cite{ws_security_promo} protocol
-for management of entities such as PCs, servers, devices, Web services and other
-applications. WS-Management has ability to discover the presence of management resources,
-control of individual management resources, subsrcibe to events on resources,
-execute specific management methods.
-
-WS-Management was created by DMTF( Distributed Management Task Forse, Inc.,
-http://www.dmtf.org/) organization, which is creating stantards for managing
-the enterprise level systems. Organisation members are largest hardware and
-sortware corporations like Broadcom, Cisco, Fujitsu, Hewlett-Packard, IBM, Intel,
-Microsoft, Oracle. DTMF standards promote multi-vendor interoperability, which
-is great for the integration between different IT systems. 
-
-\end{itemize}
-
-Most of mentioned protocols are recommended by W3C Consortium and are production
-standards. Lots of \gls{SOA} information systems use WS-* protocols for
-enterprise level services. Mostly these protocols are based on \gls{XML} and
-\gls{SOAP}. One example of such protocol is the \gls{WSDL} service description.
-
-\subsubsection{Service Description and Service Contract}
-\label{sec:ws_service_contract}
-\gls{WSDL} file is an \gls{XML} document which has specification of  service contract.
-As it was mentioned earlier(\autoref{itm:service_description_artifact}) contract should be shipped with a component and should  tell the
-client what input does service expect, and what output it will produce if specified input conditions are met. 
-Contract may be a primary specification and it should be enough for a client to start using a service.
-This is similar to library header file in C language. 
-You have a ready and compiled library shipped with a header file, where are all
-method declarations and definitions of data structures.
-If header file is verbose enough, there is no need to use the documentation. You can place this component into your system very easily.
-
-
-
-Regular \gls{WSDL} document contains some necessary elements
-~\cite{wsdl_language_spec, wikipedia:WSDL}: Service, Endpoint, Binding,
-Interface and Message Types. \autoref{tbl:wdsl_members} describes them in
-details.
-
-
-\begin{table}[h]
-	\centering	
-	\begin{tabular}[h]{|l|p{10cm}|}
-		\hline
-		\textbf{WSDL 2.0 Term} & 
-		\textbf{Description} 	
-	    	\tabularnewline
-		\hline
-			Service &
-			The service element describes \textit{where} to access the service.\newline A
-			WSDL 2.0 service specifies a single interface that the service will support,
-			and a list of endpoint locations where that service can be accessed.
-	    	\tabularnewline	    	
-	    	\hline
-			Endpoint & 
-			Defines the address or connection point to a Web service.
-			It is typically represented by a simple HTTP URL string.			
-			Each endpoint must also reference a previously defined binding to indicate			
-			what protocols and transmission formats are to be used at that endpoint.				
-	    	\tabularnewline
-
-	    	\hline
-			Binding &		
-			Specifies concrete message format and transmission protocol details			 
-			for an interface, and must supply such details for every operation			 
-			and fault in the interface.
-	    	\tabularnewline
-
-	    	\hline
-			Interface &
-			Defines a Web service, the operations that can be performed,			
-			and the messages that are used to perform the operation.			
-			Defines the abstract interface of a Web service as a set of abstract \textit{operations},			
-			each operation representing a simple interaction between the client and the service.			
-			Each operation specifies the types of messages that the service can send or receive as part of that operation.			
-			Each operation also specifies a message exchange \textit{pattern} that indicates the sequence in which the associated messages are to be transmitted between the parties. 
-	    	\tabularnewline
-
-		\hline
-			Message Types &
-			The types element describes the kinds of messages that the service will send and receive.			
-			The XML Schema\footnotemark ~language (also known as XSD) is used (inline or
-			referenced) for this purpose.
-	    	\tabularnewline
-		\hline	  
-	\end{tabular} 
-	\caption{Objects in WSDL 2.0~\cite{wsdl_language_spec, wikipedia:WSDL} }
-	\label{tbl:wdsl_members}
-\end{table}
- 
-\footnotetext{XML schema is the XML document, that
-			specifies structure of other XML document and describes data types and constraints, that other document might have. 
-			You can create a schema for necessary XML data structure and verify if processed message corresponds to schema you have already defined}
-
-
-Document may also contain optional element named \textit{documentation}.
-There may be human readable service documentation, with   purpose and use of the service, the meanings of all messages, constraints their use, and the sequence in which operations should be invoked.
-To be documentation more complete, you may specify an external link to any additional documentation.
-
-
-You can see the example of WSDL service contract in the appendix 
-\autoref{sec:appendix_service_contracts}. This example is from the official
-\gls{WSDL} standard ~\cite{wsdl_language_spec}. It describes a hotel reservation
-service, where you can book you a room in a fictional hotel named GreatH. For simplicity it describes
-only one method - the \textit{opCheckAvailability} operation. This description
-is quite verbose to understand what it is about. There is input and output
-object type declaration. It also has an output error response declaration and
-if some error occures during client request processing, server should send a
-message of specified kind.
-These \gls{XML} object types are declared in different \textit{namespaces} ( see
-xmlns:*	declarations at the start of \gls{WSDL} document). This gives an ability
-to group domain types into one separate file and your main description
-file would not be overcrowded.
-
-
-\gls{WSDL} definition of the service does not contain any additional
-information about service hosting company and its products. At the moment when
-you get a service contract, you already know what company provides this service and what
-for this service was made. There is assumption that service provider somehow
-gave you this service contract. Another possibility to get the service
-description is to use a special \textit{directory} or catalog, where you can
-find all information about company you are dealing with. Web Services
-architecture include \gls{UDDI} mechanism for that particular purpose.
-
-Official \gls{UDDI} Version 3.0.2 Technical Specification draft~\cite{uddi_spec}
-defines \gls{UDDI} as follows:
-\begin{quotation}
-\textit{
- The focus of Universal Description Discovery & Integration (UDDI) is the
-definition of a set of services supporting the description and discovery of (1) businesses,
-organizations, and other Web services providers, 
-(2) the Web services they make available,
- and (3) the technical interfaces which may be used to access those services.
- Based on a common set of industry standards, including HTTP, XML, XML Schema, and SOAP,
- UDDI provides an interoperable, foundational infrastructure for a Web services-based software environment
- for both publicly available services and services only exposed internally within an organization.
-}
-\end{quotation}
-
-\gls{UDDI} mechanism uses \gls{SOAP} messages for client-server communication.  
-
-CONCLUSION_HERE
-
-
-
-
-
-
-
+DDDDDDDDDDDDDDDDDDDDDDDDDDD
 
 \subsection{SOA and Embedded Systems}
 
+Resent topics had a review of available tools and techologies for implementing a
+\gls{SOA} system. Most of them are not directly portable to embedded systems.
+Most related publications [тыц тыц тыц] claim that SOA tools need to be adapted
+to a constrained hardware by using more lightweight approaches.
+Common possibilities are: use of more resource friendly protocols, use of
+existing service protocols in a contstrained manner( low request per second
+ration or smaller payload/packet size), use of special constrained protocols,
+which were designed specially for interaction between small devices.
+TODO list of suitable  protocols.
+
+Main constraints - resources of embedded system.
+Target STM32 device.
+Absence of ethernet.
+Existing implementations require more resources than STM32 or similar has.
+TODO another constraints of embedded systems.
+
+
+ 
 
 \subsubsection{Authentication and Authorization in embedded systems}
 \paragraph{Need of security}
+TODO some statements from WS-arch about security.
+
+
 Authorization is the process of granting or denying access to a network resource.
 Most computer security systems are based on a two-step process.
 The first stage is authentication, which ensures that a user is who he or she claims to be.
@@ -668,3 +433,7 @@ the near future.
 \subsubsection{JSON}
 \subsubsection{XML}
 \subsubsection{Others}
+
+\subsection{Final target system requirements}
+TODO list of final requirements here. This list is needed to be proved by the
+implementation
