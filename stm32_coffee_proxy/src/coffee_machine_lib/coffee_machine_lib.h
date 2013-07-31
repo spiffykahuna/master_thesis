@@ -25,6 +25,31 @@
 //int		coffee_message_encode(coffee_message_t**);
 //int		coffee_message_decode(coffee_message_t**);
 
+#include "strbuffer.h"
+
+typedef enum _product_currency_t {
+	EUR,
+	USD,
+	LTL,
+	LVL,
+	RUB,
+	SEK
+} product_currency_t;
+
+
+struct _product_list_t {
+	unsigned long long id;
+	char *productName;
+
+	double productPrice;
+	product_currency_t currency;
+	struct _product_list_t *nextProduct;
+} __attribute__ ((aligned));
+
+typedef struct _product_list_t product_list_t;
+
 char * get_version(void);
+
+//product_list_t* getProductList(void);
 
 #endif /* COFFEE_MACHINE_LIB_H_ */

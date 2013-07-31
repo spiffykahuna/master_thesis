@@ -217,7 +217,9 @@ void handle_request(packet_t *requestPacket) {
 
 	if(METHOD_IS("subtract", methodName)) 		{ responseJson = subtract(rpcRequest); methodFound = 1;}
 	if(METHOD_IS("system.help", methodName)) 	{ responseJson = getSystemHelp(rpcRequest, requestPacket->transport); methodFound = 1;}
-	if(METHOD_IS("get_info", methodName))		{ responseJson = getInfo(rpcRequest); methodFound = 1;}
+	if(METHOD_IS("machine.getInfo", methodName))		{ responseJson = getInfo(rpcRequest); methodFound = 1;}
+	if(METHOD_IS("machine.getProducts", methodName))	{ responseJson = get_products(rpcRequest,  requestPacket->transport); methodFound = 1;}
+
 
 	if(METHOD_IS("get_free_memory", methodName))		{ responseJson = get_free_memory(rpcRequest); methodFound = 1;}
 

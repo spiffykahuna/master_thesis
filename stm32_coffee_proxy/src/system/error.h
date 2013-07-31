@@ -18,4 +18,6 @@ json_t * create_response_error(int errorCode, char* errorMsg);
 
 char * format_jsonrpc_error(proxy_error_t errorNum, char* errorMsg, char* errorData, json_int_t id);
 
+inline json_t* server_error(const json_t *requestJson);
+
 #endif /* ERROR_H_ */

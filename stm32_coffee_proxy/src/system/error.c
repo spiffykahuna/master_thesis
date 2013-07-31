@@ -43,6 +43,15 @@ char * format_jsonrpc_error(proxy_error_t errorNum, char* errorMsg, char* errorD
 	return error_space;
 }
 
+inline json_t* server_error(const json_t *requestJson) {
+	json_t *responseJson = NULL;
+
+	json_t* errorObj = create_error(JSONRPC_SERVER_ERROR, MSG_JSONRPC_ERRORS.server_error);
+
+	responseJson = jsonrpc_response(requestJson, errorObj, TRUE);
+
+	return responseJson;
+}
 
 
 
