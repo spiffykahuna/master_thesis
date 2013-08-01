@@ -1,5 +1,156 @@
 \subsection{REST and RESTful services}
-principles
+
+\subsubsection{What is the REST?}
+Representational state transfer (REST) is a software design model for
+distributed systems~\cite{Fielding2000}. This term was introduced in 2000 in the doctoral dissertation of
+Roy Fielding, one of the principal authors of the Hypertext Transfer Protocol
+(\gls{HTTP}) specification. REST uses a stateless, client-server,
+cacheable communications protocol which is almost always the HTTP protocol. Its original
+feature is to work by using simple HTTP to make calls between machines instead
+of choosing more complex mechanisms such as CORBA, RPC or SOAP.
+
+REST-style architectures conventionally consist of clients and servers.
+Clients make requests to servers, servers process requests and return responses.
+Requests and responses are built around the transfer of \textit{representations}
+of \textit{resources}.
+Author defines the resource as the key abstraction of information in
+REST~\cite{Fielding2000}. It can be any information that can be named and
+addressed: documents, images, non-virtual physical systems and services.
+A representation of a resource is typically a document that captures the current or intended state of a resource.
+
+Restful applications use HTTP requests to change a state of resource  \footnote{
+all four CRUD(Create/Read/Update/Delete) operations)}: post data to create and/or update
+resource, read data (e.g., make queries) to get current state of resource, and
+delete data to delete existing resource.
+
+REST does not offer security features, encryption, session management, QoS
+guarantees, etc. But these can be added by building on top of HTTP, for example
+username/password tokens are often used for encryption, REST can be used on
+top of HTTPS (secure sockets)\cite{ws_techologies_state_of_the_art}.
+
+\subsubsection{Key principles of REST}
+REST is a set of principles that define how Web standards, such as HTTP and
+\gls{URI}s, are supposed to be used.
+
+The  five key principles of REST are\cite{rest_brief_intro}:
+\begin{itemize}
+  
+ \item Give every “thing” an ID
+ \item Link things together
+ \item Use standard methods
+ \item Resources with multiple representations
+ \item Communicate statelessly
+  
+\end{itemize}
+
+\paragraph{Give every “thing” an ID}  ~\\
+
+Every resource need to be reachable and identifiable. You need to access it
+somehow, therefore you need an identificator for the resource. World Wide Web
+uses \gls{URI} identificators for that purpuse. Resource \gls{URI} could look like:
+
+\begin{listing}[H]
+\begin{minted}[frame=lines,
+               framesep=2mm]{html}
+http://example.com/customers/1234
+http://example.com/orders/2007/10/776654
+http://example.com/products/4554
+http://example.com/processes/salary-increase-234 
+http://example.com/orders/2007/11
+http://example.com/products?color=green
+\end{minted}
+\caption{Resource identificator examples \cite{rest_brief_intro}}
+\label{lst:uri_example}
+\end{listing}
+
+URIs identify resources in a global namespace. This means that this
+identificator should be unique and there should not be another same URI.
+This URI may reflect a defined customer, order or product and it might correspond
+to database entry. \autoref{lst:uri_example} last two examples identify more
+than one thing. They identify a collection of objects, which is the object
+itself and require an identificator.
+
+\paragraph{Link things together}  ~\\
+
+Previous principle introduced an unigue global identificator for the resource.
+Resource URI gives posibility to access the resource from different locations
+and applications. Resources can be also linked to each other.
+Listing \ref{lst:linked_uri_example} shows such scheme. Representation of an
+order contains the information about this order and linked product and client resources.
+This approach gives client an opportunity to change a state of client application by following linked
+resources. After receiving order information client has two possibilities for
+choice: to get product information or to fetch customer details. 
+
+\begin{listing}
+\begin{minted}[frame=lines,
+               framesep=2mm]{xml}
+<order self='http://example.com/orders/2007/10/776654' > 
+   <amount>23</amount> 
+   <product ref='http://example.com/products/4554' /> 
+   <customer ref='http://example.com/customers/1234' /> 
+</order> 
+\end{minted}
+\caption{Example of linked resources\cite{rest_brief_intro}}
+\label{lst:linked_uri_example}
+\end{listing}
+ 
+The idea of links is a core principle of the Web~\footnote{The World Wide Web
+(abbreviated as WWW or W3,[3] commonly known as the web), is a system of
+interlinked hypertext documents accessed via the Internet.\cite{wikipedia:WWW}}
+
+\paragraph{Use standard methods} ~\\
+
+There should be a standard inteface for accessing the resource object.
+REST relies on HTTP protocol, which has definitions of some standard request
+methods:
+GET, PUT, POST and DELETE.
+\autoref{tbl:rest_http_api} describes standard actions on resource.
+
+\begin{table}[h]
+	\centering	
+	\begin{tabularx}{\textwidth}{|X|X|X|X|X|}
+		\hline
+		\textbf{Resource} & 
+		\textbf{GET}  	& 
+		\textbf{PUT} 	&
+		\textbf{POST} &
+		\textbf{DELETE}
+	    
+	    \tabularnewline
+		\hline
+			\begin{sloppypar}
+				\textbf{Collection URI, such as http://example.com/resources}
+			\end{sloppypar} &
+			\textbf{List} the URIs and perhaps other details of the collection's members.&
+			\textbf{Replace} the entire collection with another collection.&
+			\textbf{Create} a new entry in the collection. The new entry's URI is
+			assigned automatically and is usually returned by the operation. &
+			\textbf{Delete} the entire collection.
+			
+	    	\tabularnewline	    	
+	    	\hline
+	    	\begin{sloppypar}
+				\textbf{Element URI, such as http://example.com/resources/item17} 
+			\end{sloppypar} &
+			\textbf{Retrieve} a representation of the addressed member of the
+			collection, expressed in an appropriate Internet media type. &
+			\textbf{Replace} the addressed member of the collection, or if it
+			doesn't exist, \textbf{create} it. &			
+			Not generally used. Treat the addressed member as a collection in its own
+			right and \textbf{create} a new entry in it. &			
+			\textbf{Delete} the addressed member of the collection.
+	
+	    \tabularnewline
+		\hline	  
+	\end{tabularx} 
+	\caption{RESTful web API HTTP methods \cite{wikipedia:REST}}
+	\label{tbl:rest_http_api}
+\end{table}
+
+
+\paragraph{Resources with multiple representations} ~\\
+\paragraph{Communicate statelessly} ~\\
+
 
 operations
 
