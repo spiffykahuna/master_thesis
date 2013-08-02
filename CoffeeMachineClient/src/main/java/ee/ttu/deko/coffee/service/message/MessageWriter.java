@@ -132,6 +132,7 @@ public class MessageWriter implements  Runnable, RPCServiceListener{
         if((data != null) && (!data.isEmpty())) {
             try {
                 outputWriter.write(toNetString(data));
+                outputWriter.flush();
             } catch (IOException e) {
                 logger.error(String.format("Unable to write data. Data %s", data) , e);
             }

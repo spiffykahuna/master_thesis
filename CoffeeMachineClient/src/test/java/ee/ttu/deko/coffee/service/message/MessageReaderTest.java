@@ -124,4 +124,18 @@ public class MessageReaderTest {
         assertEquals(validList.size(), (Object) handler.handleCounter);
         assertEquals(validList, handler.msgList);
     }
+
+    @Test
+    public void readerReceivesJsonMessages() throws Exception {
+        inputReader = new StringReader("59:{\"id\":1375391318322,\"method\":\"system.help\",\"jsonrpc\":\"2.0\"},");
+        validList.add("{\"id\":1375391318322,\"method\":\"system.help\",\"jsonrpc\":\"2.0\"}");
+
+        TestHandler handler = new TestHandler();
+        MessageReader  reader = new MessageReader(inputReader, handler);
+
+        execReader(reader);
+
+        assertEquals(1, (Object) handler.handleCounter);
+        assertEquals(validList, handler.msgList);
+    }
 }
