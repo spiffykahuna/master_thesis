@@ -72,7 +72,7 @@ There are available many techologies which can be used to implement
 \gls{SOA}~\cite{wikipedia:SOA}:
 
 \begin{itemize}
-  \item Web Services
+  \item \label{itm:soa_technologies} Web Services
   \item{SOAP} Simple Object Access Protocol, is a protocol specification for exchanging structured information in the implementation of Web Services in computer networks.
   \item{RPC} Remote procedure call is an inter-process communication that allows
   a computer program to cause a subroutine or procedure to execute in another address space (commonly on another computer on a shared network) without the programmer explicitly coding the details for this remote interaction. 
@@ -95,20 +95,12 @@ There are available many techologies which can be used to implement
 \end{itemize}
 
 This list can be continued. Most of these technologies are inspired by idea
-
-of \gls{RPC}
-
-Web Services are the most popular technology for implementing
-service-oriented software nowadays.
-
-
-
- The benefit of SOA is
-to allow simultaneous use and easy mutual data exchange between programs of different vendors without additional programming or making changes to the services.
-
 of \gls{RPC}. An \gls{RPC} is initiated by the client, which sends a request
 message to a known remote server to execute a specified procedure with specified
 parameters. The remote server sends a response to the client, and the application continues its process.
+This idea is described in details in \autoref{sec:rpc}.
+
+
 
 Web Services are the most popular technology for implementing
 service-oriented software nowadays. Next section will focus on this framework
@@ -116,6 +108,7 @@ and on the main features that any \gls{SOA} implementation should have.
 
 \input{preliminaries/ws_arch.tex}
 \input{preliminaries/rest.tex}
+\input{preliminaries/rpc.tex}
 
 DDDDDDDDDDDDDDDDDDDDDDDDDDD
 Service
@@ -125,6 +118,9 @@ whatever architecture gets the job done. SOAP and REST have their strengths and 
 and will be highly suitable to some
 applications and positively terrible for others. The decision of
 which to use depends entirely on the circumstances of the application.
+
+The RESTful approach enables us to model our domain objects as consistent,
+hierarchical URLs with predictable semantics mapping (loosely) to CRUD.  As well, HTTP comes with standard error codes, MIME types and generally does most of the heavy lifting, so we benefit from not needing to maintain a thick user-developed protocol stack that is subject to frequent modification.
 
 DDDDDDDDDDDDDDDDDDDDDDDDDDD
 
@@ -146,7 +142,9 @@ Absence of ethernet.
 Existing implementations require more resources than STM32 or similar has.
 TODO another constraints of embedded systems.
 
-
+TODO put is somewhere
+ The benefit of SOA is
+to allow simultaneous use and easy mutual data exchange between programs of different vendors without additional programming or making changes to the services.
  
 
 \subsubsection{Authentication and Authorization in embedded systems}

@@ -1,0 +1,170 @@
+\subsection{Remote procedure calls and *-RPC}
+\label{sec:rpc}
+Many distributed systems are based on explicit message exchange
+between processes. If you see a list of SOA techologies ( provided above, see
+\autoref{itm:soa_technologies}) you can find that many of these techologies use
+RPC within them. Some of them don't, for example REST described in  previous
+section, it uses different resource oriented approach(resources which
+the client can consume). Other majority of techologies are message oriented and
+use messages for \gls{IPC}. In RPC messages are sent between client and server
+to call mathods and receive results. 
+
+\subsubsection{RPC in details}
+Remote procedure calls have become a de facto standard for communication
+in distributed systems\cite{tanenbaum07}. The popularity of the model is due to
+its apparent simplicity.
+This section gives a brief introduction to RPC and the problems in there.
+
+Only one figure is enough to describe RPC(see \autoref{fig:rpc_call}).
+
+% \begin{center}
+%  \begin{figure}[h!]
+% 	\includegraphics[width=\textwidth]{../images/preliminaries/rpc_diagram.png}
+% 	\caption{Principle of RPC between a client and server program }
+% 	\label{fig:rpc_call}
+%  \end{figure}
+% \end{center}
+% \includepdf[ angle=90, addtolist={ 1 , figure , {Principle of RPC between a client and server program } , {fig:rpc_call} }
+% ]{../images/preliminaries/rpc_diagram.pdf}
+
+% \begin{sidewaysfigure}[h]
+%     \includegraphics{../images/preliminaries/rpc_diagram.eps}
+%     \caption{Property profile of the diverse library compared to the compound pool.}
+%     \label{fig:PropProf}
+% \end{sidewaysfigure}
+
+
+\begin{sidewaysfigure}
+\centering
+\scalebox{0.4}
+{\includegraphics{../images/preliminaries/rpc_diagram.png}}
+\caption{Principle of RPC between a client and server program}
+\label{fig:rpc_call}
+\end{sidewaysfigure}
+
+
+When a process on client machine calls a
+procedure on server machine, the calling process on client is suspended, and
+execution of the called procedure takes place on server. Information can be
+transported from the caller to the callee in the parameters and can come back in the procedure result.
+No message passing at all is visible to the programmer. Programmer operates only
+with method calls.
+
+The idea behind RPC is to make a remote procedure call look as much as possible
+like a local one. In other words, we want RPC to be transparent—the calling
+procedure should not be aware that the called procedure is executing on a different
+machine or vice versa\cite{tanenbaum07}. To achieve this transparency special
+software modules are used. They are called \textbf{stubs}. The main purpose
+of a stub is to handle network messages between client and server. 
+
+Whole RPC call process could be described using words like this: 
+\begin{enumerate}
+\item The client procedure calls the client stub on the client machine.
+\item The client stub builds a message and sends it over the network to remote
+machine using local operating system(OS).
+\item The remote  OS  receives the message from the network and gives
+this message to the server stub. Server stub unpacks the parameters and calls
+the server.
+\item The server does the work and returns the result to the server stub.
+\item The server stub packs result in a message and sends it to client using
+network and underlying OS.
+\item The client’s OS gives the message to the client stub.The stub unpacks the result and returns to the client.
+\item Client receives procedure result and continues his processing.
+\end{enumerate}
+
+Modern software tools help to make this process very easy. Here
+is the real world example of the small RPC system(written using Python
+programming language) that proves this\cite{xmlrpclib_python_example}:
+
+\begin{listing}[H]
+\begin{minted}[frame=lines,
+               framesep=2mm]{python}
+import xmlrpclib
+from SimpleXMLRPCServer import SimpleXMLRPCServer
+
+def is_even(n):
+    return n%2 == 0
+
+server = SimpleXMLRPCServer(("example.com", 8000))
+print "Listening on port 8000..."
+server.register_function(is_even, "is_even")
+server.serve_forever()
+\end{minted}
+\caption{RPC server example (Python and xmlrpclib)}
+\label{lst:rpc_server_python_example}
+\end{listing}
+
+Code is quite verbose\footnote{Python programming language has its own
+philosophy, called The Zen of Python. It has some statements how software
+should be designed. Two statements in the Zen of Python that are related to
+this example are: \begin{quote}\textit{Simple is better than
+complex.}\end{quote}  and \begin{quote}\textit{Readability counts.}\end{quote}}
+and people, who are not familiar with Python, could understand it.
+You create a server using the special RPC server implementation from
+\textit{xmlrpclib} library. You specify a remote host and a port number in a
+object constructor. When server object is created you need to specify remote
+methods, which may be executed. Example above uses small even check method.
+Server registers the methods and starts to wait for incoming calls.
+
+Client implementation for the corresponding server looks like:
+\begin{listing}[H]
+\begin{minted}[frame=lines,
+               framesep=2mm]{python}
+import xmlrpclib
+
+proxy = xmlrpclib.ServerProxy("http://example.com:8000/")
+print "3 is even: %s" % str(proxy.is_even(3))
+print "100 is even: %s" % str(proxy.is_even(100))
+\end{minted}
+\caption{RPC client example (Python and xmlrpclib)}
+\label{lst:rpc_client_python_example}
+\end{listing}
+
+Actually, it is more shorter and simpler than server code. You just specify a
+remote server object and receive a proxy object. Then you can use this proxy like a usual
+local object. This creates an illusion that you are not going anywhere for the
+result and working with a usual objects in the code. Proxy object may be passed
+as a parameter to a function and be used in that function without knowledge
+where it was came from.
+
+
+This idea is simple and elegant, but there are exist some problems. First of
+all, calling and called procedures run on different machines and are executed in
+different address spaces, which introduce additional complexity in passing
+parameters and results between client and server.
+Finally, both machines can independently crash, therefore special error
+handling mechanism is required.
+
+As long as the client and server machines are identical and all the parameters
+and results are scalar types, such as integers, characters, and Booleans, this model
+works fine. 
+However, in a large distributed system, it is common that multiple
+machine types are present.
+Each machine often has its own representation for
+numbers, characters, and other data items\cite{tanenbaum07}.
+
+There are several representations of character data used in computer systems:
+one byte characters(ASCII\footnote{ American Standard Code for Information
+Interchange}, EBCDIC\footnote{Extended Binary Coded Decimal Interchange Code
+(from IBM)}), multibyte characters( UTF-8, UTF-8, UTF-32\footnote{Universal
+Character Set Transformation Format},  ) and characters in different
+encodings(all tree character encodings are used for cyrillic symbols: 
+Windows-1251, Code page 855, ISO/IEC 8859-5). Each RPC client and server should
+agree about charater encoding they will use.
+
+In addition to that, problems can occur with the representation of integers
+(one’s complement, two’s complement) and floating-point numbers( IEEE 754 ).
+ 
+
+For example, IBM mainframes use the
+EBCDIC character code, whereas IBM personal computers use ASCII. As a
+consequence, it is not possible to pass a character parameter from an IBM PC
+client to an IBM mainframe server using the simple scheme of Fig. 2-3: the server
+will interpret the character incorrectly.
+
+
+
+
+ 
+
+
