@@ -109,6 +109,8 @@ and on the main features that any \gls{SOA} implementation should have.
 \input{preliminaries/ws_arch.tex}
 \input{preliminaries/rest.tex}
 \input{preliminaries/rpc.tex}
+\input{preliminaries/serialization.tex}
+
 
 DDDDDDDDDDDDDDDDDDDDDDDDDDD
 Service
@@ -121,6 +123,9 @@ which to use depends entirely on the circumstances of the application.
 
 The RESTful approach enables us to model our domain objects as consistent,
 hierarchical URLs with predictable semantics mapping (loosely) to CRUD.  As well, HTTP comes with standard error codes, MIME types and generally does most of the heavy lifting, so we benefit from not needing to maintain a thick user-developed protocol stack that is subject to frequent modification.
+
+In comparison to REST, where resource representations (documents) are
+transferred, XML-RPC is designed to call methods.
 
 DDDDDDDDDDDDDDDDDDDDDDDDDDD
 
@@ -427,10 +432,6 @@ the near future.
 
 
 
-\subsection{Data serialization}
-\subsubsection{JSON}
-\subsubsection{XML}
-\subsubsection{Others}
 
 \subsection{Final target system requirements}
 TODO list of final requirements here. This list is needed to be proved by the

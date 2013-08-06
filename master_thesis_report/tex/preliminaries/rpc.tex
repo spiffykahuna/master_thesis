@@ -133,7 +133,8 @@ all, calling and called procedures run on different machines and are executed in
 different address spaces, which introduce additional complexity in passing
 parameters and results between client and server.
 Finally, both machines can independently crash, therefore special error
-handling mechanism is required.
+handling mechanism is required. System developers must deal with such failures
+without knowing about remote procedure was actually invoked or not.
 
 As long as the client and server machines are identical and all the parameters
 and results are scalar types, such as integers, characters, and Booleans, this model
@@ -153,18 +154,61 @@ Windows-1251, Code page 855, ISO/IEC 8859-5). Each RPC client and server should
 agree about charater encoding they will use.
 
 In addition to that, problems can occur with the representation of integers
-(one’s complement, two’s complement) and floating-point numbers( IEEE 754 ).
- 
+(sign-and-magnitude method, one’s complement, two’s complement) and
+real data types( floating-point, fixed-point, binary-coded decimal and single
+precision, half precision, double precision). Some machines have different
+endianness\footnote{The terms little-endian and big-endian refer to the way in which a word of data is stored into sequential bytes of
+memory. The first byte of a sequence may store either the least significant byte of a word (little-endian) or the most
+significant byte of a word (big-endian). Endianness refers to how bytes and
+16-bit half-words map to 32-bit words in the system memory. \cite{arm_endian}}.
+If two different machines, one little-endian and other big-endian, are
+communicating to each other, they should use common endianness, otherwise they
+will accept bytes in wrong order and data will be invalid.
 
-For example, IBM mainframes use the
-EBCDIC character code, whereas IBM personal computers use ASCII. As a
-consequence, it is not possible to pass a character parameter from an IBM PC
-client to an IBM mainframe server using the simple scheme of Fig. 2-3: the server
-will interpret the character incorrectly.
+There was description of primitive data types in RPC so far, but client and
+server not always send primitive data types to each other. There could also be a
+complex data structures, that contains several primitives like characters,
+numbers or just raw bytes. Client and server should be aware of structure of
+messages they send and receive. Usually these stuctures are specified by
+Interface Definition Language(IDL).
+IDL is a  is a specification language used to describe a software component's interface.
+IDLs describe an interface in a language-independent way, enabling
+communication between software components that do not share same language and
+platform.
+An interface is firstly specified in an IDL and then compiled into a
+client stub and a server stub. RPC-based middleware systems
+offer an IDL to support application development\cite{tanenbaum07}.
 
-
-
-
+In most cases communication scheme is well known and some standard
+message protocol is used. Previous example of RPC system, that was written using
+Python programming language, used XML-RPC protocol. XML-RPC defines XML data
+types that are used in RPC messages. There are several alternative common used
+schemes, that provide similar functionality. They all could be divided into
+two groups: platform and programming language dependent and systems that  
+can be used in multiplatform and multilanguage environment. XML-RPC belongs to
+second group, the similar techologies are JSON-RPC, SOAP and CORBA.
+Actually, most RPC implementations in the first group do not require any special
+harware. They are programming language dependent and may be used with
+the assumption, that components in the system are written using that specific
+language. Some examples are provided below:
+\begin{itemize}
+  \item Java Remote Method Invocation
+  \item Pyro object-oriented form of RPC for Python.
+  \item Windows Communication Foundation ( .NET framework)
+  \item \ldots   
+\end{itemize} 
+Most of these programming languages have multiplatform implementations and RPC
+system may be built using various hardware.
+  
+\subsubsection{RPC summary}
+This section described one another posible way of \gls{IPC}. RPC is used in many
+distributed systems in obvious or imlicit way. It provides mechanism for calling 
+subroutines or procedures on another computer or system. 
+Communication in RPC is based on message passing.
+The Client sends to the server a message containing request for method call.
+The Server sends to the client a message with procedure results.
+Modern software tools provide ready RPC libraries and application programmer has no need to explicitly reinvent whole RPC system from scratch.
+You can build various distributed systems using RPC.
  
 
 
