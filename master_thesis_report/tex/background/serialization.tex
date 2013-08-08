@@ -45,7 +45,7 @@ Most of them could be divided into two groups: human-readable text based formats
 and binary formats. Both groups have their own advantages and disadvantages.
 \autoref{tbl:data_ser_formats} shortly describes them. 
 
-\begin{table}[h]
+\begin{table}[H]
 	\centering	
 	\begin{tabularx}{\textwidth}{|X|X|X|}
 		\hline
@@ -203,10 +203,12 @@ The same sturucture from XML section looks in JSON encoding like:
 \begin{minted}[frame=lines,
                framesep=2mm]{json}
 {
-	"firstname" : "John",
-	"surname" : "Smith",
-	"email" : "john.smith@example.com",
-	"mobile" : 1234567890
+	"person" : {
+		"firstname" : "John",
+		"surname" : "Smith",
+		"email" : "john.smith@example.com",
+		"mobile" : 1234567890
+	}
 }
 \end{minted}
 \caption{JSON structure decribing abstract person}
@@ -220,6 +222,69 @@ JSON specification is quite easy and it is  described using only one
 page~\cite{json_org}. This page provides also a list of programming languages
 and libraries that support JSON. 
 
-TODO HERE comes comparison.    
+Research in different documents \cite{5931189,NurseitovPRI09} showed that
+that JSON is faster and uses fewer resources than its XML
+counterpart.
+Transferring data in the form of JSON instead of XML can speed up the server
+data transfer efficiency.
+
+This is because XML is characterised by its rich verbosity,
+meaning that it requires a separate start-tag and end-tag for describing the content.
+As JSON does not use end-tags at all for the description of the content, the
+resulting number of bytes is smaller.
+Paper \cite{5931189} contains performance analysis of mobile device(Apple
+iPhone), which executes different tests working with XML, JSON and SOAP.
+Research results prove that SOAP and XML have overhead over JSON.
+
+To make messages more smaller binary formats or compression(for example gzip)  
+should be used. There is also available newly emerged Efficient XML Interchange
+(EXI)\footnote{It was adopted as a Candidate Recommendation by the
+W3C, for more information see
+\url{http://www.w3.org/TR/2013/CR-exi-profile-20130416/}} standard for binary XML encoding. It is expected to become an alternative to XML for exchanging data between embedded systems\cite{6120046}.
+
+\paragraph{Parsers} ~\\
+All JSON and XML parsers can be divided into two groups: stream-based and
+tree-based. Stream based parsers (also known as Simple API for XML(SAX)) are
+event-based. They read input message sequentially and signals the application when a new component has
+been read. They raise notifications on reaching different document parts and
+programmer needs to decide what to do with this part of document( store or
+skip). Such parsers requre less resources than tree-based, because they do not
+need to keep whole document in memory.
+
+Tree-based parsers load whole message to memory and then parse it. They create a
+tree of this document (also known as Document Object Model (DOM)) and return it
+to application developer. Programmer receives whole document tree and is able to
+extract needed parts from that.
+
+Although stream-based parsers often
+have better performance than tree-based parsers, they make application code more
+complex due to their event-driven nature.
+
+Document serializers work using similar scheme.
+
+\subsubsection{Is there a right serialization format?}
+
+There is no direct answer for that question.
+The format and the parser used has to be chosen according your application
+constraints and requirements. Binary formats give you a small message size and
+reduce requred amount of CPU cycles for data processing, but there is a lack of
+verbosity and it is hard to extract data without using additional tools. Text
+based formats reduce development and debugging time, but they have overhead
+because of their verbosity. There is a harware resources/ development
+time tradeoff in this problem. Some calculations should be made before making a
+decision.
+
+Whatever format you choose, binary or human-readable, this should be  a
+standard and open format.
+It means that this format should be supported by different software tools and programming
+languages,  you can read its specification and understand its features, your
+people can study it more quickly, system integration becomes more easy, because
+other system understand it too. If it is a production standart, there is a
+chance that it will not essentially change in near future.
+
+Text formats like XML and JSON are user all over the world and are good
+candidates to be in your system.
+
+
 
 

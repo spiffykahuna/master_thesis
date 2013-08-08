@@ -35,8 +35,8 @@
 
 
 
-Computers are very essential in our life. Computer is an electronic device
-used in almost every field. It is very accurate, fast and can accomplish
+Computers are very essential in our life. Computer is an electronic device that
+is used in almost every field. It is very accurate, fast and can accomplish
 many tasks easily. In early days computers were only used by the government
 and army to solve different high computational tasks. After invention of
 low-cost microprocessors, computers became available to every person. Nowadays  
@@ -63,11 +63,25 @@ talk directly to each other in ways natural to the application without artificia
 creating seamless applications that aggregate the capabilities of all 
 the electronics. The interoperation adds value to all the devices.
 
-TODO Internet of Things.
-TODO smooth transition to SOA and Web services.
+This idea comes from conception of Internet of Things (IoT). The Internet of
+Things is the network of physical objects that can communicate to each other
+using Internet and embedded technologies. This
+connections compose an complex system where each member can send information
+about its state and acquire data about other parties without any intervention of
+human being.
+For example sensors at your home could communicate to heater
+and ventilation system and control temperature and humidity or your alarm can
+tell all other devices that you are going to wake up soon. 
+This technologies could help to track and count everything and improve the
+quality of our lives by removing the unnecessary waste and additional cost.
 
 
-One of the methods how this communication can be performed is the concept of web services.
+The Internet of Things is quite popular topic of research nowadays. It possibly
+can change the world like the Internet did. Many companies and universities are
+trying to find and invent reasonable techologies for implementing this approach.
+
+One of the methods how this communication can be performed is the concept of
+remote services and service oriented architecture (SOA).
 World Wide Web Consortium (W3C) defines a "Web service" as: 
 \begin{quote}
 A Web service is a software system designed to support interoperable machine-to-machine interaction over a network.
@@ -84,43 +98,91 @@ Services can also be applicable in the resource-constrained embedded devices.
 
 This work would introduce the concepts how \gls{SOA} can be in the  context  of 
 embedded  systems.
-This contains some research of already available techologies and the implementation of small system prototype, which uses service approach.
+This contains some research of already available techologies for
+machine-to-machine communications and the implementation of small system
+prototype, which contains two conneted devices and uses service approach.
 
 \subsection{Impact}
-The impact of the research in this thesis has been started during the accomplishment of internship at the univercity. 
+The impact of the research in this thesis has been started during the accomplishment of internship at the university. 
 I was worked for some company and my task was to develop \gls{HMI} interface to some embedded system.
 We were using wireless communication between the control unit and the machine it was controlling.
 Control unit was a smartphone that was sending commands through Bluetooth protocol.
 On the other side there was a coffee machine that was receiveng and executing that commands.
 
-
-At the same time i was studying how large enterprise systems communicate to each other. I was reading about web services and related techologies.
-Then was born an idea that there could also be a "small" device network. 
+At the same time i was studying how large enterprise systems communicate to each other.
+I was reading about web services and related techologies.
+Then was born an idea that there could also be a "small" device network, where
+devices communicate to each other.
 
 This was a research project and developed prototype could potentially become a real product.
 In that case it needs to be connected to existing infrastructure.
-Coffee machine could provide different remote services: remote coffee product prepearing, coffee machine maintenance and acquisition of statistical data, remote payment.
-This could look like traditional coffee automatic machines at the streets that accept cash.
+Coffee machine could provide different remote services: remote coffee product
+ordering, coffee machine maintenance and acquisition of statistical data, remote
+payment.
+This could look like traditional coffee automatic machines at the streets that
+accept cash, but with a remote wireless control.
 
 I stated to mine the information about different control possibilities.
 This is how this research became a topic of my master thesis. 
 
 \subsection{The goal}
-TODO system requirements
-Study available tools and technologies.
-And
 
-Make a prototype
-Low cost hardware
-Transport and platform independent
-Universal.
+The purpose of this work is to create a prototype system which has remote
+service capabilities and make a research of available machine-to-machine
+communication possibilities.
+This should be an universal and platform independent architecture, which can be easily ported to any suitable hardware and connected
+into existing infrastructure. 
 
+Already existing hardware are two STM32f103xx family microcontrollers which have
+20 and 64 Kbytes of RAM, 128 and 512 Kbytes of flash memory. They are also
+equipped with UART communication and whole communication need to work using
+serial line. Remote server with service capabilities should work on that
+hardware. General requirement for the hardware is low-cost microcontroller with
+some connectivity, that does not make the  already existing system more
+expensive and in the same time fulfil all required functionality.
+
+Embedded server will be connected to a target device, which is actually a coffee
+machine, and handle requests from clients by executing various functions on
+target device.
+Server should provide a functional interface to the client and know about
+available functions inside coffee machine. That interface need to be verbose and
+easy to connect. 
+
+Client will be executed on mobile phone and will communicate with remote server
+using Bluetooth wireless technology. It might be any mobile platform, but
+the organization decided to try Google Android smartphones first. Android device
+need to have running program with a graphical user interface, which is able
+connect to remote service and accomplish functional needs.
+
+Coffee machine application is only the example of such architecture.
+We need a real world problem and device to show all capabilities of such system.
+Controlled device and the client application could vary. It might be a
+remote light control at home or any data acquisition and control system at the
+production plant. During this work such universal and extensible system will be
+built.
 
 
 \subsection{Outline}
+TODO here will be outline. It will be finished when all other section will be
+ready
 
-First section will introduce the concept of web services.
-Then i will write about how all this technologies could be ported to a small device.
-Next goes the implementation of a small remote service. There are described implementation details of a server and client library.
+First section will introduce available technologies of implementing
+machine-to-machine communications. The main research is about the Internet
+technologies and concept of remote web services, this is because the Internet
+is already an interconnected network with lots of machines are doing distributed
+computing and interacting with each other. Lots of problems are already solved
+there and there are available different technologies and tools.
+Althouth, all these already implemented features are not limited  only with the
+Internet and related technologies like TCP/IP and HTTP. Some essential
+features may be extracted from there and ported to resource-constrained devices. This section will also cover some connection and
+interaction possibilities that embedded systems have.
 
-Devices Profile for Web Services
+\nameref{sec:implementation} section covers embedded system prototype, that uses
+concepts from different machine-to-machine communication techologies. It
+contains description of achitecture and software and hardware was used. 
+TODO summary here
+
+Then i will write about how all
+this technologies could be ported to a small device.
+Next goes the implementation of a small remote service. 
+There are described implementation details of a server and client library.
