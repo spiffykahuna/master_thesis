@@ -36,3 +36,10 @@ char* int_to_string(int value) {
 	snprintf(buffer, 32, "%d", value);
 	return buffer;
 }
+
+inline
+char* int_to_hex_string(int value) {
+	static char buffer[32];
+	snprintf(buffer, 32, "%02X", value & 0xFF);
+	return buffer;
+}

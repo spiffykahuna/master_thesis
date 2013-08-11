@@ -5,12 +5,13 @@ import ee.ttu.deko.coffee.service.domain.Product;
 import ee.ttu.deko.coffee.service.domain.ServiceContract;
 
 import java.util.List;
+import java.util.Map;
 
 public interface CoffeeMachineService extends Service {
     ServiceContract getServiceContract();
 
     // coffee machine methods
-    Object getInfo(); // service and machine information and limits
+    Map<String, Object> getInfo(); // service and machine information and limits
     Object getServiceInfo();
 
     // we need to configure machine somehow
@@ -19,9 +20,9 @@ public interface CoffeeMachineService extends Service {
 
     // products
     List<Product>  getProducts();
-    void orderProduct(Product product);
-    void cancelProduct(Product product);
-    Product.Status getProductStatus(Product product);
+    Product.Status orderProduct(int productId);
+    Product.Status cancelProduct(int productId);
+    Product.Status getProductStatus(int productId);
 
     void login(String password);
 }

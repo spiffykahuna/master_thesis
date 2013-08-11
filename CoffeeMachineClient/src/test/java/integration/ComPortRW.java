@@ -11,9 +11,10 @@ import java.util.Random;
 
 public class ComPortRW implements Runnable {
     private static final int MAX_DELAY = 3500;
-    public static final String DEFAULT_COM_PORT = "COM36";
+    public static final String DEFAULT_COM_PORT = "COM25";
     Reader portReader;
     Writer portWriter;
+    CommPort commPort = null;
 
     StringBuilder commandBuffer;
     Random rand = new Random();
@@ -21,7 +22,7 @@ public class ComPortRW implements Runnable {
     public ComPortRW(String comPortName){
 
         CommPortIdentifier portIdentifier = null;
-        CommPort commPort = null;
+
 
         try {
             portIdentifier = CommPortIdentifier.getPortIdentifier(comPortName);
@@ -107,5 +108,7 @@ public class ComPortRW implements Runnable {
     public void close() throws IOException {
         portReader.close();
         portWriter.close();
+        commPort.close();
+
     }
 }

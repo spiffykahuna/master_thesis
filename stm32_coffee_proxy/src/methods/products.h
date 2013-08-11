@@ -8,6 +8,7 @@
 
 json_t * get_products(const json_t *requestJson, transport_type_t transport);
 
-
+json_t * order_product(const json_t *requestJson, const transport_type_t transport);
+json_t * cancel_product(const json_t *requestJson, const transport_type_t transport);
 
 #endif /* GET_PRODUCTS_H_ */

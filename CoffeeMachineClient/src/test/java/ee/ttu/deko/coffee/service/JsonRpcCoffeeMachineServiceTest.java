@@ -1,9 +1,12 @@
 package ee.ttu.deko.coffee.service;
 
 import com.thetransactioncompany.jsonrpc2.JSONRPC2Error;
+import com.thetransactioncompany.jsonrpc2.JSONRPC2ParseException;
 import ee.ttu.deko.coffee.jsonrpc.JsonRpc2_0Spec;
 import ee.ttu.deko.coffee.jsonrpc.RPCRequest;
 import ee.ttu.deko.coffee.jsonrpc.RPCResponse;
+import ee.ttu.deko.coffee.service.domain.Price;
+import ee.ttu.deko.coffee.service.domain.Product;
 import ee.ttu.deko.coffee.service.domain.ServiceContract;
 import ee.ttu.deko.coffee.service.request.RequestProcessor;
 import org.junit.After;
@@ -11,7 +14,10 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.io.*;
+import java.math.BigDecimal;
+import java.util.Currency;
 import java.util.HashMap;
+import java.util.List;
 
 import static org.hamcrest.core.StringContains.containsString;
 import static org.junit.Assert.*;
@@ -194,6 +200,8 @@ public class JsonRpcCoffeeMachineServiceTest {
                     put("someDef2", "someDef2_declaration");
                     put("someDef3", "someDef3_declaration");
                 }});
+
+                contract.put("$schema", "http://json-schema.org/draft-04/schema#");
                 response.setResult(contract);
                 return response;
             }
@@ -406,5 +414,126 @@ public class JsonRpcCoffeeMachineServiceTest {
         ServiceContract contract = service.getServiceContract();
         assertNull(contract);
 
+    }
+
+    @Test
+    public void serviceReceivesProductList() throws Exception {
+        service.connect(inputReader, outputWriter);
+
+        service.setRequestProcessor(new TestProcessor(){
+            @Override
+            public Object processRequest(Object request) {
+                assertTrue(request instanceof RPCRequest);
+                RPCRequest req = (RPCRequest) request;
+
+                assertFalse(req.getMethod().isEmpty());
+                assertTrue(req.getID() instanceof Number);
+
+                RPCResponse response = null;
+                try {
+                    response = RPCResponse.parse("{\"id\":3,\"result\":[{\"id\":4,\"price\":{\"amount\":1.0,\"currency\":\"EUR\"},\"name\":\"Cappuccino\"},{\"id\":20,\"price\":{\"amount\":1.85,\"currency\":\"EUR\"},\"name\":\"2 cappuccini\"},{\"id\":3,\"price\":{\"amount\":0.45,\"currency\":\"EUR\"},\"name\":\"Coffee\"},{\"id\":19,\"price\":{\"amount\":0.9,\"currency\":\"EUR\"},\"name\":\"2 coffees\"},{\"id\":2,\"price\":{\"amount\":1.2,\"currency\":\"EUR\"},\"name\":\"Espresso\"},{\"id\":18,\"price\":{\"amount\":2.4,\"currency\":\"EUR\"},\"name\":\"2 espresso\"},{\"id\":6,\"price\":{\"amount\":1.35,\"currency\":\"EUR\"},\"name\":\"Macchiato\"},{\"id\":22,\"price\":{\"amount\":2.7,\"currency\":\"EUR\"},\"name\":\"2 macchiato\"},{\"id\":13,\"price\":{\"amount\":0.1,\"currency\":\"EUR\"},\"name\":\"Hot Water\"},{\"id\":7,\"price\":{\"amount\":1.5,\"currency\":\"EUR\"},\"name\":\"Latte Macchiato\"},{\"id\":23,\"price\":{\"amount\":3.0,\"currency\":\"EUR\"},\"name\":\"2 latte macchiato\"},{\"id\":10,\"price\":{\"amount\":0.25,\"currency\":\"EUR\"},\"name\":\"1 portion milk\"},{\"id\":26,\"price\":{\"amount\":0.5,\"currency\":\"EUR\"},\"name\":\"2 portions milk\"},{\"id\":8,\"price\":{\"amount\":0.25,\"currency\":\"EUR\"},\"name\":\"1 portion milk foam\"},{\"id\":24,\"price\":{\"amount\":0.5,\"currency\":\"EUR\"},\"name\":\"2 portions milk foam\"},{\"id\":5,\"price\":{\"amount\":1.5,\"currency\":\"EUR\"},\"name\":\"Caffe latte\"},{\"id\":21,\"price\":{\"amount\":3.0,\"currency\":\"EUR\"},\"name\":\"2 caffe latte\"},{\"id\":12,\"price\":{\"amount\":1.5,\"currency\":\"EUR\"},\"name\":\"Jug of coffee\"},{\"id\":1,\"price\":{\"amount\":1.4,\"currency\":\"EUR\"},\"name\":\"Ristretto\"},{\"id\":17,\"price\":{\"amount\":2.8,\"currency\":\"EUR\"},\"name\":\"2 ristretto\"}],\"jsonrpc\":\"2.0\"}");
+                    response.setID(req.getID());
+                } catch (JSONRPC2ParseException e) {
+                    fail("Unable to create response object");
+                }
+                assertNotNull(response);
+                assertNotNull(response.getResult());
+                return response;
+            }
+        });
+
+        service.start();
+
+        List<Product> products = service.getProducts();
+        assertNotNull(products);
+
+        assertEquals(20, products.size());
+        assertTrue(products.contains(new Product(4, "Cappuccino", new Price(BigDecimal.valueOf(1.0), Currency.getInstance("EUR")))));
+        assertTrue(products.contains(new Product(3, "Coffee", new Price(BigDecimal.valueOf(0.45), Currency.getInstance("EUR")))));
+        assertTrue(products.contains(new Product(21, "2 caffe latte", new Price(BigDecimal.valueOf(3.0), Currency.getInstance("EUR")))));
+    }
+
+    @Test
+     public void orderProductReturnsValidStatus() throws Exception {
+        service.connect(inputReader, outputWriter);
+
+        service.setRequestProcessor(new TestProcessor(){
+            @Override
+            public Object processRequest(Object request) {
+                assertTrue(request instanceof RPCRequest);
+                RPCRequest req = (RPCRequest) request;
+
+                assertFalse(req.getMethod().isEmpty());
+                assertTrue(req.getID() instanceof Number);
+
+                RPCResponse response = new RPCResponse(Product.Status.PRODUCT_STATUS_STARTED.name(), req.getID());
+
+                assertNotNull(response);
+                assertNotNull(response.getResult());
+                return response;
+            }
+        });
+
+        service.start();
+
+        Product.Status status = service.orderProduct(4);
+        assertNotNull(status);
+        assertEquals(Product.Status.PRODUCT_STATUS_STARTED, status);
+    }
+
+    @Test
+    public void cancelProductReturnsValidStatus() throws Exception {
+        service.connect(inputReader, outputWriter);
+
+        service.setRequestProcessor(new TestProcessor(){
+            @Override
+            public Object processRequest(Object request) {
+                assertTrue(request instanceof RPCRequest);
+                RPCRequest req = (RPCRequest) request;
+
+                assertFalse(req.getMethod().isEmpty());
+                assertTrue(req.getID() instanceof Number);
+
+                RPCResponse response = new RPCResponse(Product.Status.PRODUCT_STATUS_CANCELLED.name(), req.getID());
+
+                assertNotNull(response);
+                assertNotNull(response.getResult());
+                return response;
+            }
+        });
+
+        service.start();
+
+        Product.Status status = service.cancelProduct(4);
+        assertNotNull(status);
+        assertEquals(Product.Status.PRODUCT_STATUS_CANCELLED, status);
+    }
+
+    @Test
+    public void getProductStatusReturnsValidStatus() throws Exception {
+        service.connect(inputReader, outputWriter);
+
+        service.setRequestProcessor(new TestProcessor(){
+            @Override
+            public Object processRequest(Object request) {
+                assertTrue(request instanceof RPCRequest);
+                RPCRequest req = (RPCRequest) request;
+
+                assertFalse(req.getMethod().isEmpty());
+                assertTrue(req.getID() instanceof Number);
+
+                RPCResponse response = new RPCResponse(Product.Status.PRODUCT_STATUS_IN_PROGRESS.name(), req.getID());
+
+                assertNotNull(response);
+                assertNotNull(response.getResult());
+                return response;
+            }
+        });
+
+        service.start();
+
+        Product.Status status = service.getProductStatus(4);
+        assertNotNull(status);
+        assertEquals(Product.Status.PRODUCT_STATUS_IN_PROGRESS, status);
     }
 }

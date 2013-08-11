@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 import java.io.Reader;
 import java.io.Writer;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 
@@ -45,13 +46,13 @@ public abstract class AbstractCoffeeMachineService implements CoffeeMachineServi
 
     public abstract ServiceContract getServiceContract();
 
-    public abstract Object getInfo();
+    public abstract Map<String, Object> getInfo();
 
     public abstract List<Product> getProducts();
 
-    public abstract void orderProduct(Product product);
+    public abstract Product.Status orderProduct(int productId);
 
-    public abstract void cancelProduct(Product product);
+    public abstract Product.Status cancelProduct(int productId);
 
     public abstract void connect(Reader inputReader, Writer outputWriter);
 
