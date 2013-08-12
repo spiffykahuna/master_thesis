@@ -1,6 +1,5 @@
-\subsection{System architecture}
+\subsection{System architecture and  device connection scheme}
 
-\subsubsection{Device connection scheme}
 Devices in a system may be interconnected in various ways.
 Some embedded systems \textbf{do not have} any connections at all. 
 Such systems only sense or control the environment and there is no need to
@@ -78,18 +77,14 @@ system. Coffee machine internal architecture and implementation does not allow
 us to store any additional code for implementing service functionality. Internal
 processor is utilized enough and there are no resources for anything else except
 controlling coffee machine. In addition, the company did not
-provided the specification for internal mechanism of communication to me. There
+provided to me a specification of internal communication mechanism . There
 are several microcontrollers inside that are controlling different machine
 parts.
-They provided  only the external interface to me, therefore my implementation is
-more similar to Proxy approach, where contracts are stored inside Proxy machine
+They provided  only the external interface communication protocol to me,
+therefore my implementation is more similar to Proxy approach, where contracts are stored inside Proxy machine
 and Proxy is a separate physical device.
-
-TODO  continue with the architecture
-
-
-
-\autoref{fig:general_system_arch} shows general  system architecture.
+\autoref{fig:general_system_arch} shows the general architecture of created
+system.
 
 \begin{center}
  \begin{figure}[h]
@@ -98,3 +93,23 @@ TODO  continue with the architecture
 	\label{fig:general_system_arch}
  \end{figure}
 \end{center}
+
+This is a traditional client-server approach where clients ( mobile or desktop)
+send the requests to the server( Proxy embedded device) over some network and
+physical transport( Bluetooth, various radio frequency connections, ethernet,
+USB, serial line, \ldots). Proxy server is connected to the controlled device 
+(marked on the figure as Actuator), which is the coffee machine in this example
+application.
+
+There can be different clients and proxy can control and monitor various
+devices, but connection scheme 
+\(
+{Client}\leftrightarrow{Transport}\leftrightarrow{Proxy}\leftrightarrow{Transport}\leftrightarrow{{Controlled~
+or~monitored~device}} \)  is essential.
+
+In this application mobile clients are connected through Bluetooth wireless. 
+Each client may be connected using supported by the proxy device transport.
+The proxy is connected to coffee machine by wires and serial line. 
+
+Next section covers the internals of Proxy device.
+
