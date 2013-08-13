@@ -220,7 +220,207 @@ deep knowledge about the underlying hardware. It is good to have such tools like
 standart APIs, that help to make this process more easy.
 
 \paragraph{Operating system}
+Programs for embedded devices can be written in many different ways.
+Some traditional ways how to do it:
+\begin{itemize}
+\item One big while loop and polling resources(also called busy waiting)
+\item The same while loop, but it is interrupt driven.
+Interrupts change some variables inside interrupt service routine (ISR) and main loop checks them on the next program cycle
+\item The use of cooperative multitasking realtime operating system (RTOS) 
+\end{itemize} 
 
+The two first methods are often called bare metal approach.
+Bare metal refers to techniques where programmers directly control and manipulate the underlying core, performing register-level access setting and clearing bits, and moving and operating on bytes of data directly.
+Everything traces directly to the programmer’s next line of code being executed, and there is nothing in between the programmer and the hardware.
+Resources like timers, interrupts, and I/O have to be accounted for in the application code.
+The bare metal approach works well when a system has a  well defined and deterministic processing algorithm, only a couple of tasks to manage, or needs precise instruction level determinism(hard realtime).
+
+Operating systems for microcontrollers have features like: 
+multitasking/multithreading,task prioritization, interprocess communication, memory management, abstracted I/O drivers, file systems, networking.
+They give to programmer higher level of abstraction and standard APIs, which help to reuse already existing code.
+Popular RTOS already come with various protocol stack and drivers implementations.
+However, the greates feature they have is the multitasking. 
+The program could be divided into several separate tasks and these tasks could run in the parallel.
+Parallel execution is achieved by dividing available CPU time between tasks.
+This process is called \textit{scheduling}. 
+There are two main scheduling policies: cooperative scheduling and preemptive scheduling.
+
+
+During cooperative scheduling CPU time is used by a task until this task explicitly gives CPU time to other tasks.
+This means that if the task will not give this time to others the whole system will hang.
+This approach gives reliable and deterministic control over all tasks  and programmer needs to define CPU time release points.
+There is no need of protection of common resources, because each task controls its execution and another task could run in that moment.
+
+The second preemptive scheduling approach gives each task a regular "slice" of operating time. 
+Each task has defined amount of CPU time during which it is able to do useful work.
+Scheduler takes this time when this time is over and gives this to another task.
+These tasks could have priorities, which allows to execute essential tasks before the backgroud are executed.
+At the moment of the task context switch scheduled decides which task will be next according to the priority of available tasks.
+Task with a higher priority will be triggered next. 
+Scheduler should also be able to give the execution time to tasks with lower priorities, otherwise the will be never triggered because tasks with higher priorities will be lauched instead.
+Tasks with the same priorities are executed one by one in the loop\cite{barry2010using}.
+Such scheduling algorithm gives the illusion that tasks are running in parallel.
+Parallel task execution requires protection of common and global hardware resources. 
+For example, the situation when some task can change a global variable, while another task is reading it and makes some decision.
+The result is that second task receives invalid result, which was modified between assigning a check value to some variable and reading it.
+
+
+The coffee machine service application contains many different task like: 
+multiple communication handling,
+request processing,
+request deserialization, etc.
+This amount of tasks is not final.
+This system needs to be extensible.
+There should be an opportunity to add new request and communication handlers.
+Request processing by the server is the concurrent process: while several requests are processed, another requests are sent over the network and communication interface needs to receive them.
+Responce transmitting could also run in parallel.
+
+It becomes harder to maintain and develop such concurrent program if you are not using a multitasking system. 
+You need always to carefully think where to insert a functionality into a big polling loop.
+Each insertion requires reordering of controll statements and checking the execution order of all parallell tasks.
+Moreover, your application may handle two different independent tasks and you need to keep data separated and remember which task does each variable belong.
+The use of operating system helps to keep things separated and loosely coupled.
+ 
+\paragraph{FreeRTOS}
+FreeRTOS is a popular real-time operating system for embedded devices, which has ports for many MCU devices(34 architectures \cite{FreeRTOS_website}), including STM32F1 family microcontrollers.
+This operating system was choosed for the embedded service application implementaton in this work.
+The reason is that this operating system has low entry level for the beginners and good documentation.
+In addition to that i have found and read a book \cite{barry2010using}, which is a great introduction to FreeRTOS and embedded multitask systems programming. 
+
+FreeRTOS has several features described below\cite{FreeRTOS_website}:
+\begin{itemize}
+\item Pre-emptive scheduling option 
+\item Co-operative scheduling option
+\item ROMable
+\item 6K to 10K ROM footprint
+\item Configurable / scalable
+\item Compiler agnostic
+\item Some ports never completely disable interrupts
+\item Easy to use message passing
+\item Round robin with time slicing
+\item Mutexes with priority inheritance
+\item Recursive mutexes
+\item Binary and counting semaphores
+\item Very efficient software timers
+\item Easy to use API 
+\end{itemize}
+
+All this features and support of available hardware helped to make a choice of using FreeRTOS in this project.
+I was inspired by this easy to use API, spread documentation and verbose examples.
+Next i will describe some essential FreeRTOS APIs  and how tasks are created and managed.
+
+The next thing you need to make after the setup of the programming environment and writing a trivial program to test it is the definition of system tasks.
+A task in FreeRTOS is usual C function and \autoref{lst:freertos_task_function_prototype} contains a prototype of this function.
+
+
+\begin{listing}[H]
+\begin{minted}[frame=lines,
+               framesep=2mm]{c}
+void ATaskFunction( void *pvParameters );
+\end{minted}
+\caption{FreeRTOS task function prototype}
+\label{lst:freertos_task_function_prototype}
+\end{listing} 
+
+Implementation of this function usually contains a separate program which has  infinite loop and never exits.  
+Creation of temporary tasks which are finite is also possible.
+Tasks may be deleted in the runtime using \texttt{vTaskDelete()} function.
+Task function has no return type (void) and \texttt{return} statements are not allowed, they should be explicitly deleted.
+It accepts method parameters of void pointer type, which allows to pass any type parameter there.
+Required parameter needs to be casted to \texttt{void*} before passing the parameter.
+It can be used inside task function through casting back to original type. 
+This feature is used to pass a complex configuration structure to a system task in the embedded service design.
+
+Task function do some useful application work. In order to start they require a registration in a system scheduler.
+When microcontroller program first starts, it gets into reset interrupt service routine, where starts the hardware initialization process.
+The \texttt{main()} application method is called after all hardware is initialized.
+All tasks should be started in that \texttt{main()} application method, where the first application code usually starts.
+\autoref{lst:freertos_task_create_function_prototype} shows task creation function prototype.
+\begin{listing}[H]
+\begin{minted}[frame=lines,
+               framesep=2mm]{c}
+portBASE_TYPE xTaskCreate( 
+	pdTASK_CODE pvTaskCode, 
+	const signed portCHAR * const pcName, 
+	unsigned portSHORT usStackDepth, 
+	void *pvParameters, 
+	unsigned portBASE_TYPE uxPriority, 
+	xTaskHandle *pxCreatedTask 
+);
+\end{minted}
+\caption{FreeRTOS task function prototype}
+\label{lst:freertos_task_function_prototype}
+\end{listing} 
+
+The first parameter is the pointer to a task function, which has the application logic.
+Second parameter is the name of that task. It is used for system needs like debuging.
+Parameter with name \texttt{usStackDepth} configures available stack space for the task.
+Each context switch and method calls in a task use that memory space for storing application context.
+Program counter and state of the operation registers are stored there.
+All local variables are also copied to the stack during context switch.
+Therefore this parameter should depend on the complexity of the application (function call depth) and
+amount of local variables used in each child function. 
+The fourth parameter is a pointer to the task parameters. Next parameter defines priority of that task.
+The last one is the pointer to the task handle structure, which should be defined before this method call.
+\texttt{xTaskCreate()} method returns a handle.  This handle may be used to control this task.
+
+This method only creates  tasks, but not executes. 
+\texttt{main()} application method should contain a \texttt{vTaskStartScheduler()} call, that executes the scheduler and registered tasks are executed by this scheduler.
+\texttt{vTaskStartScheduler()} call is normally a blocking call, it never ends and runs until there is some error.
+
+
+Freertos uses queues for interprocess communication.
+This is an easy way of passing messages between tasks.
+
+Listing of queue methods 
+xQueueHandle xQueueCreate( unsigned portBASE_TYPE uxQueueLength, 
+unsigned portBASE_TYPE uxItemSize 
+); 
+
+portBASE_TYPE xQueueSendToFront( xQueueHandle xQueue, 
+const void * pvItemToQueue, 
+portTickType xTicksToWait 
+);
+
+portBASE_TYPE xQueueSendToBack( xQueueHandle xQueue, 
+const void * pvItemToQueue, 
+portTickType xTicksToWait 
+); 
+
+portBASE_TYPE xQueueReceive( 
+xQueueHandle xQueue,
+const void * pvBuffer, 
+portTickType xTicksToWait 
+);
+
+portBASE_TYPE xQueuePeek( 
+xQueueHandle xQueue,
+const void * pvBuffer, 
+portTickType xTicksToWait 
+);
+
+Mutexes and semaphores
+Semaphores and mutexes are base on queues and theid methods are similar to queue methods.
+
+
+
+ 
+
+
+
+
+
+ 
+
+ – that relieve programmers from having to understand the underlying hardware in detail, and manage relatively complex tasks.
+ Many of these tasks operate in the background without the programmer’s attention once the operating system starts.
+ They work well in systems that need a lot of flexibility, and are generally for more sophisticated applications with larger code bases.
+ Third party code is often available to help support features more quickly. 
+ Faster processor clock speeds have blurred the lines on determinism somewhat, with most of these systems now fast enough for most applications. 
+ Embedded versions of these platforms are usually configurable, so the footprint can be tuned by omitting unneeded resources from the build.
+
+
+Why do we need an operating system to be installed on a 
 
 
 \subsubsection{Service software}
