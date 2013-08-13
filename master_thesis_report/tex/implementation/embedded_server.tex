@@ -188,7 +188,7 @@ The famous UART may be configured using Standard Peripheral Library like this:
 
 \begin{listing}[H]
 \begin{minted}[frame=lines,
-               framesep=2mm]{c}
+               framesep=2mm]{c++}
 RCC_APB2PeriphClockCmd(RCC_APB2Periph_USART1, ENABLE);
 
 USART_InitTypeDef USART_InitStructure;
@@ -205,7 +205,7 @@ USART_Init(USART1, &USART_InitStructure);
 \end{listing} 
 
 Most of configuration can be done using preprocessor defines.
-You may add several defines, for example \texttt{#define STM32F10X_MD} to use
+You may add several defines, for example \texttt{\#define STM32F10X\_MD} to use
 STM32 Medium density devices (Flash memory density ranges between 64 and 128
 Kbytes). Clock rates and different peripherals can be adjusted in a similar way.
 
@@ -219,14 +219,15 @@ Setup an embedded development environment takes a lot of time and requires
 deep knowledge about the underlying hardware. It is good to have such tools like
 standart APIs, that help to make this process more easy.
 
-\paragraph{Operating system}
+\paragraph{Operating system} ~\\
 Programs for embedded devices can be written in many different ways.
 Some traditional ways how to do it:
 \begin{itemize}
 \item One big while loop and polling resources(also called busy waiting)
 \item The same while loop, but it is interrupt driven.
-Interrupts change some variables inside interrupt service routine (ISR) and main loop checks them on the next program cycle
-\item The use of cooperative multitasking realtime operating system (RTOS) 
+Interrupts change some global variables inside interrupt service routine (ISR)
+and main loop checks them on the next program cycle
+\item The use of multitasking realtime operating system (RTOS) 
 \end{itemize} 
 
 The two first methods are often called bare metal approach.
@@ -281,8 +282,10 @@ Each insertion requires reordering of controll statements and checking the execu
 Moreover, your application may handle two different independent tasks and you need to keep data separated and remember which task does each variable belong.
 The use of operating system helps to keep things separated and loosely coupled.
  
-\paragraph{FreeRTOS}
-FreeRTOS is a popular real-time operating system for embedded devices, which has ports for many MCU devices(34 architectures \cite{FreeRTOS_website}), including STM32F1 family microcontrollers.
+\paragraph{FreeRTOS} ~\\
+FreeRTOS is a popular real-time operating system for embedded devices, which has
+ports for many MCU devices(34 architectures \cite{FreeRTOS_website}),
+also including STM32F1 family microcontrollers.
 This operating system was choosed for the embedded service application implementaton in this work.
 The reason is that this operating system has low entry level for the beginners and good documentation.
 In addition to that i have found and read a book \cite{barry2010using}, which is a great introduction to FreeRTOS and embedded multitask systems programming. 
@@ -310,12 +313,14 @@ I was inspired by this easy to use API, spread documentation and verbose example
 Next i will describe some essential FreeRTOS APIs  and how tasks are created and managed.
 
 The next thing you need to make after the setup of the programming environment and writing a trivial program to test it is the definition of system tasks.
-A task in FreeRTOS is usual C function and \autoref{lst:freertos_task_function_prototype} contains a prototype of this function.
+A task in FreeRTOS is usual C function and
+listing \ref{lst:freertos_task_function_prototype} contains a prototype of this
+function.
 
 
 \begin{listing}[H]
 \begin{minted}[frame=lines,
-               framesep=2mm]{c}
+               framesep=2mm]{c++}
 void ATaskFunction( void *pvParameters );
 \end{minted}
 \caption{FreeRTOS task function prototype}
@@ -335,10 +340,11 @@ Task function do some useful application work. In order to start they require a 
 When microcontroller program first starts, it gets into reset interrupt service routine, where starts the hardware initialization process.
 The \texttt{main()} application method is called after all hardware is initialized.
 All tasks should be started in that \texttt{main()} application method, where the first application code usually starts.
-\autoref{lst:freertos_task_create_function_prototype} shows task creation function prototype.
+Listing \autoref{lst:freertos_task_create_function_prototype} shows task
+creation function prototype.
 \begin{listing}[H]
 \begin{minted}[frame=lines,
-               framesep=2mm]{c}
+               framesep=2mm]{c++}
 portBASE_TYPE xTaskCreate( 
 	pdTASK_CODE pvTaskCode, 
 	const signed portCHAR * const pcName, 
@@ -349,7 +355,7 @@ portBASE_TYPE xTaskCreate(
 );
 \end{minted}
 \caption{FreeRTOS task function prototype}
-\label{lst:freertos_task_function_prototype}
+\label{lst:freertos_task_create_function_prototype}
 \end{listing} 
 
 The first parameter is the pointer to a task function, which has the application logic.
@@ -362,74 +368,452 @@ Therefore this parameter should depend on the complexity of the application (fun
 amount of local variables used in each child function. 
 The fourth parameter is a pointer to the task parameters. Next parameter defines priority of that task.
 The last one is the pointer to the task handle structure, which should be defined before this method call.
-\texttt{xTaskCreate()} method returns a handle.  This handle may be used to control this task.
+\texttt{xTaskCreate()} method returns a handle.  This handle may be used to
+control  this task.
 
 This method only creates  tasks, but not executes. 
 \texttt{main()} application method should contain a \texttt{vTaskStartScheduler()} call, that executes the scheduler and registered tasks are executed by this scheduler.
 \texttt{vTaskStartScheduler()} call is normally a blocking call, it never ends and runs until there is some error.
+On error scheduler method finishes and program execution returns to the
+\texttt{main()} application method, where program continues to run.
 
 
-Freertos uses queues for interprocess communication.
-This is an easy way of passing messages between tasks.
+Task can force a contex switch by calling \texttt{taskYIELD()} method.
+FreeRTOS scheduling algorithm  can be configured as cooperative or preemptive.
+In cooperative scheduling mode \texttt{taskYIELD()} method is used to make a
+context switch and give CPU time other tasks.
+In preemptive it forces a context switch before time slice has ended.
+Another task can start from the middle of the time slice of previous task.
+This gives better overall system performance.
 
-Listing of queue methods 
-xQueueHandle xQueueCreate( unsigned portBASE_TYPE uxQueueLength, 
-unsigned portBASE_TYPE uxItemSize 
+FreeRTOS uses queues for interprocess communication.
+Oueues can be used to send messages between tasks, and between interrupts and
+tasks. 
+In most cases they are used as thread safe FIFO (First In First Out) buffers with new data being sent to the back of the queue, although data can also be sent to the front. 
+
+The queue operations are  mutually exclusive ( see listing
+\autoref{lst:freertos_queue_methods}).
+The same queue element cannot be received twice in different tasks.
+Messages are sent through queues by copy, creation of the queue allocated memory
+space and queue insert function copies inserted value to that space.
+You hold different values in a queue: this may be plain C language primitive
+type, a structure or even \texttt{void*} type. Large structures can be sent by
+storing a structure reference pointer. 
+Queue functions are also blocking functions. Delay amount measured in system
+ticks can be provided to queue functions, it is able to lock forever by passing
+a special system value to these functions. Operation methods also return status
+of the operation.
+ 
+\begin{center}
+ \begin{figure}[H]
+	\includegraphics[height=\textheight]{../images/implementation/embedded_server/queue_ipc.png}
+	\caption{Writing to and reading from a queue.\cite{FreeRTOS_website}}
+	\label{fig:queue_ipc}
+ \end{figure}
+\end{center}
+
+\begin{listing}[h]
+\begin{minted}[frame=lines,
+               framesep=2mm]{c++}
+xQueueHandle xQueueCreate( 
+	unsigned portBASE_TYPE uxQueueLength, 
+	unsigned portBASE_TYPE uxItemSize 
 ); 
 
-portBASE_TYPE xQueueSendToFront( xQueueHandle xQueue, 
-const void * pvItemToQueue, 
-portTickType xTicksToWait 
+portBASE_TYPE xQueueSendToFront( 
+	xQueueHandle xQueue, 
+	const void * pvItemToQueue, 
+	portTickType xTicksToWait 
 );
 
 portBASE_TYPE xQueueSendToBack( xQueueHandle xQueue, 
-const void * pvItemToQueue, 
-portTickType xTicksToWait 
+	const void * pvItemToQueue, 
+	portTickType xTicksToWait 
 ); 
 
 portBASE_TYPE xQueueReceive( 
-xQueueHandle xQueue,
-const void * pvBuffer, 
-portTickType xTicksToWait 
+	xQueueHandle xQueue,
+	const void * pvBuffer, 
+	portTickType xTicksToWait 
 );
 
 portBASE_TYPE xQueuePeek( 
-xQueueHandle xQueue,
-const void * pvBuffer, 
-portTickType xTicksToWait 
+	xQueueHandle xQueue,
+	const void * pvBuffer, 
+	portTickType xTicksToWait 
 );
+\end{minted}
+\caption{FreeRTOS queue methods}
+\label{lst:freertos_queue_methods}
+\end{listing} 
 
-Mutexes and semaphores
-Semaphores and mutexes are base on queues and theid methods are similar to queue methods.
+Semaphores and mutexes are based on the queues and theid methods are similar to
+queue methods.
+They can protect your sensitive data from being changed from other tasks.
+\texttt{xSemaphoreTake()} and \texttt{xSemaphoreGive()} are used for that
+purpose. There are also available mechanism of critical sections.
 
+FreeRTOS has own memory management mechanism and there are four memory
+allocation  options available:
+\begin{enumerate}
+  \item Memory can be allocated, but it cannot be freed. This option is for
+  static applications, which allocate memory only at system startup and use that for
+  the lifetime of program 
+  \item  Best fit algorithm is used. Memory can be freed. This approach does not
+  combine free blocks into a single large block and memory gets fragmented. This
+  is not good for applications who allocate random memory size.
+  \item  In this option the standard C library \texttt{malloc()} and
+  \texttt{free()} functions are used. This is a standard way of memory
+  allocation and it is supported by the compiler and linker.
+  \item This scheme uses a first fit algorithm and, unlike scheme 2, does
+  combine free memory blocks into a single large block
+\end{enumerate}
 
+Options other than 3 are more efficient than standard \texttt{malloc()}
+and \texttt{free()} and are thread safe. Their footprint is smaller and work in
+pair with the OS kernel. 
 
- 
+I tried several options and ended up with the last configuration option. 
+Option 3 was not stable for me and system frequently crashed while using it.
+Therefore last approach was choosed as more stable. Memory heap is stored inside
+one big byte array and memory allocator takes a free space from there.
 
-
-
-
-
- 
-
- – that relieve programmers from having to understand the underlying hardware in detail, and manage relatively complex tasks.
- Many of these tasks operate in the background without the programmer’s attention once the operating system starts.
- They work well in systems that need a lot of flexibility, and are generally for more sophisticated applications with larger code bases.
- Third party code is often available to help support features more quickly. 
- Faster processor clock speeds have blurred the lines on determinism somewhat, with most of these systems now fast enough for most applications. 
- Embedded versions of these platforms are usually configurable, so the footprint can be tuned by omitting unneeded resources from the build.
-
-
-Why do we need an operating system to be installed on a 
-
+FreeRTOS may be used in various applications and it contains lots of useful
+functionality. It can be extended using different modules ( see
+\cite{FreeRTOS_website}) like networking modules (TCP and UDP), input output
+modules, filesystem modules and others. It is a quite good choice for a newbie
+like me. There is no need to reinvent the wheel.
 
 \subsubsection{Service software}
-Here will be STM32 server implementation.
 
 
+Previous section was mainly about available features in the operating system and
+hardware. 
+This section covers how the software of embedded server is written
+using some of them.
+
+\paragraph{Initialization} ~\\
+Application starts with hardware initialization code. Microcontroller clock
+source is external quartz oscillator (8 Mhz) and MCU is configured to use 
+PLL(Phase locked Loop) frequency multiplier,  which is used for multiplying its
+input frequency by a given factor of two to sixteen. 
+Using the PLL, you can generate clocks up to 72MHz.
+
+Next comes initalization of USART communication interfaces. USART are configured
+to use \gls{DMA} controller. \gls{DMA} works in both directions: receive and
+transmit. The usage of DMA requires initialization of DMA controller, assigning
+destination/transmiting memory buffer and buffer length, and other configuration
+parameters. DMA may be configured to use memory increment and data direction (
+from the peripheral to buffer or from buffer to peripheral). This feature
+enables sending and receiving data to/from the USART without utilization of
+CPU.
+
+In case of transmitting the data, program may store data to the memory
+buffer, trigger DMA send event and continue further processing. DMA controller
+sends the data bytes to USART one by one until incremented memory address is
+equal to the length of the buffer. Interrupt is generated after operation
+completion (or in case of error, you need to check status flags to extract
+operation status), which signalizes end of transmission operation to user.
+While DMA is sending data, CPU can prepare next bulk of data to send.
+
+Receiving of data works in a similar way.
+Three types of DMA interrupts are used for that:
+\begin{itemize}
+  \item DMA Full transfer interrupt indicates that full buffer transfer was
+  ended
+  \item DMA Half transfer interrupt routine triggers when the half of the
+  transmitting buffer is sent
+  \item USART idle interrupt indicates that the
+  line is free and there are no more characters.
+\end{itemize}  
+When the DMA half interrupt occures user receives first half of the receive
+buffer. Second half of the buffer may be taken by the user after the full
+transfer interrupt. Line idle interrupt service routine is triggered when the
+line is free for some amount of time. Programmer needs to check what is the
+current status of the transfer and how many bytes are already received by the
+DMA controller. Current position( first half or second half of the buffer) can
+be calculated according that value and the right chunk of bytes can be
+extracted.
+
+Interrupt service routines store incoming bytes in a FIFO(First In First Out)
+buffer. Application note \cite{stm_dma_fifo_appnote} contains description of
+this approach. In short, two receive buffers are used: one for DMA controller
+and another is for user application. There are some problems using traditional
+one buffer implementation: user software should retrieve data from the
+receive buffer before the data are overwritten by the next received data.
+Receive buffers are often implemented in a circular way( DMA also has this
+option) and when buffer is filled, write pointer returns to the start of the
+buffer and data may be written again. User needs to read this data or it will be
+overwritten. In a double-receive-buffer approach the second buffer, which
+belongs to the user, is not overwritten. The code implemened by me just ignores
+to write into user buffer when it is full. There is a tradeoff while user is
+inactive and does not read anything: 
+to loose all the data and overwrite all buffer with new bytes or to loose only
+some part of it. That is how receiving of the message works in the embedded
+server described in this work.
+
+After initializaton of the USART transceivers and their DMA program initializes 
+FreeRTOS tasks and data stuctures. All system queues and semaphores are created
+at that time. Tasks are registered and task input parameters are passed into
+task functions. Next scheduler is started and all tasks start to run. Scheduler
+works forever while system is powered.
+
+This is how succesful scenario looks like. There are also another ones:
+\begin{itemize}
+  \item There is unable to create tasks and data structures (not enough memory
+  or some error)
+  \item There is not enough memory to start all tasks and scheduler function
+  exits and programm crashes.
+  \item A stack of some task gets overflowed and task crashes.
+  \item There is not enough memory in a heap and task cannot allocate memory
+  for new objects. As a result programm crashes.
+\end{itemize}
+
+All this events are signalized by the FreeRTOS kernel and programmer needs to
+decide what to do if some of them happens. Our application is in early stage
+development and error conditions are handled using unlimited loops.
+Program gets into this loop and it is able to watch stack trace in the debugger
+and find a place where it was behaved incorrectly.
+
+\paragraph{System tasks and their functions} ~\\
+
+The architecture of this embedded server consists of several components.
+\autoref{fig:server_components_and_data_flow} shows how they all are connected
+together.
+
+\begin{center}
+ \begin{figure}[h]
+	\includegraphics[width=\textwidth]{../images/implementation/embedded_server/system_tasks_and_data_flow.png}
+	\caption{System tasks architecture and  the data flow}
+	\label{fig:server_components_and_data_flow}
+ \end{figure}
+\end{center}
+
+Most tasks have similar structure and may be covered with a few lines of code:
 
 
+\begin{listing}[H]
+\begin{minted}[frame=lines,
+               framesep=2mm]{c++}
+void tskSomeTask(void *pvParameters) {
+	while(1) {
+		if(uxQueueMessagesWaiting(someQueue) > 0) {
+			xStatus = xQueueReceive( 
+				systemMsgQueue, 
+				&sysMsg, 
+				QUEUE_RECEIVE_WAIT_TIMEOUT 
+			);
+			
+			/* 
+				make some useful work here
+			*/
+		}
+		vTaskDelay(250 / portTICK_RATE_MS);
+	}
+}
+\end{minted}
+\caption{General task function structure}
+\label{lst:task_function_structure}
+\end{listing}
 
+As it was written before, FreeRTOS tasks are made like unlimited loops.
+Usually tasks are waiting for some messages in a queue.
+When a message is inserted from somewhere task receives it from the queue and
+starts processing. When the work gets done,  task sleeps for define amount of
+time. 
+
+Most of task in this system are made using this method. 
+Tasks wait for resources and process them. 
+They are in sleep most of time.
+
+Task with a higher priority is the task called  \texttt{tskSystem}.
+It is started before all other tasks and is responsible of handling system
+messages. 
+\texttt{tskSystem} is used to output debug information and logging messages.
+It is waiting for the message with type \texttt{MSG\_TYPE\_LOGGING} and sends it
+over logging UART.
+This task wakes between every 250 ms intervals and checks for new logging
+messages. It also reports the remaining heap memory size.
+
+Logging messages are sent to a system queue from other tasks.
+Logging gives the ability to trace essential processing steps and to quickly
+find the broken place.
+I have implemented logging API which is similar to Apache log4j in Java
+programming language( see \url{http://logging.apache.org/log4j/1.2/} and search
+for \textit{log4j} and \textit{slf4j} keywords.
+In order to write log message you need to call \texttt{logger(LEVEL\_INFO,
+"log message text")} method specifying a level of severity for a message and
+message text. There are  lots of these calls in application code. It is
+necessary to log all essential moments of application lifecycle. Level with
+lowest severity \texttt{LEVEL\_TRACE} may be used for tracking separate method
+calls. Each method may have trace logging call at entry and return points.
+User can turn of these messages by setting global logging system level to more
+higher one (the highest is \texttt{LEVEL\_OFF}).
+
+Other tasks will be covered according to data flow showed in
+\autoref{fig:server_components_and_data_flow}.
+
+The first task that meets request from the client is the UART reader task.
+At the early state of developent this was a special and dedicated task for
+reading from one communicating port. Later i changed it to be more common and
+function was renamed to \texttt{tskAbstractReader()}. Now this can be a
+reader for any source. It is configurable by task input configuration parameters
+which have stucture showed in listing \ref{lst:reader_config_structure}
+
+\begin{listing}[H]
+\begin{minted}[frame=lines,
+               framesep=2mm]{c++}
+typedef struct _reader_params_t {
+	transport_type_t				transport_type;
+	stream_read_char_function_t		read_char_func;
+	stream_has_byte_function_t		stream_has_byte;
+	xQueueHandle					dataInputQueue;
+	portTickType					dataInputQueueTimeout;
+	xSemaphoreHandle				dataReadSemaphore;
+} reader_params_t;
+\end{minted}
+\caption{Reader configuration structure}
+\label{lst:reader_config_structure}
+\end{listing}
+
+This task become an abstract because it has common processing algorithm ( which
+is similar to algorithm in listing \ref{lst:task_function_structure}).
+It waits for \texttt{dataReadSemaphore} in a loop. 
+This semaphore is released in DMA \gls{ISR} when UART message arrives.
+\texttt{stream_has_byte_function_t} is a function that returns true
+when UART incoming message FIFO has bytes to read. 
+\texttt{stream_read_byte_function_t} returns one byte from the buffer
+\footnote{Most programming language have a concept named \textit{streams} or
+\textit{data input output streams}. The tutorial located at
+\url{http://docs.oracle.com/javase/tutorial/essential/io/streams.html}
+(accessed 13-August-2013) introduces this abstraction.}.
+
+This byte can be processed using any algorithm. This is a place where you need
+to define a protocol that your application will use.
+There are available million and one more communication protocols and this work
+covered some of them below. 
+This level requires an analogue to  Data link
+layer protocols from ISO OSI communication model 
+( an exapmle can be Ethernet, Point-to-Point Protocol (PPP), High-Level Data
+Link Control (HDLC)  and others). 
+Their purpose is to provide an defined
+mechanism how pieces of data bytes compose communication frames or packets. 
+Frame is a digital data transmission unit in computer networking and
+telecommunication. These protocols define which data bytes are control
+information and which represent data to be sent.
+
+There should be special byte sequences (or single bytes) which indicate the 
+beginning and the end of each communication message. 
+The first control symbol i started to use was ASCII newline symbol ('\\n').
+Incoming sequences of bytes were separated by a byte with value \textt{0x0A}.
+The messages were line oriented and each incoming line was a new message.
+
+There is a problem using such control mechanism. If your message contains a 
+newline( which is very predictable if you are working with text) you receive an
+incomplete message and there is impossible to find if received message is wrong
+or not. Message gets splitted into two message packets.
+
+I started to improve this solution and the next step was usage of ASCII control
+characters like EOT(end of transmission, value \textt{0x04}), ETB (end of
+transmission block, value \textt{0x17}) and similar. Using these  control
+characters you can detect messages in incoming stream, but this does not help in case of transfering data
+bytes, which can be any value between \textt{0x00} and \textt{0xFF}.
+
+
+I started a reseach of suitable protocols that have a solution for that problem.
+My mistake was that i started from wrong direction.
+I started to read
+specification for Point-to-Point Protocol and other Internet related
+technologies.
+My thoughts were about realization of a complex data packet structure, with lots
+of packet members and a complex data flow control in there, like it is in these
+technologies. My friends, who are programmers, adviced me to create a custom
+protocol using \texttt{\mbox{start_byte:length:checksum:data:end_byte}} message
+structure. This might be that exact structure, but finally i found a solution
+from the beggining of my master thesis research - the
+website\footnote{\url{http://www.simple-is-better.org/}} of Roland Koebler, which is named \textit{"Simpler is better"}.
+The title page of this site contains a beautiful quote:
+\begin{quotation} 
+Technology always develops from the primitive, via the complicated, to the
+simple. \newline
+— Antoine de Saint-Exupéry
+\end{quotation}
+
+I have found there a very simple solution how to transfer data packets. It is
+called \textit{netstrings} ( \url{http://cr.yp.to/proto/netstrings.txt} is the
+source specification). 
+A netstring is a self-delimiting encoding of a string
+which has very simple format: \texttt{<LENGTH>:<DATA>,}. Length is number of
+charactes to read, colon indicates the start of the message, message is read
+until message length becomes equal to \texttt{<LENGTH>}, last comes message
+separator - the comma.
+
+netstrings method was enough to fulfill application needs. 
+Current application requirements do not define data link protocol.
+This approach defines  a logical message protocol and it can be used in the
+demonstration of service application. If the requirements change this proctocol
+can be replaces by any other, but for now it is enough.
+
+
+Let's get back to UART read task. This task contains a simple finite state
+machine (FSM) for parsing netstrings. When a message is received, UART read task
+puts the payload to the \texttt{dataInputQueue} and continues to read next
+messages.
+
+The last config parameter \texttt{transport\_type\_t} specifies a transport,
+from which messages are transfered.
+This is a system wide enumeration constant which identifies a source of the
+message. This architecture allow to have many different sources of requests. The
+core is transport independent, it takes only messages with defined structure
+from message queue. The information sources can be UART lines, \gls{CAN},
+Ethernet, any wireless or wired physical transport solution. 
+To add a new transport to the system you need
+to write a source reader, which understands underlying physical data stream
+protocol and can extract information data from that, and a writer, which is
+connected to response queue and can take messages from there and write them to
+the stream.
+
+Messages in this system have a structure defined in listing 
+\ref{lst:packet_structure} and are named \textit{packets}.
+
+\begin{listing}[H]
+\begin{minted}[frame=lines,
+               framesep=2mm]{c++}
+typedef struct _packet_t {
+	json_int_t			id;
+	packet_type_t		type;
+	transport_type_t 	transport;
+	
+	union {
+		strbuffer_t		*stringData;
+		json_t			*jsonDoc;
+	} payload;
+	
+	int locked;
+} packet_t;
+\end{minted}
+\caption{System packet structure. Packets are used to deliver messages between
+different parts of the system}
+\label{lst:packet_structure}
+\end{listing}
+
+Packet contains an identificator, type or the meaning of that packet  and data
+payload. Variable \texttt{locked} is used for simple synchronization ( mutex
+lock).
+
+The reader needs to create a new packet, assign type
+\texttt{PKG\_TYPE\_OUTGOING\_MESSAGE\_STRING}, assign payload (
+\texttt{strbuffer\_t} is a simple character buffer structure) and to put this
+packet to \texttt{dataInputQueue} from the task configuration.
+
+UART writer pulls the same structured packet from the response queue, checks
+that packet type is \texttt{PKG\_TYPE\_OUTGOING\_MESSAGE\_STRING}, extracts the
+payload and sends the data back to the client. It is also responsible of
+cleaning the memory, it needs to destroy this packet ( by calling appropriate
+method)
+
+Reader gives the work to message parser task.
+TODO make a JSON-RPC message introduction
 
 
 %  One solution is to use closed encrypted proprietary
