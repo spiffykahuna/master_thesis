@@ -552,7 +552,7 @@ to loose all the data and overwrite all buffer with new bytes or to loose only
 some part of it. That is how receiving of the message works in the embedded
 server described in this work.
 
-After initializaton of the USART transceivers and their DMA program initializes 
+After initializaton of the USART transceivers and their DMA, program initializes 
 FreeRTOS tasks and data stuctures. All system queues and semaphores are created
 at that time. Tasks are registered and task input parameters are passed into
 task functions. Next scheduler is started and all tasks start to run. Scheduler
@@ -682,7 +682,7 @@ It waits for \texttt{dataReadSemaphore} in a loop.
 This semaphore is released in DMA \gls{ISR} when UART message arrives.
 \texttt{stream_has_byte_function_t} is a function that returns true
 when UART incoming message FIFO has bytes to read. 
-\texttt{stream_read_byte_function_t} returns one byte from the buffer
+\texttt{stream\_read\_byte\_function\_t} returns one byte from the buffer
 \footnote{Most programming language have a concept named \textit{streams} or
 \textit{data input output streams}. The tutorial located at
 \url{http://docs.oracle.com/javase/tutorial/essential/io/streams.html}
@@ -741,13 +741,13 @@ simple. \newline
 
 I have found there a very simple solution how to transfer data packets. It is
 called \textit{netstrings} ( \url{http://cr.yp.to/proto/netstrings.txt} is the
-source specification). 
+source specification, last accessed at 13-August-2013). 
 A netstring is a self-delimiting encoding of a string
 which has very simple format: \texttt{<LENGTH>:<DATA>,}. Length is number of
 charactes to read, colon indicates the start of the message, message is read
 until message length becomes equal to \texttt{<LENGTH>}, last comes message
 separator - the comma.
-
+\label{sec:netstrings}
 netstrings method was enough to fulfill application needs. 
 Current application requirements do not define data link protocol.
 This approach defines  a logical message protocol and it can be used in the
@@ -780,9 +780,9 @@ Messages in this system have a structure defined in listing
 \begin{minted}[frame=lines,
                framesep=2mm]{c++}
 typedef struct _packet_t {
-	json_int_t			id;
-	packet_type_t		type;
-	transport_type_t 	transport;
+	json_int_t          id;
+	packet_type_t       type;
+	transport_type_t    transport;
 	
 	union {
 		strbuffer_t		*stringData;
@@ -804,7 +804,8 @@ lock).
 The idea of using such data structures was inspired by the Chain of Responsibility software design pattern\footnote{Description of that pattern in russian language~\url{http://cpp-reference.ru/patterns/behavioral-patterns/chain-of-responsibility/} }.
 \begin{center}
  \begin{figure}[H]
-	\includegraphics[width=0.5\textwidth]{../images/implementation/embedded_server/demo-chain-of-responsibility-1.png}
+ 	\centering
+	\includegraphics[width=0.6\textwidth]{../images/implementation/embedded_server/demo-chain-of-responsibility-1.png}
 	\caption{The idea of  Chain of Responsibility software design pattern}
 	\label{fig:chain_of_responsibility}
  \end{figure}
@@ -833,8 +834,12 @@ It receives system packet with a type \texttt{PKG\_TYPE\_INCOME\_MESSAGE\_STRING
 Parsed JSON-RPC requests are added to the request queue by this task.
 
 JSON website \cite{json_org} contains an overview of available JSON serialization and deserialization libraries.
-I have tried some of them, which laimed to be very lightweight: Jansson (\url{http://www.digip.org/jansson/}), parson (\url{http://kgabis.github.io/parson/}) and jsmn (\url{http://zserge.bitbucket.org/jsmn.html})
-I was also tried to write my own JSON parser, but after some progress i realized, that i am writing something similar to those ready libraries.
+I have tried some of them, which claimed to be very lightweight: Jansson
+(\url{http://www.digip.org/jansson/}), parson
+(\url{http://kgabis.github.io/parson/}) and jsmn
+(\url{http://zserge.bitbucket.org/jsmn.html}).
+I was also tried to write my own
+JSON parser, but after some progress i realized, that i am writing something similar to those ready libraries.
 I decided to take one of them and to use in my project.
 
 The last one, jsmn JSON parser library, is the most lightweight solution i have ever seen.
@@ -888,7 +893,7 @@ It is more convenient and efficient to store and later use raw id value for the 
 
 The next processing unit in the request chain of responibility is the request handler task.
 This is the main request handling module in this system.
-Listing \ref{request_handler_algorithm} contains an algorithm description of request handler task written in C like pseudocode: 
+Listing \ref{lst:request_handler_algorithm} contains an algorithm description of request handler task written in C like pseudocode: 
 
 \begin{listing}[h]
 \begin{minted}[frame=lines,
@@ -918,18 +923,60 @@ The method not found error response is returned if there is no such method avail
 I have developed several demo methods to demonstrate coffe machine service functionality
 \autoref{tbl:service_remote_methods} contains description of available methods in this system.
 
-\begin{longtable}[H]
-	\centering	
-	\begin{tabularx}{\textwidth}{|X|X|X|X|}
-		\hline
-		\textbf{Method name} & 
-		\textbf{Input parameters}  	& 
-		\textbf{Method output} &
-		\textbf{Description} &
+
+\begin{longtabu} to \linewidth {|p{3cm}|p{1.5cm}|X|p{5cm}|}
+%\hline
+%\rowfont\bfseries H1 & H2 & H3 & H4 
+%\endhead
+
+% \\ \hline
+% \multicolumn8{r}{There is more to come} \\
+% \endfoot
+
+% \\ \hline
+% \endlastfoot
+
+% \hline \hline
+% \endlastfoot
+
+\hline 
+\multicolumn{1}{|l|}{\textbf{Method name}} & 
+\multicolumn{1}{l|}{\textbf{Input parameters}} &
+\multicolumn{1}{l|}{\textbf{Method output}} &  
+\multicolumn{1}{l|}{\textbf{Description}} \\ 
+\hline 
+\endfirsthead
+
+\multicolumn{4}{l}%
+{{\bfseries \tablename\ \thetable{} -- continued from previous page}} \\
+\hline 
+\multicolumn{1}{|l|}{\textbf{Method name}} & 
+\multicolumn{1}{l|}{\textbf{Input parameters}} &
+\multicolumn{1}{l|}{\textbf{Method output}} &  
+\multicolumn{1}{l|}{\textbf{Description}} \\ 
+\hline 
+\endhead
+
+\hline \multicolumn{4}{|r|}{{Continued on next page}} \\ \hline
+\endfoot
+
+% \hline \hline
+\endlastfoot
+
+
+%\begin{longtable}{|p{0.2\texwidth}|p{0.2\texwidth}|p{0.2\texwidth}|p{0.4\texwidth}|}
+%\begin{longtable}{| l | l | l | p{5cm} |}
+%	\centering	
+	%\begin{tabularx}{\textwidth}{|X|X|X|X|}
+% 		\hline
+% 		\textbf{Method name} &
+% 		\textbf{Input parameters}  	&
+% 		\textbf{Method output} &
+% 		\textbf{Description} &
 			
 	    
-	    \tabularnewline
-		\hline
+	%    \tabularnewline
+	%	\hline
 		"system.help" &
 		-- &
 		Full service description. &
@@ -938,14 +985,14 @@ I have developed several demo methods to demonstrate coffe machine service funct
 		
 		\tabularnewline
 		\hline
-		"machine.getInfo" &
+		"machine.\newline~getInfo" &
 		-- &
 		Information about coffe machine &
 		This method returns to a client a JSON object with name of connected coffee machine and machine firmware version.
 
 		\tabularnewline
 		\hline
-		"machine.getProducts" &
+		"machine.\newline~getProducts" &
 		-- &
 		List of available products &
 		A complete list of available products is returned.
@@ -954,7 +1001,7 @@ I have developed several demo methods to demonstrate coffe machine service funct
 		
 		\tabularnewline
 		\hline
-		"machine.orderProduct" &
+		"machine.\newline~orderProduct" &
 		A product code &
 		Returns a status of order operation. &
 		This method call starts coffee prerearing procedure on the coffee machine.
@@ -968,20 +1015,20 @@ I have developed several demo methods to demonstrate coffe machine service funct
 		
 		\tabularnewline
 		\hline
-		"machine.getProductStatus" &
+		"machine.\newline~getProductStatus" &
 		A product code &
 		Returns a status of previously started product order. &
 		This method call is used for retrieving a status of coffee product currently being prepared.
 		Valid product code, that was received as a result from  "machine.getProducts" should be provided.
 		Method returns the status of operation which can be one of follows: \newline
-		"PRODUCT\_STATUS\_STARTED" \newline"  
+		"PRODUCT\_STATUS\_STARTED" \newline  
 		"PRODUCT\_STATUS\_IN\_PROGRESS" \newline 
 		"PRODUCT\_STATUS\_FINISHED" \newline 
 		"PRODUCT\_STATUS\_FAILED" 
 		
 		\tabularnewline
 		\hline
-		"machine.cancelProduct" &
+		"machine.\newline~cancelProduct" &
 		A product code &
 		Returns a status of cancel operation &
 		Possible values are: \newline
@@ -990,10 +1037,13 @@ I have developed several demo methods to demonstrate coffe machine service funct
 		
 		\tabularnewline
 		\hline
-	\end{tabularx} 
+	%\end{tabularx} 
 	\caption{Embedded service remote methods}
 	\label{tbl:service_remote_methods}
-\end{longtable}
+\end{longtabu}
+
+
+
 
 Each handler method receives and returns an JSON-RPC message object. 
 Some methods are communicating to a directly connected coffee machine and trigger some events there.
@@ -1042,7 +1092,7 @@ JSON-Schema is supported by the IETF(Internet Engineering Task Forse) organizati
 
 \begin{listing}[h]
 \begin{minted}[frame=lines,
-               framesep=2mm]{javascript}
+               framesep=2mm]{json}
 {
     "description": "A geographical coordinate",
     "type": "object",
@@ -1062,8 +1112,10 @@ There are developed by large coorporations like Microsoft, IBM, Oracle who have 
 These standards are more bureaucratic that simple and verbose JSON solutions. 
 
 Author of this work tries to say that service oriented technologies can be implemented not only using XML, SOAP and HTTP.
-There are lots of other alternatives and the correct one depends on the target application.
-I needed more compact and lightweight protocols, because of the target hardware. 
+There are lots of other alternatives and the implementation of correct solution
+depends on the target application.
+I needed more compact and lightweight protocol, because of the target hardware. 
+
 
 TODO insert some glue paragraph here.
 

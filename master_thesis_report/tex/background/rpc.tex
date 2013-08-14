@@ -243,7 +243,7 @@ To give a visual information about these objects and data structures listing \re
 
 \begin{listing}[h]
 \begin{minted}[frame=lines,
-               framesep=2mm]{javascript}
+               framesep=2mm]{json}
 Legend:
 --> data sent to Server
 <-- data sent to Client
@@ -256,10 +256,12 @@ rpc call with positional parameters:
 <-- {"jsonrpc": "2.0", "result": -19, "id": 2}
 
 rpc call with named parameters:
---> {"jsonrpc": "2.0", "method": "subtract", "params": {"subtrahend": 23, "minuend": 42}, "id": 3}
+--> {"jsonrpc": "2.0", "method": "subtract", 
+     "params": {"subtrahend": 23, "minuend": 42}, "id": 3}
 <-- {"jsonrpc": "2.0", "result": 19, "id": 3}
 
---> {"jsonrpc": "2.0", "method": "subtract", "params": {"minuend": 42, "subtrahend": 23}, "id": 4}
+--> {"jsonrpc": "2.0", "method": "subtract", 
+     "params": {"minuend": 42, "subtrahend": 23}, "id": 4}
 <-- {"jsonrpc": "2.0", "result": 19, "id": 4}
 
 a Notification:
@@ -268,15 +270,21 @@ a Notification:
 
 rpc call of non-existent method:
 --> {"jsonrpc": "2.0", "method": "foobar", "id": "1"}
-<-- {"jsonrpc": "2.0", "error": {"code": -32601, "message": "Method not found"}, "id": "1"}
+<-- {"jsonrpc": "2.0", 
+     "error": {"code": -32601, "message": "Method not found"}, 
+     "id": "1"}
 
 rpc call with invalid JSON:
 --> {"jsonrpc": "2.0", "method": "foobar, "params": "bar", "baz]
-<-- {"jsonrpc": "2.0", "error": {"code": -32700, "message": "Parse error"}, "id": null}
+<-- {"jsonrpc": "2.0", 
+     "error": {"code": -32700, "message": "Parse error"}, 
+     "id": null}
 
 rpc call with invalid Request object:
 --> {"jsonrpc": "2.0", "method": 1, "params": "bar"}
-<-- {"jsonrpc": "2.0", "error": {"code": -32600, "message": "Invalid Request"}, "id": null}
+<-- {"jsonrpc": "2.0", 
+     "error": {"code": -32600, "message": "Invalid Request"}, 
+     "id": null}
 
 \end{minted}
 \caption{JSON-RPC examples of client-server communication \cite{jsonrpc_spec}}
@@ -285,8 +293,11 @@ rpc call with invalid Request object:
 
 JSON-RPC is more simple when it is compared with XML-RPC. 
 It is more compact and transport independent 
-(XML-RPC specification at \url{http://xmlrpc.scripting.com/default.html} tells that it uses HTTP as the main transport).
-\autoref{sec:xml_vs_json} section provides more detailed comparison of JSON and XML
+\footnote{XML-RPC specification at
+\url{http://xmlrpc.scripting.com/default.html} tells that it uses HTTP as the
+main transport}.
+\nameref{sec:xml_vs_json} section provides more detailed comparison of JSON and
+XML
 
 \subsubsection{RPC summary}
 This section described one another posible way of \gls{IPC}. RPC is used in many
