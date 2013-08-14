@@ -199,7 +199,95 @@ language. Some examples are provided below:
 \end{itemize} 
 Most of these programming languages have multiplatform implementations and RPC
 system may be built using various hardware.
-  
+
+JSON-RPC version 2.0 will be used in this work as primary RPC solution in the implementation of embedded client-server architecture. 
+It is based on \gls{JSON} object serialization (see \ref{sec:json_description} section to see information about JSON or visit \url{http://www.json.org/})
+and uses JSON format for  transfering messages between client and the server.
+
+JSON-RPC is a lightweight RPC solution that is designed to be simple \cite{jsonrpc_spec}.
+It defines how client and server should communicate between each other. 
+To make a RPC call client needs to send Request object, server need to response with a Response object.
+
+The specification \cite{jsonrpc_spec} defines Request object like a stucture with following members:
+\begin{itemize}
+\item \textbf{jsonrpc} -- A String specifying the version of the JSON-RPC protocol. This must be exactly "2.0".
+\item \textbf{method} -- A String containing the name of the method to be invoked.
+\item \textbf{params} -- A Structured value that holds the parameter values to be used during the invocation of the method. This member may be omitted.
+\item \textbf{id} --  An identifier established by the Client that must contain a String, Number, or NULL value if included. If it is not included the request is assumed to be a notification. 
+\end{itemize}
+
+A Notification is a Request object without an "id" member.
+A Request object that is a Notification means the Client's lack of interest in the corresponding Response object. 
+The Server must not reply to a Notification.
+
+Response object is a JSON object with similar to Request members:
+
+\begin{itemize}
+\item \textbf{jsonrpc} -- Has the same meaning as in Request object
+
+\item \textbf{result} --  This member is required on success. It must not exist if there was an error in method invocation.
+	This member returns a method result value. It might be complex JSON object. 
+\item \textbf{error} --  This member is required on error. This should be a defined object (see below)   
+
+\item \textbf{id} --  Identification  of a client. This member value should be the same, which was sent previously by the client. It may be NULL in case of error
+ \end{itemize}
+
+ When there is an error in the RPC call, the Response Object must contain the error member with a value that is a Object with the following members:
+\begin{itemize}
+\item \textbf{code} -- A Number that indicates the error type that occurred.
+\item \textbf{message} --  A String providing a short description of the error.
+\item \textbf{data} --     A Primitive or Structured value that contains additional information about the error. This may be omitted.
+\end{itemize}	
+
+To give a visual information about these objects and data structures listing \ref{lst:jsonrpc_example} contains examples of client server communication.
+
+\begin{listing}[h]
+\begin{minted}[frame=lines,
+               framesep=2mm]{javascript}
+Legend:
+--> data sent to Server
+<-- data sent to Client
+
+rpc call with positional parameters:
+--> {"jsonrpc": "2.0", "method": "subtract", "params": [42, 23], "id": 1}
+<-- {"jsonrpc": "2.0", "result": 19, "id": 1}
+
+--> {"jsonrpc": "2.0", "method": "subtract", "params": [23, 42], "id": 2}
+<-- {"jsonrpc": "2.0", "result": -19, "id": 2}
+
+rpc call with named parameters:
+--> {"jsonrpc": "2.0", "method": "subtract", "params": {"subtrahend": 23, "minuend": 42}, "id": 3}
+<-- {"jsonrpc": "2.0", "result": 19, "id": 3}
+
+--> {"jsonrpc": "2.0", "method": "subtract", "params": {"minuend": 42, "subtrahend": 23}, "id": 4}
+<-- {"jsonrpc": "2.0", "result": 19, "id": 4}
+
+a Notification:
+--> {"jsonrpc": "2.0", "method": "update", "params": [1,2,3,4,5]}
+--> {"jsonrpc": "2.0", "method": "foobar"}
+
+rpc call of non-existent method:
+--> {"jsonrpc": "2.0", "method": "foobar", "id": "1"}
+<-- {"jsonrpc": "2.0", "error": {"code": -32601, "message": "Method not found"}, "id": "1"}
+
+rpc call with invalid JSON:
+--> {"jsonrpc": "2.0", "method": "foobar, "params": "bar", "baz]
+<-- {"jsonrpc": "2.0", "error": {"code": -32700, "message": "Parse error"}, "id": null}
+
+rpc call with invalid Request object:
+--> {"jsonrpc": "2.0", "method": 1, "params": "bar"}
+<-- {"jsonrpc": "2.0", "error": {"code": -32600, "message": "Invalid Request"}, "id": null}
+
+\end{minted}
+\caption{JSON-RPC examples of client-server communication \cite{jsonrpc_spec}}
+\label{lst:jsonrpc_example}
+\end{listing}                                                                                                             
+
+JSON-RPC is more simple when it is compared with XML-RPC. 
+It is more compact and transport independent 
+(XML-RPC specification at \url{http://xmlrpc.scripting.com/default.html} tells that it uses HTTP as the main transport).
+\autoref{sec:xml_vs_json} section provides more detailed comparison of JSON and XML
+
 \subsubsection{RPC summary}
 This section described one another posible way of \gls{IPC}. RPC is used in many
 distributed systems in obvious or imlicit way. It provides mechanism for calling 

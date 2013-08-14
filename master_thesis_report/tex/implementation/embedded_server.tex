@@ -801,6 +801,18 @@ Packet contains an identificator, type or the meaning of that packet  and data
 payload. Variable \texttt{locked} is used for simple synchronization ( mutex
 lock).
 
+The idea of using such data structures was inspired by the Chain of Responsibility software design pattern\footnote{Description of that pattern in russian language~\url{http://cpp-reference.ru/patterns/behavioral-patterns/chain-of-responsibility/} }.
+\begin{center}
+ \begin{figure}[H]
+	\includegraphics[width=0.5\textwidth]{../images/implementation/embedded_server/demo-chain-of-responsibility-1.png}
+	\caption{The idea of  Chain of Responsibility software design pattern}
+	\label{fig:chain_of_responsibility}
+ \end{figure}
+\end{center}
+The idea of this pattern is that client request is processed by a chain of processing units.
+Each processing unit takes request from previous chain member, makes processing and gives processed object to the next chain member.
+This chain can be easily changed by adding or removing processing units and replacing their position in the chain.
+
 The reader needs to create a new packet, assign type
 \texttt{PKG\_TYPE\_OUTGOING\_MESSAGE\_STRING}, assign payload (
 \texttt{strbuffer\_t} is a simple character buffer structure) and to put this
@@ -813,8 +825,247 @@ cleaning the memory, it needs to destroy this packet ( by calling appropriate
 method)
 
 Reader gives the work to message parser task.
-TODO make a JSON-RPC message introduction
+This embedded server implementation uses 
+JSON data structures and JSON-RPC protocol  as primary  message passing technology.
+They were covered before and some client-server communication was introduced (see listing \ref{lst:jsonrpc_example}). 
+The message parser task takes string messages from message queue and converts them into JSON request objects. 
+It receives system packet with a type \texttt{PKG\_TYPE\_INCOME\_MESSAGE\_STRING} and makes a \texttt{PKG\_TYPE\_INCOME\_JSONRPC\_REQUEST}  from it.
+Parsed JSON-RPC requests are added to the request queue by this task.
 
+JSON website \cite{json_org} contains an overview of available JSON serialization and deserialization libraries.
+I have tried some of them, which laimed to be very lightweight: Jansson (\url{http://www.digip.org/jansson/}), parson (\url{http://kgabis.github.io/parson/}) and jsmn (\url{http://zserge.bitbucket.org/jsmn.html})
+I was also tried to write my own JSON parser, but after some progress i realized, that i am writing something similar to those ready libraries.
+I decided to take one of them and to use in my project.
+
+The last one, jsmn JSON parser library, is the most lightweight solution i have ever seen.
+It suits well for the embedded systems without dynamic  memory allocation. 
+This is a stream based parser and it does not hold copied of data, but holds only references to them.
+The regular usage includes declaration of static array of token structures. 
+A token is a structure that represents JSON object. 
+It has a type and pointers to the original character data of character JSON message.
+There are no separate copies stored, API provides only pointers to data.
+You need to define the array of tokens in the code, that will be enough to process a new message. 
+Parser API function returns a status code that can be a success, parsing error or lack of tokens in the token array.
+You can process the tokens if there was a success at parsing step.
+Some finite state machine needs to be implemented for this. As the result, it requires more complex proccessing code (like stream based parser do).
+It is not convenient to use such API, this library requires a more beautiful wrapper.
+
+The main choise of JSON parsing library consisted of the battle between Jansson and parson.
+Jansson was choosed to be used in this project, because of the custom memory allocation and more elegant API.
+It also has a very good documentation with examples and explanations.
+
+\begin{listing}[h]
+\begin{minted}[frame=lines,
+               framesep=2mm]{c++}
+json_t *array, *integer;
+
+array = json_array();
+integer = json_integer(42);
+
+json_array_append(array, integer);
+json_decref(integer); 
+\end{minted}
+\caption{Examples of using Jansson library API}
+\label{lst:jansson_example}
+\end{listing}
+
+This library uses the object reference counting for managing the lifecycle of the objects.
+The reference count is used to track whether a JSON object is still in use or not. 
+When a value is created, it’s reference count is set to 1. 
+If a reference to a value is kept (e.g. a value is stored somewhere for later use), its reference count is incremented, and when the value is no longer needed, the reference count is decremented. 
+When the reference count drops to zero, there are no references left, and the value can be destroyed and memory is freed.
+This gives a possibility to make complex nested object structures and there is no need of tracking each object separately.
+Complex objects can be deleted by decrementing the reference count of the root objects. 
+Jansson library recursively decrements count of all nested objects and if reference count becomes zero object is destroyed.
+
+Income message parsing task uses Jansson library to parse incoming JSON-RPC requests.
+When request object is parsed it is checked for compatibility with JSON-RPC version 2.0(checks for valid JSON object members). 
+Request identificator (\texttt{id}) is exctracted from JSON object and assigned to the packet identificator inside parser task.
+The \texttt{id} is a positive integer which has \texttt{json\_int\_t} type (this is actually defined as \texttt{unsigned long long} inside Jansson library).
+It is more convenient and efficient to store and later use raw id value for the packet, than to extract the \texttt{id} from JSON object every time
+( which requires a hash table lookup inside member extract function, which is more expensive than reading a single variable)
+
+
+The next processing unit in the request chain of responibility is the request handler task.
+This is the main request handling module in this system.
+Listing \ref{request_handler_algorithm} contains an algorithm description of request handler task written in C like pseudocode: 
+
+\begin{listing}[h]
+\begin{minted}[frame=lines,
+               framesep=2mm]{c++}
+while(1) {
+	if(requestQueueHasRequests()) {
+		request = getRequestFromQueue();
+		if(request && (typeof(request) == JSONRPC_REQUEST)) {
+			response = handleRequest(request);			
+		} else {
+			reportError();
+		}
+		destroyRequest(request);
+		if(response) {
+			sendResponseToResponseQueue(response);
+		}		
+	}
+}
+\end{minted}
+\caption{Request hadler algorithm}
+\label{lst:request_handler_algorithm}
+\end{listing}
+
+The request handling method contains a table of available methods and the method name from the request is searched in that table.
+If method was found, a function that corresponds to that particular method is called and the request is passed as the parameter to that fuction.
+The method not found error response is returned if there is no such method available.
+I have developed several demo methods to demonstrate coffe machine service functionality
+\autoref{tbl:service_remote_methods} contains description of available methods in this system.
+
+\begin{longtable}[H]
+	\centering	
+	\begin{tabularx}{\textwidth}{|X|X|X|X|}
+		\hline
+		\textbf{Method name} & 
+		\textbf{Input parameters}  	& 
+		\textbf{Method output} &
+		\textbf{Description} &
+			
+	    
+	    \tabularnewline
+		\hline
+		"system.help" &
+		-- &
+		Full service description. &
+		Service contract is returned by this method. 
+		This is a structured JSON document, that contains a  description of available mehtods similar to this table. 
+		
+		\tabularnewline
+		\hline
+		"machine.getInfo" &
+		-- &
+		Information about coffe machine &
+		This method returns to a client a JSON object with name of connected coffee machine and machine firmware version.
+
+		\tabularnewline
+		\hline
+		"machine.getProducts" &
+		-- &
+		List of available products &
+		A complete list of available products is returned.
+		The members of that list are JSON structures that define a product.
+		They contain the name of a product, its code and the price.
+		
+		\tabularnewline
+		\hline
+		"machine.orderProduct" &
+		A product code &
+		Returns a status of order operation. &
+		This method call starts coffee prerearing procedure on the coffee machine.
+		Valid product code, that was received as a result from  "machine.getProducts" should be provided.
+		Method returns the status of operation which can be one of follows: \newline
+		"PRODUCT\_STATUS\_STARTED" \newline
+		"PRODUCT\_STATUS\_FAILED" \newline 
+		"PRODUCT\_STATUS\_BUSY" 
+		The last status is returned if this product is already running.
+		
+		
+		\tabularnewline
+		\hline
+		"machine.getProductStatus" &
+		A product code &
+		Returns a status of previously started product order. &
+		This method call is used for retrieving a status of coffee product currently being prepared.
+		Valid product code, that was received as a result from  "machine.getProducts" should be provided.
+		Method returns the status of operation which can be one of follows: \newline
+		"PRODUCT\_STATUS\_STARTED" \newline"  
+		"PRODUCT\_STATUS\_IN\_PROGRESS" \newline 
+		"PRODUCT\_STATUS\_FINISHED" \newline 
+		"PRODUCT\_STATUS\_FAILED" 
+		
+		\tabularnewline
+		\hline
+		"machine.cancelProduct" &
+		A product code &
+		Returns a status of cancel operation &
+		Possible values are: \newline
+		TODO define cancel return codes here
+		
+		
+		\tabularnewline
+		\hline
+	\end{tabularx} 
+	\caption{Embedded service remote methods}
+	\label{tbl:service_remote_methods}
+\end{longtable}
+
+Each handler method receives and returns an JSON-RPC message object. 
+Some methods are communicating to a directly connected coffee machine and trigger some events there.
+This communication is using closed proprietary protocol and these methods are working with a special library from the manufacturer.
+This library was provided to me and was partially implemented by me.
+User code need only to execute a methods from that library and receive a result.
+Library internals write requests to the coffee machine and receiving response messages using UART transciever.
+Library specification is the C language header file, where are defined all function prototypes and return codes. 
+The coffee machine manufacturer insisted of not publishing the details of protocol used and the implementation of that library.
+We are using it here in the design with the assumption, that it does its communication work well, with any knowledge of internal behaviour of that software module (black box).
+This was one of the main reasons why a proxy/translator architecture ( mentioned here \ref{sec:device_connection_scheme}) may be used to integrate proprietary and legacy devices into other systems.
+
+Returned responce JSON-RPC messages are serialized back to string characer data in the request handler task and are inserted to a responce queue, where they could be picked by a UART writer task for futher writing
+(see \autoref{fig:server_components_and_data_flow}).
+The last UART writer task writes data to the client interface UART and totally destroys that response message.
+
+Now we have described the whole data flow cycle of this system architecture.
+One of the main design goals it that system packets are created and deleted only once inside Reader and Writer software modules near the corresponding client interface.
+Other processing units are only changing the internal packet structure by changing packet type and payload of the packet.
+This reduces overall memory consumption.
+
+The architecture design that is based on queues and separate processing tasks help to produce an extensible and scalable systems.
+When some task becomes a throwput bottleneck there is always an opportunity to add the another same task in parallel. 
+Two or more tasks can receive the work from one queue and more than one task could push the results into one destination queue.
+Processing units in between can be changed or totally replaced, because input and output interface of the modules is defined.
+For example, if we decide to change the netstrings message encoding for something else, we  only need to rewrite Reader and Writer modules.
+JSON to XML data serialization replacement requires more fundamental changes (because JSON object is used as primary data transfer objects in the request handle methods, therefore you need to rewrite all request methods to solve that problem), but if the underlying communication transport structure is not changed, it is not necessary to touch this part of the system.
+
+
+\subsubsection{Service description contract}
+\label{sec:service_json_contract}
+
+As you already know, the whole system i based on the JSON-RPC specification.
+Service description contract is also made using similar technologies.
+\autoref{sec:appendix_service_contracts} provides an examples of service contracts.
+JSON version of contract is inspired from JSON Schema Service Descriptor Draft at \url{http://www.simple-is-better.org/}.
+This is a specification of service interface description. 
+Service contract of coffee machine service is made according to that specification.
+
+It uses a JSON-Schema\footnote{\url{http://json-schema.org/}} specification to describe the JSON data format. 
+JSON object could also be self desctiptive and automatically verified by the machine.
+There is no official standart available yet, but most of these techologies are in the development phase right now. 
+These are mostly working drafts.
+JSON-Schema is supported by the IETF(Internet Engineering Task Forse) organization and there is a big hope that these JSON technologies become an production standart.
+
+
+\begin{listing}[h]
+\begin{minted}[frame=lines,
+               framesep=2mm]{javascript}
+{
+    "description": "A geographical coordinate",
+    "type": "object",
+    "properties": {
+        "latitude": { "type": "number" },
+        "longitude": { "type": "number" }
+    }
+}
+\end{minted}
+\caption{JSON-Schema definition of geographic coordinate object}
+\label{lst:json_schema_geo}
+\end{listing}
+
+JSON is a great and more lightweight alternative for XML.
+Web Services and related XML technologies become a de facto standart for large corporate service systems. 
+There are developed by large coorporations like Microsoft, IBM, Oracle who have personal interest of these technologies.
+These standards are more bureaucratic that simple and verbose JSON solutions. 
+
+Author of this work tries to say that service oriented technologies can be implemented not only using XML, SOAP and HTTP.
+There are lots of other alternatives and the correct one depends on the target application.
+I needed more compact and lightweight protocols, because of the target hardware. 
+
+TODO insert some glue paragraph here.
 
 %  One solution is to use closed encrypted proprietary
 % protocol and be calm, but as it was mentioned earlier, it limits the possibility of integration
