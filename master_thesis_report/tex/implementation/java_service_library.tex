@@ -2,23 +2,23 @@
 \subsection{General purpose client library implementation}
 
 \subsubsection{The technology}
-This section will define a client side of this application.
+This section will define a client side of embedded service application.
 JSON-RPC messages are used as the main application protocol.
 Client part should also support all these features that server offers.
 
-\autoref{fig:rpc_call} showed the main principle of RPC.
-Usually RPC client application consists of two modules: client application code
+\autoref{fig:rpc_call} showed the main architecture of RPC.
+RPC client   application usually consists of two modules: client application code
 and client RPC stub, that communicates with remote server.
 Client calls usual methods on a stub and stub handles all
-the communication magic, it sends requests, receives responces, serialize and
-deserialize data objects.
+the communication magic, it sends requests, receives responses, serialize and
+diserialize data objects.
 
 There were already some examples of a small RPC application (see listings
 \ref{lst:rpc_server_python_example} and
 \ref{lst:rpc_client_python_example})
 Our system requirements does not allow to use Python programming language.
 The client application in this work is written for Google Android smartphone
-planform, which has a \gls{JVM} virtual machine inside, and the Java programming
+platform, which has a \gls{JVM} virtual machine inside, and the Java programming
 language is used.
 
 Java is very popular programming language which is based on \textit{Write once,
@@ -40,7 +40,7 @@ extensibility and portability and therefore Java is a good choice to start.
 
 I have implemented an universal library for the RPC communication with the
 previously described embedded service. That library is easy to add to any Java
-project and start to develop a new controll application. 
+project and start to develop a new control application. 
 
 \subsubsection{Library structure}
 
@@ -49,21 +49,21 @@ or service contract. The JSON service descriptor from the
 \autoref{sec:appendix_service_contracts} has enough information to create a
 binding library to that embedded service.
 
-This code can be done in two different ways: static and dynamic binding.
-This library described here is a static binding library, because it has already 
-defined interface class and client methods are known at compile time.
+This client code can be realized in two different ways: static and dynamic binding.
+The library described here, is a static binding library, because it has an already 
+defined interface class and client methods are known at the compile time.
 
 Dynamic libraries can determine available server methods at the runtime. Client
-library connects to a server and receives a list of operations. For example JSON
-service contract can be obtained and parsed at the runtime. Dynamic proxy
+library may connect to a server and receives a list of operations. For example JSON
+service contract that is used in this work, can be obtained and parsed at the runtime. Dynamic proxy
 class can be created from received list of methods and methods can be called
 only by a name without the compile time checking. Client may know only a method
 name or a part of that name and decide while application is running, which
 methods to call. Domain keywords for Java are: \textit{reflection}, \textit{dynamic proxy
 class}, \textit{duck typing}.
 
-I prefered to make more robust solution and created an Java interface class with
-all methods that server has. The code is provided below.
+I preferred to make more robust solution and created an Java interface class with
+all methods that server has. The definition of the main interface class in the library is provided below.
 
 \begin{listing}[H]
 \begin{minted}[frame=lines,
@@ -100,30 +100,29 @@ public interface CoffeeMachineService extends Service {
 \label{lst:rpc_client_interface_class}
 \end{listing}
 
-Some object oriented design techiques are used here to help a programmer to
-write more abstract code. \texttt{CoffeeMachineService}  extends another
+Some object oriented design techniques are used here to get a more abstract code. 
+\texttt{CoffeeMachineService}  extends another
 interface \texttt{Service}, which has method that are common to every RPC
 service.
-\texttt{CoffeeMachineService} contans only coffee machine related methods and
+\texttt{CoffeeMachineService} interface contains only coffee machine related methods and
 inherits other methods from the parent class.
 
 Client can use these classes in the application code and does not need to know
 the implementation details. To start using it client needs to create an instance
-of \texttt{CoffeeMachineService}, connect it to \texttt{Reader} and
-\texttt{Writer} stream objects and call RPC methods.
+of \texttt{JsonRpcCoffeeMachineService}( the implementation of \texttt{CoffeeMachineService} interface), connect it to \texttt{Reader} and
+\texttt{Writer} stream objects and after that  user can call RPC methods.
 
 \paragraph{Character encoding} ~\\
 Java programming language has the abstraction of \texttt{Reader} and
 \texttt{Writer}. These are character stream interfaces that allow to write or
 read characters to/from underlying information sources. JSON-RPC is a text
 based protocol and we only need to handle character data in our application, but
-not binary data. Binary data only is transported between client and server
-hardware and low level j software. \texttt{Reader} and \texttt{Writer} are parents of
+not binary data.\texttt{Reader} and \texttt{Writer} are parents of
 \texttt{InputStreamReader} and \texttt{OutputStreamWriter}, which are bridge
 from byte streams to character streams. They transfer bytes to characters and
-back using a specified charset\footnote{the mapping between characters and sequences of bytes}.
+back using a specified character set\footnote{the mapping between characters and sequences of bytes}.
 JVM internally stores characters as 16-bit Unicode variables, but in other
-systems character can be:  an US-ASCII seven-bit value, UTF-8 multibyte
+systems character can be:  an US-ASCII seven-bit value, UTF-8 multi-byte
 encoding, Extended Binary Coded Decimal Interchange Code (EBCDIC) 8-bit
 character encoding and others. Character encoding needs to be specified for
 \texttt{InputStreamReader} and \texttt{OutputStreamWriter} in order to convert
@@ -146,21 +145,24 @@ data bytes should come and where they need to be written.
 This library assumes that received characters are encoded using
 netstrings\footnote{ \texttt{<LENGTH>:<DATA>,} format, for more details see
 \autoref{sec:netstrings} } message encoding.
-Message reader class in the library has the implementation of similar finite
+\texttt{MessageReader} class in the library has the implementation of similar finite
 state machine parsing algorithm, that was used in the embedded server implementation.
+It reads the netstrings encoded messages, extracts the data from them and sends extracted characters to
+\texttt{MessageHandler} for processing.
 
-The Message writer class composes a valid netstring message and  uses provided
-by the client \texttt{Writer} object to write that message to the destination.
-Message writer receives JSON  objects converts them to String data, wraps them
-in a netstring message and sends this character data to the desctination.
+
+The \texttt{MessageWriter} class composes a valid netstring message and  uses  the provided
+by a client \texttt{Writer} object to write that message to the destination.
+\texttt{MessageWriter} receives JSON  objects,converts them into a String data, wraps them
+in a netstring message and sends this character data to the destination.
 
 \paragraph{JSON serialization and the JSON-RPC} ~\\
 
 This JSON-RPC client is based on the \texttt{jsonrpc2-base} library from
 Vladimir Dzhuvinov (\url{http://software.dzhuvinov.com}).
 This library provides a ready classes for handling JSON-RPC requests and
-responces 
-\autoref{tbl:jsonrpc2-base_methods} showes the entire lifecycle of RPC call.
+responses 
+\autoref{tbl:jsonrpc2-base_methods} shows the entire lifecycle of a RPC call.
 
 
 
@@ -258,9 +260,9 @@ responces
 	\label{tbl:jsonrpc2-base_methods}
 \end{longtabu}
 
-\texttt{jsonrpc2-base} is able to serialize Java datatypes to JSON objects
-Listining \ref{lst:jsonrpc2-base_serialization} shows how RPC request object is
-created from the standart Java data types and \autoref{tbl:json_java_mapping}
+\texttt{jsonrpc2-base} is able to serialize Java data types to JSON objects
+Listing \ref{lst:jsonrpc2-base_serialization} shows how RPC request object is
+created from the standard Java data types and \autoref{tbl:json_java_mapping}
 shows how JSON to JAVA mappings are done.
 
 \begin{listing}[H]
@@ -285,7 +287,7 @@ String jsonString = reqOut.toString();
 
 // jsonString can now be dispatched to the server...
 \end{minted}
-\caption{RPC request creating from Java standart datatypes \cite{jsonrpc2-base}}
+\caption{RPC request creating from Java standard data types \cite{jsonrpc2-base}}
 \label{lst:jsonrpc2-base_serialization}
 \end{listing}
 
@@ -335,7 +337,7 @@ String jsonString = reqOut.toString();
 		\tabularnewline
 		\hline	  
 	\end{tabularx} 
-	\caption{{JSON}\(\leftrightarrow\){Java} datatype mapping in
+	\caption{{JSON}\(\leftrightarrow\){Java} data type mapping in
 	\texttt{jsonrpc2-base} library \cite{jsonrpc2-base}}
 	\label{tbl:json_java_mapping}
 \end{table}
@@ -383,7 +385,7 @@ request, while programming interface needs to stay fixed.
 There is only one strategy for the \texttt{RequestProcessor} implemented yet.
 This processor sends a request to a message handler only ones and starts to wait
 for a response from a \texttt{RequestWaiter} help class.
-After some timeot it returnes the result or a \texttt{null} value if there was
+After some timeout it returns the result or a \texttt{null} value if there was
 not  any response received.
 
 Message writer module of the client stub implements the
@@ -395,7 +397,7 @@ handling.
 Service implementation contains a list of service listeners, who are listening
 for various RPC messages. 
 Listing \ref{lst:event_listener_publisher_interfaces} contains a list o messages that can
-be captured by the \texttt{RPCServiceListener}. It also contans a interface of a
+be captured by the \texttt{RPCServiceListener}. It also contains a interface of a
 class that publishes internal system events.
 
 \begin{listing}[H]
@@ -426,9 +428,9 @@ methods are triggered by the request publishers.
 
 System event methods are triggered by a
 \texttt{MessageHandler}. This is a small routing class that decides where to put
-moving requests, notification, respoces and errors according to their types. 
+moving requests, notification, responses and errors according to their types. 
 For example, if \texttt{handleMessage(RPCRequest request)} message handler
-method is called from somewhere in the code, message handler publishes recieved
+method is called from somewhere in the code, message handler publishes received
 \texttt{RPCRequest} object to all subscribed listeners. 
 Message handler calls \texttt{onRequest(RPCRequest request)} method on each
 service subscriber and passes new \texttt{RPCRequest} as parameter.
@@ -452,12 +454,20 @@ This is how JSON-RPC messages flow inside service client library.
 
 It might seem quite complicated, but it has lots of advantages. 
 Using a publish-subscribe mechanism you might add  multiple event listeners to
-the system very easilly. 
+the system very easily. 
 For example if you need a request logger, you create a class which implements a
 \texttt{RPCServiceListener} interface and register it in a main service class 
 by calling special methods. Now your logger can listen all RPC
 messages and log the information about them.
 
+\paragraph{Conclusion} ~\\
+
+This library can be used in the client application code as the abstract interface of a remote coffee machine.
+It makes programming of client code more elegant and easy.
+System programmer does not need to develop RPC related code, he can simply use this interface in his projects.
+The only necessary step is the connection of a service instance class to the data input and output character streams.
+This library uses the netstrings  character data encoding, which is a very simple way how to transfer character data messages.
+The whole design is based on the JSON-RPC communication protocol.
 
 
 
