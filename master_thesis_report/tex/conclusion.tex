@@ -1,4 +1,136 @@
 \newpage
 \section{Conclusions}
+
+Several possible variants of \gls{SOA} implementation were covered in this work.
+Some of them are mature and standartized tools which are used in many production
+systems nowadays.
+Another ones are lightweight and beautiful alternatives to the first group. They
+can be  used even in the small microcontroller devices. 
+Their specifications does not tie a programmer to work with a limited specific
+set of technologies. 
+Some of covered tools can be used in any environment and support all creativity
+of the developers. 
+JSON and XML, the ideas of RPC, they all can be used in many various ways.
+
+Author was trying to analyze all of them in his research.
+This work contans some comparison of SOA implementations and related techologies
+is the context of the embedded systems.
+Some technologies were choosed for the trial.
+The choice of the techologies  does not mean that they are the best and the
+only suitable solution for the application described here.
+Author's  aim was to show that it is possible to create the systems of small
+devices using lightweight protocols and data structures.
+
+Some specific application field was choosed as an example in this work.
+Lets watch how it was realized and overview the results.
+
 \subsection{Results}
+
+There was a defined goal of this work: make a research of available
+machine-to-machine communication techniques and deliver a functional system
+prototype to fulfill some business needs.
+
+Author has a freedom of choosing any suitable technology and was limited only
+with the available hardware platform. 
+This work can be characterize as a research activity of detecting possible
+facilities, not than an implementation of specific task of interconnecting
+a mobile phone and the coffee machine.
+There should be a goal to reach, some problem which needs a solution in order to
+start watching around. 
+I have defined this abstract task and decided to make a
+case study about it.
+
+One of multiple ways how to design a client-server system is the
+\gls{SOA}. Services are self-describing and open components, which use standard
+communication schemes. 
+Autor of this work was inspired by this approach and have created a SOA
+based system.
+
+
+This paper contains a research of different technologies that help to implement
+services on the devices.
+It is unable to find and analyze all possible solutions. The most popular and
+open approaches were analyzed instead. 
+Author choosed a concept of remote procedure calls and found a simple
+and lightweight solution of JSON-RPC. 
+
+I had no experience of programming microcontrollers before. The company, where i
+was doing my university internship, provided me one specific microcontroller
+family and my task was to learn how it can be applied. To find out the
+hardware possibilities you need to study the  architecture of a specific
+devices.
+This work became for me not only a research project, but  a complete
+microcontroller practical cource.
+I have learned how to use different development tools and STM32F1 and other ARM
+Cortex-M3 microcontroller hardware platform features, practiced low level C
+programming and even soldered wires on development boards to repair boundary
+scan debugger.
+This was done only by myself with the help of internet resources
+and other information sources.
+This was the largest laboratory work i have ever experienced.
+
+A small remote service was finally implemented on a STM32F103ZE microcontroller. 
+This server is able to response for remote client requests and provide some
+useful services.
+This device is a proxy bridge between client application and coffee machine
+hardware.
+Only a few set of functions were implemented, but this functinality reflects all
+the architecture features.
+It is able to determine the structure of this system by tracing how a
+single RPC request is transfered between different system modules..
+
+This solution uses embedded realtime operating system FreeRTOS, so i was
+involved in a development of a parallel and multitasking system. 
+Server program consists of parallel tasks, which are communicating to each other
+and process incoming requests. Internals are implemented as chain of
+processing units, which pass work to each other.
+
+The client side of application is designed as a Java library that can be used
+in any kind of client application. It provides remote device methods and handles
+all communication between the client code and embedded service server.
+
+This library  is used inside the Android demo application, that is executed on
+the mobile phone or tablet.
+Android program was designed to be an example application case. 
+This provides some controls over the remote coffee machine. 
+
+
+The goal of this work was achieved.
+This was a research of a big bunch of techologies: embedded hardware related
+highly constrained and optimized software was studied together with  modern
+internet technologies that connect billions different machines.
+
+Lots of new things and interesting computer science approaches were found during 
+accomplishing the tasks and information mining.
+Obtained experience and knowledge would help me to
+deliver more quality products in future and not to make those mistakes that
+every young computer system engineer does.
+
 \subsection{Future work}
+This small implementation of client-server application connects together only
+two devices. 
+This does not define any additional methods how to find
+devices in a network and connect other devices.
+This is only an abstract service architecture that was designed to be universal.
+
+This is no security, addressing, discovery. 
+It requires some reliable transport protocol stack that covers data transfering
+from physical communication layer up to application layer.
+
+In order to become a real world product and be integrated to other systems 
+there should be dedicated connectivity requirements.
+Devices should be connected in some standard way. 
+
+Most  information sources covered the development of embedded services in
+context of internet and TCP/IP networks.
+
+I see the next development cycle of this architecture to be the integration to
+the Internet of Things.
+Many research groups are working on developing distributed communication for
+small embedded devices and wireless sensor networks on the Internet. 
+Their workpapers include keywords like 6LoWPAN, IEEE 802.15.4, IPv6 
+
+ IoT and all the requiremens
+
+Only two devices were connected
+Fixed static connection. Need for dynamic

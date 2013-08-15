@@ -1,7 +1,7 @@
 \newpage
 \subsection{General purpose client library implementation}
 
-\subsubsection{The technology}
+\subsubsection{The technology used}
 This section will define a client side of embedded service application.
 JSON-RPC messages are used as the main application protocol.
 Client part should also support all these features that server offers.
@@ -9,21 +9,22 @@ Client part should also support all these features that server offers.
 \autoref{fig:rpc_call} showed the main architecture of RPC.
 RPC client   application usually consists of two modules: client application code
 and client RPC stub, that communicates with remote server.
-Client calls usual methods on a stub and stub handles all
+Client calls usual methods on a stub and the code in a stub handles all
 the communication magic, it sends requests, receives responses, serialize and
 diserialize data objects.
 
 There were already some examples of a small RPC application (see listings
 \ref{lst:rpc_server_python_example} and
 \ref{lst:rpc_client_python_example})
-Our system requirements does not allow to use Python programming language.
+Our system requirements and environment does not allow to use Python programming
+language.
 The client application in this work is written for Google Android smartphone
 platform, which has a \gls{JVM} virtual machine inside, and the Java programming
 language is used.
 
-Java is very popular programming language which is based on \textit{Write once,
-run anywhere} philosophy. This means a programmer can develop code on a PC and
-can expect it to run on any Java enabled hardware, from small embedded systems
+Java is very popular programming language which is based on \textit{"Write
+once, run anywhere"} philosophy. This means a programmer can develop code on a
+PC and can expect it to run on any Java enabled hardware, from small embedded systems
 to huge server mainframes. 
 This is quite mature programming language with lots of libraries and already
 written code that solves different problems. For example, see a list Java tools
@@ -31,7 +32,7 @@ for JSON at \url{http://www.json.org/}.
 
 Android system uses Java as one of the main programming language. 
 Most programs for android are written using Java and Google provides good
-development tools for Java programming language.
+Android development tools for Java programming language.
 Android client application will be covered in the next section, while this one will describe the client
 stub library which is written in Java. 
 This code can be executed on every hardware that is supported by Java virtual
@@ -41,7 +42,8 @@ extensibility and portability and therefore Java is a good choice to start.
 I have implemented an universal library for the RPC communication with the
 previously described embedded service. That library is easy to add to any Java
 project and start to develop a new control application. 
-
+It can be extended to add some required funtionality.
+ 
 \subsubsection{Library structure}
 
 The library interface should be identical to a service interface description
@@ -60,10 +62,15 @@ class can be created from received list of methods and methods can be called
 only by a name without the compile time checking. Client may know only a method
 name or a part of that name and decide while application is running, which
 methods to call. Domain keywords for Java are: \textit{reflection}, \textit{dynamic proxy
-class}, \textit{duck typing}.
+class}, \textit{duck typing}. 
+The Python example above uses this approach and
+you can retrieve list of available methods from server by calling
+\texttt{listMethods()} on a \texttt{ServerProxy} object. 
+This techniquie is more suitable for dynamically typed programming languages. 
 
-I preferred to make more robust solution and created an Java interface class with
-all methods that server has. The definition of the main interface class in the library is provided below.
+I preferred to make more robust and simple solution. I created a Java
+interface class with all methods that server has. 
+The definition of the main interface classes in the library is provided below.
 
 \begin{listing}[H]
 \begin{minted}[frame=lines,
@@ -109,8 +116,8 @@ inherits other methods from the parent class.
 
 Client can use these classes in the application code and does not need to know
 the implementation details. To start using it client needs to create an instance
-of \texttt{JsonRpcCoffeeMachineService}( the implementation of \texttt{CoffeeMachineService} interface), connect it to \texttt{Reader} and
-\texttt{Writer} stream objects and after that  user can call RPC methods.
+of \texttt{JsonRpcCoffeeMachineService} ( the implementation of
+\texttt{CoffeeMachineService} interface), connect it to \texttt{Reader} and \texttt{Writer} stream objects and after that  user can call RPC methods.
 
 \paragraph{Character encoding} ~\\
 Java programming language has the abstraction of \texttt{Reader} and
@@ -137,8 +144,9 @@ with byte streams) from somewhere, provide valid character encoding and create
 an \texttt{InputStreamReader} from \texttt{InputStream}, and pass it to
 \texttt{connect()} method of the RPC library. The source of an
 \texttt{InputStream} may be the array of bytes in the memory, a file on the
-disk, a network socket or even String objects. Client should decide where from
-data bytes should come and where they need to be written.
+disk, a network socket or even String objects. In general words, client should
+decide where from data bytes should come, where they need to be written, and
+wrap these bytes into character streams.
 
 \paragraph{Message encoding} ~\\
 
@@ -151,7 +159,7 @@ It reads the netstrings encoded messages, extracts the data from them and sends 
 \texttt{MessageHandler} for processing.
 
 
-The \texttt{MessageWriter} class composes a valid netstring message and  uses  the provided
+The \texttt{MessageWriter} class composes a valid netstring message and  uses the provided
 by a client \texttt{Writer} object to write that message to the destination.
 \texttt{MessageWriter} receives JSON  objects,converts them into a String data, wraps them
 in a netstring message and sends this character data to the destination.
@@ -161,7 +169,7 @@ in a netstring message and sends this character data to the destination.
 This JSON-RPC client is based on the \texttt{jsonrpc2-base} library from
 Vladimir Dzhuvinov (\url{http://software.dzhuvinov.com}).
 This library provides a ready classes for handling JSON-RPC requests and
-responses 
+responses.
 \autoref{tbl:jsonrpc2-base_methods} shows the entire lifecycle of a RPC call.
 
 

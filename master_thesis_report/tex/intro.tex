@@ -150,9 +150,17 @@ easy to connect.
 
 Client will be executed on mobile phone and will communicate with remote server
 using Bluetooth wireless technology. It might be any mobile platform, but
-the organization decided to try Google Android smartphones first. Android device
-need to have running program with a graphical user interface, which is able
-connect to remote service and accomplish functional needs.
+the organization decided to try Google Android smartphones first. 
+Android device need to have running program with a graphical user interface,
+which is able connect to remote service and accomplish functional needs.
+
+We need to be able to switch existing client hardware architecture and the to
+choose various clients for this embedded service. It might be a Android mobile
+application, regular desktop computer program or even web application.
+It is good to have one common client code that will be used in these different
+environments. We should write a client library, which have bindings to the
+remote service and handles all the communication. It should provide a
+convenient interface to a library client.
 
 Coffee machine application is only the example of such architecture.
 We need a real world problem and device to show all capabilities of such system.
@@ -161,6 +169,22 @@ remote light control at home or any data acquisition and control system at the
 production plant. During this work such universal and extensible system will be
 built.
 
+To summarize and make our goal more complete we should make a list and follow
+it:
+\begin{enumerate}
+  \item Make a research about available device-to-device connectivity
+  techniques, software standarts and communication protocols. Get current state
+  of the art and find a suitable technology for the existing environment
+  \item Get familiar with already existing hardware tools, setup programming
+  environment and write some sample programs to test the capabilities.
+  \item Implement service oriented architecture on a microcontroller hardware.
+  \item Write some test functionality to prove choosed approach.
+  \item Implement a client library software module.
+  \item Create a test application that will use this client module inside the
+  system and show how it can be applied. 
+\end{enumerate}
+
+This work will cover every step in this list and author will try to complete it. 
 
 \subsection{Outline}
 TODO here will be outline. It will be finished when all other section will be
