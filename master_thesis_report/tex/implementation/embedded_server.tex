@@ -1,7 +1,8 @@
 \newpage
 \subsection{Implementation of the embedded server}
+\label{sec:embedded_service_impl}
 This server can be implemented using any suitable hardware and software.
-Choosed tools and libraries are not fixed and can be easily changed in
+Chosen tools and libraries are not fixed and can be easily changed in
 future.
 Loosely coupled modules in the system give a possibility to change everything
 without a need of global redesign.
@@ -14,7 +15,7 @@ a embedded system.
 \label{sec:hardware}
 \begin{center}
  \begin{figure}[h]
-	\includegraphics[width=\textwidth]{../images/implementation/embedded_server/stm3210b-eval.png}
+	\includegraphics[height=0.5\textheight]{../images/implementation/embedded_server/stm3210b-eval.png}
 	\caption{STM32F10X 128K evaluation board (STM3210B-EVAL)
 	\cite{stm_eval_board_manual}}
 	\label{fig:stm_eval_board}
@@ -22,7 +23,7 @@ a embedded system.
 \end{center}
 
 The hardware used in this work are the two ARM Cortex M3 microcontrollers from
-STMicroelectronics(\url{http://www.st.com/}). They were choosed because the
+STMicroelectronics(\url{http://www.st.com/}). They were chosen because the
 company already has a development board  and some other products from that
 manufacturer. There is nothing special in that hardware and similar
 microcontrollers from other manufacturers may be used in the same way.
@@ -74,7 +75,7 @@ These are the main features we need.
 
 \begin{center}
  \begin{figure}[h]
-	\includegraphics[width=\textwidth]{../images/implementation/embedded_server/stm32f103vbt6_hardware.png}
+	\includegraphics[height=0.5\textheight]{../images/implementation/embedded_server/stm32f103vbt6_hardware.png}
 	\caption{Hardware block diagram of STM32F103VBT6 MCU on STM3210B-EVAL board
 	\cite{stm_eval_board_manual}}
 	\label{fig:stm32f103vbt6_hardware}
@@ -83,9 +84,9 @@ These are the main features we need.
 
 The second microcontroller that was used  is the STM32F103ZE MCU. It has more
 memory:
-64KB SRAM and 512KB Flash memory. This controller was choosed because the first
+64KB SRAM and 512KB Flash memory. This controller was chosen because the first
 one has not enough resources, especially SRAM memory. The text messages, that
-are transfered from client to server and back, require to be stored in the RAM
+are transferred from client to server and back, require to be stored in the RAM
 memory and each request has several copies of data while it is processed.
 Amount of RAM on the first MCU was enough to execute optimized and final version of the server, but during development there is need for
 storing additional debug information and to try different libraries.
@@ -175,9 +176,9 @@ microcontroller: Using CMSIS\footnote{The ARM® Cortex™ Microcontroller Softwa
 Interface Standard (CMSIS) is a vendor-independent hardware abstraction layer for the Cortex-M processor series.}
 from ARM and Standard Peripheral Library from STMicroelectronics. These are
 hardware abstraction layer libraries that help to write portable code. They
-define standard  application programming interace (API) for the ARM
+define standard  application programming interface (API) for the ARM
 architecture. Hardware vendors provide CMSIS compliant bindings for their
-harware and programmers may write their code in standart manner, reducing
+hardware and programmers may write their code in standard manner, reducing
 resources for platform change and reusing existing code.
 
 Standard Peripheral Library is a C language library that provides standard API
@@ -209,15 +210,15 @@ You may add several defines, for example \texttt{\#define STM32F10X\_MD} to use
 STM32 Medium density devices (Flash memory density ranges between 64 and 128
 Kbytes). Clock rates and different peripherals can be adjusted in a similar way.
 
-The distibution of STM Standard Peripheral Library contains a lot of
+The distribution of STM Standard Peripheral Library contains a lot of
 code and application examples, that helped me a lot. I have found there how to
 configure a USART DMA\footnote{Direct Memory Access} controller and how to
 transfer bytes using USART without intervention of central processing unit.
-This is  quite good source for the begginers like me.
+This is  quite good source for the beginners like me.
 
 Setup an embedded development environment takes a lot of time and requires
 deep knowledge about the underlying hardware. It is good to have such tools like
-standart APIs, that help to make this process more easy.
+standard APIs, that help to make this process more easy.
 
 \paragraph{Operating system} ~\\
 Programs for embedded devices can be written in many different ways.
@@ -240,7 +241,7 @@ Operating systems for microcontrollers have features like:
 multitasking/multithreading,task prioritization, interprocess communication, memory management, abstracted I/O drivers, file systems, networking.
 They give to programmer higher level of abstraction and standard APIs, which help to reuse already existing code.
 Popular RTOS already come with various protocol stack and drivers implementations.
-However, the greates feature they have is the multitasking. 
+However, the greatest feature they have is the multitasking. 
 The program could be divided into several separate tasks and these tasks could run in the parallel.
 Parallel execution is achieved by dividing available CPU time between tasks.
 This process is called \textit{scheduling}. 
@@ -255,10 +256,10 @@ There is no need of protection of common resources, because each task controls i
 The second preemptive scheduling approach gives each task a regular "slice" of operating time. 
 Each task has defined amount of CPU time during which it is able to do useful work.
 Scheduler takes this time when this time is over and gives this to another task.
-These tasks could have priorities, which allows to execute essential tasks before the backgroud are executed.
+These tasks could have priorities, which allows to execute essential tasks before the background are executed.
 At the moment of the task context switch scheduled decides which task will be next according to the priority of available tasks.
 Task with a higher priority will be triggered next. 
-Scheduler should also be able to give the execution time to tasks with lower priorities, otherwise the will be never triggered because tasks with higher priorities will be lauched instead.
+Scheduler should also be able to give the execution time to tasks with lower priorities, otherwise the will be never triggered because tasks with higher priorities will be launched instead.
 Tasks with the same priorities are executed one by one in the loop\cite{barry2010using}.
 Such scheduling algorithm gives the illusion that tasks are running in parallel.
 Parallel task execution requires protection of common and global hardware resources. 
@@ -274,11 +275,11 @@ This amount of tasks is not final.
 This system needs to be extensible.
 There should be an opportunity to add new request and communication handlers.
 Request processing by the server is the concurrent process: while several requests are processed, another requests are sent over the network and communication interface needs to receive them.
-Responce transmitting could also run in parallel.
+Response transmitting could also run in parallel.
 
 It becomes harder to maintain and develop such concurrent program if you are not using a multitasking system. 
 You need always to carefully think where to insert a functionality into a big polling loop.
-Each insertion requires reordering of controll statements and checking the execution order of all parallell tasks.
+Each insertion requires reordering of control statements and checking the execution order of all parallel tasks.
 Moreover, your application may handle two different independent tasks and you need to keep data separated and remember which task does each variable belong.
 The use of operating system helps to keep things separated and loosely coupled.
  
@@ -286,7 +287,7 @@ The use of operating system helps to keep things separated and loosely coupled.
 FreeRTOS is a popular real-time operating system for embedded devices, which has
 ports for many MCU devices(34 architectures \cite{FreeRTOS_website}),
 also including STM32F1 family microcontrollers.
-This operating system was choosed for the embedded service application implementaton in this work.
+This operating system was chosen for the embedded service application implementation in this work.
 The reason is that this operating system has low entry level for the beginners and good documentation.
 In addition to that i have found and read a book \cite{barry2010using}, which is a great introduction to FreeRTOS and embedded multitask systems programming. 
 
@@ -387,7 +388,7 @@ Another task can start from the middle of the time slice of previous task.
 This gives better overall system performance.
 
 FreeRTOS uses queues for interprocess communication.
-Oueues can be used to send messages between tasks, and between interrupts and
+Queues can be used to send messages between tasks, and between interrupts and
 tasks. 
 In most cases they are used as thread safe FIFO (First In First Out) buffers with new data being sent to the back of the queue, although data can also be sent to the front. 
 
@@ -404,15 +405,8 @@ ticks can be provided to queue functions, it is able to lock forever by passing
 a special system value to these functions. Operation methods also return status
 of the operation.
  
-\begin{center}
- \begin{figure}[H]
-	\includegraphics[height=\textheight]{../images/implementation/embedded_server/queue_ipc.png}
-	\caption{Writing to and reading from a queue.\cite{FreeRTOS_website}}
-	\label{fig:queue_ipc}
- \end{figure}
-\end{center}
 
-\begin{listing}[h]
+\begin{listing}[H]
 \begin{minted}[frame=lines,
                framesep=2mm]{c++}
 xQueueHandle xQueueCreate( 
@@ -447,7 +441,16 @@ portBASE_TYPE xQueuePeek(
 \label{lst:freertos_queue_methods}
 \end{listing} 
 
-Semaphores and mutexes are based on the queues and theid methods are similar to
+\begin{center}
+ \begin{figure}[H]
+	\centering
+	\includegraphics[height=\textheight]{../images/implementation/embedded_server/queue_ipc.png}
+	\caption{Writing to and reading from a queue.\cite{FreeRTOS_website}}
+	\label{fig:queue_ipc}
+ \end{figure}
+\end{center}
+
+Semaphores and mutexes are based on the queues and their methods are similar to
 queue methods.
 They can protect your sensitive data from being changed from other tasks.
 \texttt{xSemaphoreTake()} and \texttt{xSemaphoreGive()} are used for that
@@ -475,7 +478,7 @@ pair with the OS kernel.
 
 I tried several options and ended up with the last configuration option. 
 Option 3 was not stable for me and system frequently crashed while using it.
-Therefore last approach was choosed as more stable. Memory heap is stored inside
+Therefore last approach was chosen as more stable. Memory heap is stored inside
 one big byte array and memory allocator takes a free space from there.
 
 FreeRTOS may be used in various applications and it contains lots of useful
@@ -499,10 +502,10 @@ PLL(Phase locked Loop) frequency multiplier,  which is used for multiplying its
 input frequency by a given factor of two to sixteen. 
 Using the PLL, you can generate clocks up to 72MHz.
 
-Next comes initalization of USART communication interfaces. USART are configured
+Next comes initialization of USART communication interfaces. USART are configured
 to use \gls{DMA} controller. \gls{DMA} works in both directions: receive and
 transmit. The usage of DMA requires initialization of DMA controller, assigning
-destination/transmiting memory buffer and buffer length, and other configuration
+destination/transmitting memory buffer and buffer length, and other configuration
 parameters. DMA may be configured to use memory increment and data direction (
 from the peripheral to buffer or from buffer to peripheral). This feature
 enables sending and receiving data to/from the USART without utilization of
@@ -526,7 +529,7 @@ Three types of DMA interrupts are used for that:
   \item USART idle interrupt indicates that the
   line is free and there are no more characters.
 \end{itemize}  
-When the DMA half interrupt occures user receives first half of the receive
+When the DMA half interrupt occurs user receives first half of the receive
 buffer. Second half of the buffer may be taken by the user after the full
 transfer interrupt. Line idle interrupt service routine is triggered when the
 line is free for some amount of time. Programmer needs to check what is the
@@ -545,28 +548,28 @@ Receive buffers are often implemented in a circular way( DMA also has this
 option) and when buffer is filled, write pointer returns to the start of the
 buffer and data may be written again. User needs to read this data or it will be
 overwritten. In a double-receive-buffer approach the second buffer, which
-belongs to the user, is not overwritten. The code implemened by me just ignores
+belongs to the user, is not overwritten. The code implemented by me just ignores
 to write into user buffer when it is full. There is a tradeoff while user is
 inactive and does not read anything: 
 to loose all the data and overwrite all buffer with new bytes or to loose only
 some part of it. That is how receiving of the message works in the embedded
 server described in this work.
 
-After initializaton of the USART transceivers and their DMA, program initializes 
-FreeRTOS tasks and data stuctures. All system queues and semaphores are created
+After initialization of the USART transceivers and their DMA, program initializes 
+FreeRTOS tasks and data structures. All system queues and semaphores are created
 at that time. Tasks are registered and task input parameters are passed into
 task functions. Next scheduler is started and all tasks start to run. Scheduler
 works forever while system is powered.
 
-This is how succesful scenario looks like. There are also another ones:
+This is how successful scenario looks like. There are also another ones:
 \begin{itemize}
   \item There is unable to create tasks and data structures (not enough memory
   or some error)
   \item There is not enough memory to start all tasks and scheduler function
-  exits and programm crashes.
+  exits and program crashes.
   \item A stack of some task gets overflowed and task crashes.
   \item There is not enough memory in a heap and task cannot allocate memory
-  for new objects. As a result programm crashes.
+  for new objects. As a result program crashes.
 \end{itemize}
 
 All this events are signalized by the FreeRTOS kernel and programmer needs to
@@ -654,11 +657,11 @@ Other tasks will be covered according to data flow showed in
 \autoref{fig:server_components_and_data_flow}.
 
 The first task that meets request from the client is the UART reader task.
-At the early state of developent this was a special and dedicated task for
+At the early state of development this was a special and dedicated task for
 reading from one communicating port. Later i changed it to be more common and
 function was renamed to \texttt{tskAbstractReader()}. Now this can be a
 reader for any source. It is configurable by task input configuration parameters
-which have stucture showed in listing \ref{lst:reader_config_structure}
+which have structure showed in listing \ref{lst:reader_config_structure}
 
 \begin{listing}[H]
 \begin{minted}[frame=lines,
@@ -680,7 +683,7 @@ This task become an abstract because it has common processing algorithm ( which
 is similar to algorithm in listing \ref{lst:task_function_structure}).
 It waits for \texttt{dataReadSemaphore} in a loop. 
 This semaphore is released in DMA \gls{ISR} when UART message arrives.
-\texttt{stream_has_byte_function_t} is a function that returns true
+\texttt{stream\_has\_byte\_function\_t} is a function that returns true
 when UART incoming message FIFO has bytes to read. 
 \texttt{stream\_read\_byte\_function\_t} returns one byte from the buffer
 \footnote{Most programming language have a concept named \textit{streams} or
@@ -694,7 +697,7 @@ There are available million and one more communication protocols and this work
 covered some of them below. 
 This level requires an analogue to  Data link
 layer protocols from ISO OSI communication model 
-( an exapmle can be Ethernet, Point-to-Point Protocol (PPP), High-Level Data
+( an example can be Ethernet, Point-to-Point Protocol (PPP), High-Level Data
 Link Control (HDLC)  and others). 
 Their purpose is to provide an defined
 mechanism how pieces of data bytes compose communication frames or packets. 
@@ -705,7 +708,7 @@ information and which represent data to be sent.
 There should be special byte sequences (or single bytes) which indicate the 
 beginning and the end of each communication message. 
 The first control symbol i started to use was ASCII newline symbol ('\\n').
-Incoming sequences of bytes were separated by a byte with value \textt{0x0A}.
+Incoming sequences of bytes were separated by a byte with value \texttt{0x0A}.
 The messages were line oriented and each incoming line was a new message.
 
 There is a problem using such control mechanism. If your message contains a 
@@ -714,23 +717,23 @@ incomplete message and there is impossible to find if received message is wrong
 or not. Message gets splitted into two message packets.
 
 I started to improve this solution and the next step was usage of ASCII control
-characters like EOT(end of transmission, value \textt{0x04}), ETB (end of
-transmission block, value \textt{0x17}) and similar. Using these  control
+characters like EOT(end of transmission, value \texttt{0x04}), ETB (end of
+transmission block, value \texttt{0x17}) and similar. Using these  control
 characters you can detect messages in incoming stream, but this does not help in case of transfering data
-bytes, which can be any value between \textt{0x00} and \textt{0xFF}.
+bytes, which can be any value between \texttt{0x00} and \texttt{0xFF}.
 
 
-I started a reseach of suitable protocols that have a solution for that problem.
+I started a research of suitable protocols that have a solution for that problem.
 My mistake was that i started from wrong direction.
 I started to read
 specification for Point-to-Point Protocol and other Internet related
 technologies.
 My thoughts were about realization of a complex data packet structure, with lots
 of packet members and a complex data flow control in there, like it is in these
-technologies. My friends, who are programmers, adviced me to create a custom
-protocol using \texttt{\mbox{start_byte:length:checksum:data:end_byte}} message
+technologies. My friends, who are programmers, advised me to create a custom
+protocol using \texttt{\mbox{start\_byte:length:checksum:data:end\_byte}} message
 structure. This might be that exact structure, but finally i found a solution
-from the beggining of my master thesis research - the
+from the beginning of my master thesis research - the
 website\footnote{\url{http://www.simple-is-better.org/}} of Roland Koebler, which is named \textit{"Simpler is better"}.
 The title page of this site contains a beautiful quote:
 \begin{quotation} 
@@ -744,14 +747,14 @@ called \textit{netstrings} ( \url{http://cr.yp.to/proto/netstrings.txt} is the
 source specification, last accessed at 13-August-2013). 
 A netstring is a self-delimiting encoding of a string
 which has very simple format: \texttt{<LENGTH>:<DATA>,}. Length is number of
-charactes to read, colon indicates the start of the message, message is read
+characters to read, colon indicates the start of the message, message is read
 until message length becomes equal to \texttt{<LENGTH>}, last comes message
 separator - the comma.
 \label{sec:netstrings}
 netstrings method was enough to fulfill application needs. 
 Current application requirements do not define data link protocol.
 This approach defines  a logical message protocol and it can be used in the
-demonstration of service application. If the requirements change this proctocol
+demonstration of service application. If the requirements change this protocol
 can be replaces by any other, but for now it is enough.
 
 
@@ -852,14 +855,14 @@ There are no separate copies stored, API provides only pointers to data.
 You need to define the array of tokens in the code, that will be enough to process a new message. 
 Parser API function returns a status code that can be a success, parsing error or lack of tokens in the token array.
 You can process the tokens if there was a success at parsing step.
-Some finite state machine needs to be implemented for this. As the result, it requires more complex proccessing code (like stream based parser do).
+Some finite state machine needs to be implemented for this. As the result, it requires more complex processing code (like stream based parser do).
 It is not convenient to use such API, this library requires a more beautiful wrapper.
 
-The main choise of JSON parsing library consisted of the battle between Jansson and parson.
-Jansson was choosed to be used in this project, because of the custom memory allocation and more elegant API.
+The main choice of JSON parsing library consisted of the battle between Jansson and parson.
+Jansson was chosen to be used in this project, because of the custom memory allocation and more elegant API.
 It also has a very good documentation with examples and explanations.
 
-\begin{listing}[h]
+\begin{listing}[H]
 \begin{minted}[frame=lines,
                framesep=2mm]{c++}
 json_t *array, *integer;
@@ -891,11 +894,11 @@ It is more convenient and efficient to store and later use raw id value for the 
 ( which requires a hash table lookup inside member extract function, which is more expensive than reading a single variable)
 
 
-The next processing unit in the request chain of responibility is the request handler task.
+The next processing unit in the request chain of responsibility is the request handler task.
 This is the main request handling module in this system.
 Listing \ref{lst:request_handler_algorithm} contains an algorithm description of request handler task written in C like pseudocode: 
 
-\begin{listing}[h]
+\begin{listing}[H]
 \begin{minted}[frame=lines,
                framesep=2mm]{c++}
 while(1) {
@@ -918,9 +921,9 @@ while(1) {
 \end{listing}
 
 The request handling method contains a table of available methods and the method name from the request is searched in that table.
-If method was found, a function that corresponds to that particular method is called and the request is passed as the parameter to that fuction.
+If method was found, a function that corresponds to that particular method is called and the request is passed as the parameter to that function.
 The method not found error response is returned if there is no such method available.
-I have developed several demo methods to demonstrate coffe machine service functionality
+I have developed several demo methods to demonstrate coffee machine service functionality
 \autoref{tbl:service_remote_methods} contains description of available methods in this system.
 
 
@@ -987,7 +990,7 @@ I have developed several demo methods to demonstrate coffe machine service funct
 		\hline
 		"machine.\newline~getInfo" &
 		-- &
-		Information about coffe machine &
+		Information about coffee machine &
 		This method returns to a client a JSON object with name of connected coffee machine and machine firmware version.
 
 		\tabularnewline
@@ -1004,7 +1007,7 @@ I have developed several demo methods to demonstrate coffe machine service funct
 		"machine.\newline~orderProduct" &
 		A product code &
 		Returns a status of order operation. &
-		This method call starts coffee prerearing procedure on the coffee machine.
+		This method call starts coffee prepearing procedure on the coffee machine.
 		Valid product code, that was received as a result from  "machine.getProducts" should be provided.
 		Method returns the status of operation which can be one of follows: \newline
 		"PRODUCT\_STATUS\_STARTED" \newline
@@ -1032,7 +1035,8 @@ I have developed several demo methods to demonstrate coffe machine service funct
 		A product code &
 		Returns a status of cancel operation &
 		Possible values are: \newline
-		TODO define cancel return codes here
+		"PRODUCT\_STATUS\_CANCELLED" \newline 
+		"PRODUCT\_STATUS\_FAILED"
 		
 		
 		\tabularnewline
@@ -1056,7 +1060,7 @@ The coffee machine manufacturer insisted of not publishing the details of protoc
 We are using it here in the design with the assumption, that it does its communication work well, with any knowledge of internal behaviour of that software module (black box).
 This was one of the main reasons why a proxy/translator architecture ( mentioned here \ref{sec:device_connection_scheme}) may be used to integrate proprietary and legacy devices into other systems.
 
-Returned responce JSON-RPC messages are serialized back to string characer data in the request handler task and are inserted to a responce queue, where they could be picked by a UART writer task for futher writing
+Returned response JSON-RPC messages are serialized back to string character data in the request handler task and are inserted to a response queue, where they could be picked by a UART writer task for further writing
 (see \autoref{fig:server_components_and_data_flow}).
 The last UART writer task writes data to the client interface UART and totally destroys that response message.
 
@@ -1066,7 +1070,7 @@ Other processing units are only changing the internal packet structure by changi
 This reduces overall memory consumption.
 
 The architecture design that is based on queues and separate processing tasks help to produce an extensible and scalable systems.
-When some task becomes a throwput bottleneck there is always an opportunity to add the another same task in parallel. 
+When some task becomes a throughput bottleneck there is always an opportunity to add the another same task in parallel. 
 Two or more tasks can receive the work from one queue and more than one task could push the results into one destination queue.
 Processing units in between can be changed or totally replaced, because input and output interface of the modules is defined.
 For example, if we decide to change the netstrings message encoding for something else, we  only need to rewrite Reader and Writer modules.
@@ -1080,14 +1084,14 @@ As you already know, the whole system i based on the JSON-RPC specification.
 Service description contract is also made using similar technologies.
 \autoref{sec:appendix_service_contracts} provides an examples of service contracts.
 JSON version of contract is inspired from JSON Schema Service Descriptor Draft at \url{http://www.simple-is-better.org/}.
-This is a specification of service interface description. 
+There is a specification of service interface description, which is similar to the \gls{WSDL} from WS-* technologies. 
 Service contract of coffee machine service is made according to that specification.
 
 It uses a JSON-Schema\footnote{\url{http://json-schema.org/}} specification to describe the JSON data format. 
 JSON object could also be self desctiptive and automatically verified by the machine.
-There is no official standart available yet, but most of these techologies are in the development phase right now. 
+There is no official standard available yet, but most of these technologies are in the development phase right now. 
 These are mostly working drafts.
-JSON-Schema is supported by the IETF(Internet Engineering Task Forse) organization and there is a big hope that these JSON technologies become an production standart.
+JSON-Schema is supported by the IETF(Internet Engineering Task Forse) organization and there is a big hope that these JSON technologies become an production standard.
 
 
 \begin{listing}[h]
@@ -1107,8 +1111,8 @@ JSON-Schema is supported by the IETF(Internet Engineering Task Forse) organizati
 \end{listing}
 
 JSON is a great and more lightweight alternative for XML.
-Web Services and related XML technologies become a de facto standart for large corporate service systems. 
-There are developed by large coorporations like Microsoft, IBM, Oracle who have personal interest of these technologies.
+Web Services and related XML technologies become a de facto standard for large corporate service systems. 
+There are developed by large corporations like Microsoft, IBM, Oracle who have personal interest of these technologies.
 These standards are more bureaucratic that simple and verbose JSON solutions. 
 
 Author of this work tries to say that service oriented technologies can be implemented not only using XML, SOAP and HTTP.
@@ -1116,8 +1120,47 @@ There are lots of other alternatives and the implementation of correct solution
 depends on the target application.
 I needed more compact and lightweight protocol, because of the target hardware. 
 
+\hyperref[lst:json_contract_example]{Provided} 
+JSON service descriptor contains the declaration of implemented methods and their input parameters structures and types of returned objects.
+Service contract can be received as a response of "system.help" method
+The communication could look like:
 
-TODO insert some glue paragraph here.
+\begin{listing}[H]
+\begin{minted}[frame=lines,
+               framesep=2mm]{javascript}
+-->  {"jsonrpc": "2.0", "method": "system.help", "id": 1}
+<--  {"jsonrpc": "2.0", "result": { Service contract object here}, "id": 1}
+\end{minted}
+\caption{Acquisition of service contract}
+\label{lst:service_contract_acquisition}
+\end{listing}
+
+There could be also any defined character sequence that tells the server to response with the documentation object.
+Imagine that you are connecting to an old legacy device using serial line communication.
+You have found it in your basement within the old gadgets of your  grandfather. 
+You connect some wires, open a serial terminal and do not know what to do next.
+There is no protocol description nearby and the internet has only few unclear reference to the text written on the device box.
+You start typing some chaotic text in the terminal and  send it to the device, and device does not respond you.
+After some retries are made, you receive a huge text containing the specification of this device.
+For example, server may respond to some of received character sequences:
+\begin{listing}[H]
+\begin{minted}[frame=lines,
+               framesep=2mm]{javascript}
+-h
+--help
+{"jsonrpc": "2.0", "method": "system.help", "id": 1}
+"^*[Hh][Ee][Ll][Pp]*$" regular expression values
+... to be continued
+\end{minted}
+\caption{Server may return service contract description after he receives these characters from communication line}
+\label{lst:server_help_return}
+\end{listing}
+
+
+PROFIT! Now you could game with the recovered device.
+
+Service contract provide an easy and descriptive way how to search for available piece of functionality.
+You can call remote procedures right after you have received this kind of specification. 
 
 %  One solution is to use closed encrypted proprietary
 % protocol and be calm, but as it was mentioned earlier, it limits the possibility of integration

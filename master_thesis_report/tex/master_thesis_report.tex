@@ -27,6 +27,7 @@
 % images
 \usepackage{graphicx}
 \usepackage{wrapfig}
+\usepackage{subfig}
 
 
 %\usepackage[printonlyused,withpage]{acronym}
@@ -75,8 +76,11 @@ backref=page,
 \usepackage{longtable}
 \usepackage{tabu}
 
+	
 
 \usepackage{lscape}
+\usepackage{pdflscape}
+
 \usepackage{rotating}
 \usepackage{epstopdf}
 \usepackage{subcaption}
@@ -194,8 +198,10 @@ backref=page,
 	\printglossaries
 	
 	\input{annotation_eng.tex}
+	\newpage
 	\input{annotation_est.tex}
 	
+	\newpage	
 	\pdfbookmark{\contentsname}{contents}
 	\tableofcontents
 	
@@ -211,10 +217,10 @@ backref=page,
 	
 	\newpage
 	\listoffigures
-	\newpage
+	%\newpage
 	\listoftables
 	
-	
+	\newpage
 	\bibliographystyle{ieeetr}
 	\bibliography{../resource/references}
 	

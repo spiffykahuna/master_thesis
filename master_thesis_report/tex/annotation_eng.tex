@@ -1,12 +1,20 @@
 \clearpage\vspace*{\fill}
 \section*{Annotation}
-
 Current work introduces conceptual approaches for implementing an extensible
 service oriented client-server application on a small microcontroller.
 This is a general-purpose transport and hardware independent embedded server
 that uses remote procedure calls as primary communication protocol.
 This server looks like remote service that could provide defined functions to
-the client. \ldots
+the client.
+
+This paper has a research about available service oriented architecture technologies and reviews them in the context of embedded resource constrained hardware systems.
+
+There is also an implementation of a small embedded service and corresponding client.
+Service part is implemented on STM32F1 family ARM Cortex-M3 microcontroller and runs FreeRTOS operating system.
+Client part is realized as Java library RPC stub and Android demo application.
+
+Client and server are communicating using lightweight JSON-RPC protocol over Bluetooth wireless communication line.
+Some few RPC call functions are implemented to show the capabilities of such client-server architecture.
 
 \vspace{\fill}
 \clearpage

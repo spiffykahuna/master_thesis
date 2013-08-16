@@ -1,11 +1,11 @@
 \subsection{Remote procedure calls and *-RPC}
 \label{sec:rpc}
 Many distributed systems are based on explicit message exchange
-between processes. If you see a list of SOA techologies ( provided above, see
-\autoref{itm:soa_technologies}) you can find that many of these techologies use
+between processes. If you see a list of SOA technologies ( provided above, see
+\autoref{itm:soa_technologies}) you can find that many of these technologies use
 RPC within them. Some of them don't, for example REST described in  previous
 section, it uses different resource oriented approach(resources which
-the client can consume). Other majority of techologies are message oriented and
+the client can consume). Other majority of technologies are message oriented and
 use messages for \gls{IPC}. In RPC messages are sent between client and server
 to call mathods and receive results. 
 
@@ -151,7 +151,7 @@ Interchange}, EBCDIC\footnote{Extended Binary Coded Decimal Interchange Code
 Character Set Transformation Format},  ) and characters in different
 encodings(all tree character encodings are used for cyrillic symbols: 
 Windows-1251, Code page 855, ISO/IEC 8859-5). Each RPC client and server should
-agree about charater encoding they will use.
+agree about character encoding they will use.
 
 In addition to that, problems can occur with the representation of integers
 (sign-and-magnitude method, one’s complement, two’s complement) and
@@ -165,11 +165,11 @@ If two different machines, one little-endian and other big-endian, are
 communicating to each other, they should use common endianness, otherwise they
 will accept bytes in wrong order and data will be invalid.
 
-There was description of primitive data types in RPC so far, but client and
+This was a description of primitive data types in RPC so far, but client and
 server not always send primitive data types to each other. There could also be a
 complex data structures, that contains several primitives like characters,
 numbers or just raw bytes. Client and server should be aware of structure of
-messages they send and receive. Usually these stuctures are specified by
+messages they send and receive. Usually these structures are specified by
 Interface Definition Language(IDL).
 IDL is a  is a specification language used to describe a software component's interface.
 IDLs describe an interface in a language-independent way, enabling
@@ -186,7 +186,7 @@ types that are used in RPC messages. There are several alternative common used
 schemes, that provide similar functionality. They all could be divided into
 two groups: platform and programming language dependent and systems that  
 can be used in multiplatform and multilanguage environment. XML-RPC belongs to
-second group, the similar techologies are JSON-RPC, SOAP and CORBA.
+second group, the similar technologies are JSON-RPC, SOAP and CORBA.
 Actually, most RPC implementations in the first group do not require any special
 harware. They are programming language dependent and may be used with
 the assumption, that components in the system are written using that specific
@@ -202,7 +202,7 @@ system may be built using various hardware.
 
 JSON-RPC version 2.0 will be used in this work as primary RPC solution in the implementation of embedded client-server architecture. 
 It is based on \gls{JSON} object serialization (see \ref{sec:json_description} section to see information about JSON or visit \url{http://www.json.org/})
-and uses JSON format for  transfering messages between client and the server.
+and uses JSON format for  transferring messages between client and the server.
 
 JSON-RPC is a lightweight RPC solution that is designed to be simple \cite{jsonrpc_spec}.
 It defines how client and server should communicate between each other. 
@@ -241,9 +241,9 @@ Response object is a JSON object with similar to Request members:
 
 To give a visual information about these objects and data structures listing \ref{lst:jsonrpc_example} contains examples of client server communication.
 
-\begin{listing}[h]
+\begin{listing}[H]
 \begin{minted}[frame=lines,
-               framesep=2mm]{json}
+               framesep=2mm]{javascript}
 Legend:
 --> data sent to Server
 <-- data sent to Client

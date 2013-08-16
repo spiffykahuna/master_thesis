@@ -78,7 +78,7 @@ quality of our lives by removing the unnecessary waste and additional cost.
 
 The Internet of Things is quite popular topic of research nowadays. It possibly
 can change the world like the Internet did. Many companies and universities are
-trying to find and invent reasonable techologies for implementing this approach.
+trying to find and invent reasonable technologies for implementing this approach.
 
 One of the methods how this communication can be performed is the concept of
 remote services and service oriented architecture (SOA).
@@ -98,19 +98,19 @@ Services can also be applicable in the resource-constrained embedded devices.
 
 This work would introduce the concepts how \gls{SOA} can be in the  context  of 
 embedded  systems.
-This contains some research of already available techologies for
+This contains some research of already available technologies for
 machine-to-machine communications and the implementation of small system
-prototype, which contains two conneted devices and uses service approach.
+prototype, which contains two connected devices and uses service approach.
 
 \subsection{Impact}
 The impact of the research in this thesis has been started during the accomplishment of internship at the university. 
 I was worked for some company and my task was to develop \gls{HMI} interface to some embedded system.
 We were using wireless communication between the control unit and the machine it was controlling.
 Control unit was a smartphone that was sending commands through Bluetooth protocol.
-On the other side there was a coffee machine that was receiveng and executing that commands.
+On the other side there was a coffee machine that was receiving and executing that commands.
 
 At the same time i was studying how large enterprise systems communicate to each other.
-I was reading about web services and related techologies.
+I was reading about web services and related technologies.
 Then was born an idea that there could also be a "small" device network, where
 devices communicate to each other.
 
@@ -173,12 +173,12 @@ To summarize and make our goal more complete we should make a list and follow
 it:
 \begin{enumerate}
   \item Make a research about available device-to-device connectivity
-  techniques, software standarts and communication protocols. Get current state
+  techniques, software standards and communication protocols. Get current state
   of the art and find a suitable technology for the existing environment
   \item Get familiar with already existing hardware tools, setup programming
   environment and write some sample programs to test the capabilities.
   \item Implement service oriented architecture on a microcontroller hardware.
-  \item Write some test functionality to prove choosed approach.
+  \item Write some test functionality to prove chosen approach.
   \item Implement a client library software module.
   \item Create a test application that will use this client module inside the
   system and show how it can be applied. 
@@ -187,26 +187,26 @@ it:
 This work will cover every step in this list and author will try to complete it. 
 
 \subsection{Outline}
-TODO here will be outline. It will be finished when all other section will be
-ready
 
-First section will introduce available technologies of implementing
-machine-to-machine communications. The main research is about the Internet
-technologies and concept of remote web services, this is because the Internet
+The first section will introduce available technologies of implementing
+machine-to-machine communications. 
+The main research is about the Internet technologies and concept of remote web services, this is because the Internet
 is already an interconnected network with lots of machines are doing distributed
-computing and interacting with each other. Lots of problems are already solved
-there and there are available different technologies and tools.
-Althouth, all these already implemented features are not limited  only with the
-Internet and related technologies like TCP/IP and HTTP. Some essential
-features may be extracted from there and ported to resource-constrained devices. This section will also cover some connection and
-interaction possibilities that embedded systems have.
+computing and interacting with each other. 
+Lots of problems are already solved there and there are available different technologies and tools.
+Although, all these already implemented features are not limited  only with the
+Internet and related technologies like TCP/IP and HTTP. 
+Some essential features may be extracted from there and ported to resource-constrained devices.
+The first section will also cover some connection and interaction possibilities that embedded systems have.
 
 \nameref{sec:implementation} section covers embedded system prototype, that uses
-concepts from different machine-to-machine communication techologies. It
-contains description of achitecture and software and hardware was used. 
-TODO summary here
+concepts from different machine-to-machine communication technologies. It
+contains description of architecture and software and hardware was used. 
+Embedded service was implemented on a microcontroller device. 
+\nameref{sec:embedded_service_impl} section covers the hardware and software parts of the system.
 
-Then i will write about how all
-this technologies could be ported to a small device.
-Next goes the implementation of a small remote service. 
-There are described implementation details of a server and client library.
+\nameref{sec:java_library} section describes the details of Java client stub library.
+There is also implementation of a demo client application  in the section next to it. 
+This is the last section here.
+
+

@@ -10,7 +10,7 @@ controller).
 Another group of devices are systems that are able to interchange
 information using \textbf{proprietary} communication methods at \textbf{physical
 and logical} layers. These systems can send information to another systems, but
-they are using non standart protocols for data transmission.
+they are using non standard protocols for data transmission.
 
 Third group uses standard (serial line, ethernet with ip protocol)
 communication techniques at the physical and transport level and some \textbf{proprietary
@@ -24,34 +24,30 @@ Research paper \cite{lws_milanovic.pdf} introduces three architectures , that
 cover three possible ways of connectivity between devices in previously 
 mentioned groups: proxy, translator and full architecture.
 
-\begin{figure}[h]
-        \centering
-        \begin{subfigure}[b]{0.3\textwidth}
-                \centering
-                \includegraphics[width=\textwidth]{../images/implementation/proxy_arch.png}
-                \caption{ Proxy approach provides physical and logical
-                conversion}
-                \label{fig:proxy_arch}
-        \end{subfigure}%
-        ~ %add desired spacing between images, e. g. ~, \quad, \qquad etc.
-          %(or a blank line to force the subfigure onto a new line)
-        \begin{subfigure}[b]{0.3\textwidth}
-                \centering
-                \includegraphics[width=\textwidth]{../images/implementation/translator_arch.png}
-                \caption{Translator approach provides logical conversion}
-                \label{fig:tranlator_arch}
-        \end{subfigure}
-        ~ %add desired spacing between images, e. g. ~, \quad, \qquad etc.
-          %(or a blank line to force the subfigure onto a new line)
-        \begin{subfigure}[b]{0.3\textwidth}
-                \centering
-                \includegraphics[width=\textwidth]{../images/implementation/full_arch.png}
-                \caption{Full approach where embedded systems directly provide services for the environment}
-                \label{fig:full_arch}
-        \end{subfigure}
+
+
+\begin{figure}[H]
+        \centering		  
+		  
+		\subfloat[Proxy approach provides physical and logical conversion]{
+			\label{fig:proxy_arch}
+			\includegraphics[width=0.3\textwidth]{../images/implementation/proxy_arch.png}
+		} 
+		\subfloat[Translator approach provides logical conversion]{
+			\label{fig:tranlator_arch}
+			\includegraphics[width=0.3\textwidth]{../images/implementation/translator_arch.png}
+		}
+		\subfloat[Full approach where embedded systems directly provide services for the environment]{
+			\label{fig:full_arch}
+			\includegraphics[width=0.3\textwidth]{../images/implementation/full_arch.png}
+		} 
+		       
         \caption{Possible connection architectures for the embedded services}
         \label{fig:connection_architectures}
 \end{figure}
+
+
+
 
 Proxy is a device which is between the client and the embedded service. It
 provides services to the client and in the same time can communicate with
@@ -70,7 +66,7 @@ In the Full architecture client and service provider can directly connect to
 each other without need of any device in the middle. 
 
 Our coffee machine system use closed proprietary protocol inside, but all
-communication messages are transfered over standart serial line. This is more
+communication messages are transferred over standard serial line. This is more
 similar to Translator approach, but there is one problem in implementing such
 architecture. We cannot directly store service contract inside coffee machine
 system. Coffee machine internal architecture and implementation does not allow

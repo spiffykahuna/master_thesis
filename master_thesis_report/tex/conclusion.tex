@@ -2,7 +2,7 @@
 \section{Conclusions}
 
 Several possible variants of \gls{SOA} implementation were covered in this work.
-Some of them are mature and standartized tools which are used in many production
+Some of them are mature and standardized tools which are used in many production
 systems nowadays.
 Another ones are lightweight and beautiful alternatives to the first group. They
 can be  used even in the small microcontroller devices. 
@@ -12,16 +12,16 @@ Some of covered tools can be used in any environment and support all creativity
 of the developers. 
 JSON and XML, the ideas of RPC, they all can be used in many various ways.
 
-Author was trying to analyze all of them in his research.
-This work contans some comparison of SOA implementations and related techologies
+Author was trying to analyse all of them in his research.
+This work chosen some comparison of SOA implementations and related technologies
 is the context of the embedded systems.
-Some technologies were choosed for the trial.
-The choice of the techologies  does not mean that they are the best and the
+Some technologies were chosen for the trial.
+The choice of the technologies  does not mean that they are the best and the
 only suitable solution for the application described here.
 Author's  aim was to show that it is possible to create the systems of small
 devices using lightweight protocols and data structures.
 
-Some specific application field was choosed as an example in this work.
+Some specific application field was chosen as an example in this work.
 Lets watch how it was realized and overview the results.
 
 \subsection{Results}
@@ -43,15 +43,15 @@ case study about it.
 One of multiple ways how to design a client-server system is the
 \gls{SOA}. Services are self-describing and open components, which use standard
 communication schemes. 
-Autor of this work was inspired by this approach and have created a SOA
+Author of this work was inspired by this approach and have created a SOA
 based system.
 
 
 This paper contains a research of different technologies that help to implement
 services on the devices.
-It is unable to find and analyze all possible solutions. The most popular and
-open approaches were analyzed instead. 
-Author choosed a concept of remote procedure calls and found a simple
+It is unable to find and analyse all possible solutions. The most popular and
+open approaches were analysed instead. 
+Author has chosen a concept of remote procedure calls and found a simple
 and lightweight solution of JSON-RPC. 
 
 I had no experience of programming microcontrollers before. The company, where i
@@ -60,9 +60,9 @@ family and my task was to learn how it can be applied. To find out the
 hardware possibilities you need to study the  architecture of a specific
 devices.
 This work became for me not only a research project, but  a complete
-microcontroller practical cource.
+microcontroller practical course.
 I have learned how to use different development tools and STM32F1 and other ARM
-Cortex-M3 microcontroller hardware platform features, practiced low level C
+Cortex-M3 microcontroller hardware platform features, exercised low level C
 programming and even soldered wires on development boards to repair boundary
 scan debugger.
 This was done only by myself with the help of internet resources
@@ -74,10 +74,10 @@ This server is able to response for remote client requests and provide some
 useful services.
 This device is a proxy bridge between client application and coffee machine
 hardware.
-Only a few set of functions were implemented, but this functinality reflects all
+Only a few set of functions were implemented, but this functionality reflects all
 the architecture features.
 It is able to determine the structure of this system by tracing how a
-single RPC request is transfered between different system modules..
+single RPC request is transferred between different system modules..
 
 This solution uses embedded realtime operating system FreeRTOS, so i was
 involved in a development of a parallel and multitasking system. 
@@ -96,7 +96,7 @@ This provides some controls over the remote coffee machine.
 
 
 The goal of this work was achieved.
-This was a research of a big bunch of techologies: embedded hardware related
+This was a research of a big bunch of technologies: embedded hardware related
 highly constrained and optimized software was studied together with  modern
 internet technologies that connect billions different machines.
 
@@ -113,24 +113,63 @@ This does not define any additional methods how to find
 devices in a network and connect other devices.
 This is only an abstract service architecture that was designed to be universal.
 
-This is no security, addressing, discovery. 
-It requires some reliable transport protocol stack that covers data transfering
+There is no security, addressing, discovery and quality of service. 
+It requires some reliable transport protocol stack that covers data transferring
 from physical communication layer up to application layer.
 
 In order to become a real world product and be integrated to other systems 
 there should be dedicated connectivity requirements.
 Devices should be connected in some standard way. 
 
-Most  information sources covered the development of embedded services in
+Most of reviewed information sources covered the development of embedded services in
 context of internet and TCP/IP networks.
 
 I see the next development cycle of this architecture to be the integration to
 the Internet of Things.
 Many research groups are working on developing distributed communication for
 small embedded devices and wireless sensor networks on the Internet. 
-Their workpapers include keywords like 6LoWPAN, IEEE 802.15.4, IPv6 
+Their work papers include keywords like 6LoWPAN, IEEE 802.15.4, IPv6, RPL,  UDP, COAP, RESTful embedded services.
 
- IoT and all the requiremens
+\autoref{fig:future_technologies} shows how this technologies could be applied.
 
-Only two devices were connected
-Fixed static connection. Need for dynamic
+\begin{figure}[H]
+        \centering		  
+		  \begin{tabular}{c}
+			\subfloat[Optimized IP protocols]{
+				\label{fig:optimized_ip_stack}
+				\includegraphics[width=0.5\textwidth]{../images/optimized_ip.jpg}
+			} \\
+			\subfloat[RESTful Web things Things architecture]{
+				\label{fig:restful_wot}
+				\includegraphics[width=0.5\textwidth]{../images/restful_WoT.jpg}
+			} \\
+			\subfloat[RESTful temperature sensor usage example]{
+				\label{fig:restful_sensor}
+				\includegraphics[width=0.5\textwidth]{../images/restful_temperature_sensor.jpg}
+			} 
+		  \end{tabular}        
+        \caption{Optimized internet technologies for networked embedded systems~\cite{iot_standards,CoAP_Tutorial}}
+        \label{fig:future_technologies}
+\end{figure}
+
+
+During this research i have found a project named Contiki.
+Contiki is an open source operating system for networked, memory-constrained systems with a particular focus on low-power wireless Internet of Things devices.
+Examples of where Contiki is used include street lighting systems, sound monitoring for smart cities, radiation monitoring systems, and alarm systems.\footnote{\url{http://www.contiki-os.org/}}
+
+This project supports  very resource efficient  full IP networking\footnote{ uIP TCP/IP Stack from Adam Dunkels. See ~\cite{Dunkels07programmingmemory-constrained} } and is optimized for tiny systems, having only a few kilobytes of memory available. 
+This is a good candidate to be the main technology of this kind of system we have been developed here.
+
+Our design could be rewritten for the Contiki OS and we could migrate to the hardware used in wireless sensor networks.
+This could be a very tiny chip with some wireless interface onboard.
+It is able to build very low-power and low-cost embedded web service  using this technology stack.
+
+This kind of work requires another exhaustive research and laboratory experiments.
+This field is the topic of interest of many scientists and companies, who produce networked embedded solutions.
+It is quite popular nowadays and there are many use cases and benefits using distributed embedded network computing.
+
+More and more devices gets connected to the internet. 
+This technologies could help to improve the quality of our lives by
+introducing a network of low-cost and low-power sensors and actuators. 
+
+

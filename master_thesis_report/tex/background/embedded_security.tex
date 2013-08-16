@@ -105,11 +105,11 @@ protocol.  Most of them are designed to interconnect big computers inside a
 network. Mostly they operate on transport and application level and use TCP/IP
 protocol stack.
 
-All these protocols could be devided into these groups:
+All these protocols could be divided into these groups:
 \begin{itemize}
   \item Protocols that transmit the secret over the network. (For example
   Password authentication protocol). These protocols are not secure.
-  \item Protocols that not send secrets and provide authentification through
+  \item Protocols that not send secrets and provide authentication through
   sending messages. (CHAP and Password-authenticated key agreement).
   \item Protocols that require a trusted third party.  
 \end{itemize}
@@ -125,7 +125,7 @@ send encrypted messages to each other. Finally they authenticate each other when
 
 Last group uses trusted third party authority to check each other. There is
 assumption that all three parties should have connection between each other. Embedded device during
-client authentification needs to connect some server and ask for a secret. Third
+client authentication needs to connect some server and ask for a secret. Third
 party should always have a high authority, two other parties should trust him.
 This scheme should be used in case of high security requirements.
 
@@ -134,12 +134,12 @@ This scheme should be used in case of high security requirements.
 Choosing of right authentication protocol in general should depend on application.
 Sometimes, there will be enough just to send plain text passwords over the
 network.
-Engineer should analyze all hazards during system design process.
+Engineer should analyse all hazards during system design process.
 
-Lifecycle of an embedded system is more longer than livecycle of average personal computer. Application specific controller  may run for decades and it will be still functional.
-Choosed security algorithm may be not secure enough after some years. Some vulnerabilities can be discovered during that period. 
+Lifecycle of an embedded system is more longer than lifecycle of average personal computer. Application specific controller  may run for decades and it will be still functional.
+Chosen security algorithm may be not secure enough after some years. Some vulnerabilities can be discovered during that period. 
 Computational power of modern processors raises every year and  secure encryption may be cracked during some seconds in the future.
-There is no 100\% secure system, everything can be breaked. 
+There is no 100\% secure system, everything can be broken. 
 
 Your system security should have such encryption, that provides proper security
 level to your application data and can not be cracked quickly.
@@ -178,7 +178,7 @@ while developing a system.
 Multicast Authentication]
 Embedded networks usually consist of a number of Electronic Control
 Units (ECUs). Each ECU performs a set of functions in the system. These ECUs are
-connnected to a network, and communicate using a protocol such as CAN,
+connected to a network, and communicate using a protocol such as CAN,
 FlexRay, or Time-Triggered Protocol (TTP). These protocols are among the most
 capable of those currently in use in wired embedded system networks. Many other protocols are even
 less capable, but have generally similar requirements and constraints:
@@ -192,7 +192,7 @@ packet, all other nodes connected to the network receive the
 message. (In CAN, hardware performs message filtering at the
 receiver based on content.) Each packet includes the sender's
 identity, but does not include explicit destination information. The configuration of the network is
-usually fixed at design time, and changes a littel or  does not change at all.
+usually fixed at design time, and changes a little or  does not change at all.
 \item{Resource Limited Nodes} - 
 Processing and storage capabilities
 of nodes are often limited due to cost considerations at design
@@ -243,13 +243,13 @@ Although the authentication is only one-way, you can negotiate CHAP in both dire
 with the help of the same secret set for mutual authentication.
 
 This protocol is described in the document [http://tools.ietf.org/html/rfc1994].
-Document specifies main protocol consepts and packet formats.
+Document specifies main protocol concepts and packet formats.
 
-There are some procol extensions like MS-CHAP and CHAP is used
+There are some protocol extensions like MS-CHAP and CHAP is used
 as a part of other protocols like EAP(EAP MD5-Challenge) and RADIUS (uses CHAP
 packets). They all use CHAP concepts somehow. 
 
-One of the main puproses of this work is to develop a prototype of an embedded
+One of the main purposes of this work is to develop a prototype of an embedded
 service. This system uses JSON [SEEE JSON SECTION] object format to encapsulate
 pieces of information. I will port CHAP packet format to JSON object. It need to
 be the same CHAP protocol but it should be placed into JSON. See
@@ -267,7 +267,7 @@ security approaches to embedded control systems. This requires the use of
 lightweight security protocols.
 
 Embedded control and acquisition devices may be integrated to the main
-infrastructure of the several sorganisation. These connections need to be secure
+infrastructure of the several organisation. These connections need to be secure
 enough.
 Resent decades ago Internet was also a research project, and top computers were
 like nowadays microcontrollers are. But now it is used in whole world as one of

@@ -52,23 +52,23 @@ separate action. This may be a simple business task. Clients can make calls
 and receive required data or post some event messages.
 
 Services are self-describing and open components. There is a service interface,
-that is based on the exchange of messages and documents using standart formats.
+that is based on the exchange of messages and documents using standard formats.
 Interface internals ( operating system, hardware platform, programming language)
 are hidden from client. Client uses only a service specification scheme, also
-called contract. Consumers can get required piece of funcionality by mapping problem
+called contract. Consumers can get required piece of functionality by mapping problem
 solution steps to a service calls. This scheme provides quick access and easy integration of software components.
 
 
 Service architecture have been successfully adopted in
 business environments. Different information systems, that were created inside
 companies for automation of business processes,  are now turned into services
-which may easily interact with each other. For example, Estonian goverment uses
+which may easily interact with each other. For example, Estonian government uses
 services to transmit data between information systems of different departments.
 There are also some free services available. Some Internet search companies like
 Google, Bing, Yandex provide lots of alternatives how to retrieve data without
 using regular browser( search , geolocation and maps,  spell check \gls{API}s )
 
-There are available many techologies which can be used to implement
+There are available many technologies which can be used to implement
 \gls{SOA}~\cite{wikipedia:SOA}:
 
 \begin{itemize}
@@ -112,48 +112,48 @@ and on the main features that any \gls{SOA} implementation should have.
 \input{background/serialization.tex}
 \input{background/soa_embedded.tex}
 
-TODO DDDDDDDDDDDDDDDDDDDDDDDDDDD
-Service
--
-Oriented Architecture can be implemented in different ways. General focus is on
-whatever architecture gets the job done. SOAP and REST have their strengths and weaknesses
-and will be highly suitable to some
-applications and positively terrible for others. The decision of
-which to use depends entirely on the circumstances of the application.
+% TODO DDDDDDDDDDDDDDDDDDDDDDDDDDD
+% Service
+% -
+% Oriented Architecture can be implemented in different ways. General focus is on
+% whatever architecture gets the job done. SOAP and REST have their strengths and weaknesses
+% and will be highly suitable to some
+% applications and positively terrible for others. The decision of
+% which to use depends entirely on the circumstances of the application.
 
 
 
 
 
 
-Main constraints - resources of embedded system.
-Target STM32 device.
-Absence of ethernet.
-Existing implementations require more resources than STM32 or similar has.
-TODO another constraints of embedded systems.
+% Main constraints - resources of embedded system.
+% Target STM32 device.
+% Absence of ethernet.
+% Existing implementations require more resources than STM32 or similar has.
+% TODO another constraints of embedded systems.
 
-TODO put is somewhere
- The benefit of SOA is
-to allow simultaneous use and easy mutual data exchange between programs of different vendors without additional programming or making changes to the services.
+% TODO put is somewhere
+ % The benefit of SOA is
+% to allow simultaneous use and easy mutual data exchange between programs of different vendors without additional programming or making changes to the services.
  
 
-DDDDDDDDDDDDDDDDDDDDDDDDDDD
+% DDDDDDDDDDDDDDDDDDDDDDDDDDD
 
 
 
-\input{background/embedded_security.tex}
+%\input{background/embedded_security.tex}
 
 
 
 
 \subsection{Final target system requirements}
-TODO list of final requirements here. This list is needed to be proved by the
-implementation
+% TODO list of final requirements here. This list is needed to be proved by the
+% implementation
 
 All previous sections introduced ideas how various devices can communicate to
 each other. Each described technology has its own pros and cons. In general, we
 need to choose a technology without any drawbacks or a technology, which is the
-smallest evil choosed from list of suitable ones.
+smallest evil chosen from list of suitable ones.
 
 
 Web Services have these advantages:
@@ -184,27 +184,41 @@ WS-* technologies: it does not require traditional transport like HTTP, TCP,
 Ethernet or Wi-fi. It can be implemented using any radio link, serial line or
 any other suitable transport, that is able to deliver response and request
 messages. Web Services in theory could also be transport independent, but most
-WS-* tools assume the HTTP(and underlying techologies) as de facto standart
+WS-* tools assume the HTTP(and underlying technologies) as de facto standard
 \footnote{SOAP protocol transport independence started from SOAP
 1.2~\cite{soap_protocol_spec}}. Support of other underlying protocols for
 SOAP(the main messaging protocol in WS-*) should be implemented separately and
-most standart tools does not have this, they just use standart HTTP. WS-* has a
+most standard tools does not have this, they just use standard HTTP. WS-* has a
 huge overhead in doing simple things like implementing small light
-controlling service in your room. This is not rigth tool for that. Simple RPC
+controlling service in your room. This is not right tool for that. Simple RPC
 would be enough.
 
-Table xxx defines system requrements and features for service prototype in this
-work. These are ideas that were keept in mind while developing of embedded
+\autoref{tbl:service_ideas} defines system requirements and features for service prototype in this
+work. These are ideas that were kept in mind while developing of embedded
 service system was in progress.
 
-\begin{table}[h]
-	\centering	
-	\begin{tabularx}{\textwidth}{|X|X|}
-		\hline
-		\textbf{Feature} & 
-		\textbf{Description}  	&
-	    \tabularnewline
-		\hline
+\begin{longtabu} to \textwidth {|X|X|}
+	
+\hline 
+\multicolumn{1}{|l|}{\textbf{Feature}} & 
+\multicolumn{1}{l|}{\textbf{Description}} \\ 
+\hline 
+\endfirsthead
+
+\multicolumn{2}{l}%
+{{\bfseries \tablename\ \thetable{} -- continued from previous page}} \\
+\hline 
+\multicolumn{1}{|l|}{\textbf{Feature}} & 
+\multicolumn{1}{l|}{\textbf{Description}} \\ 
+\hline  
+\endhead
+
+\hline \multicolumn{3}{|r|}{{Continued on next page}} \\ \hline
+\endfoot
+
+% \hline \hline
+\endlastfoot
+
 		Transport independent solution
 		&
 		Company did not defined final communication yet.
@@ -218,7 +232,7 @@ service system was in progress.
 		\hline
 			Service description and service contract &
 			Gives overview of all service capabilities. \newline 
-			Provides an interace definition language. \newline
+			Provides an interface definition language. \newline
 			Is a specification( sometimes may be only available one) to the server and
 			server interface.
 	 
@@ -229,15 +243,14 @@ service system was in progress.
 	    actions. If we had an Ethernet, the design decision would be REST(with all
 	    its benefits and philosophy).
 	    Otherwise RPC is the most suitable solution here. This system is message
-	    oriented. Some standart RPC solution should be used or ported to the
+	    oriented. Some standard RPC solution should be used or ported to the
 	    embedded device.
 	    
 	    \tabularnewline
 		\hline	
 		Lightweight and verbose messages &
 		Microcontroller has limited resources. We cannot use huge messages for really
-		small request data(TODO link to SOAP XML-RPC and JSON-RPC AND binary
-		comparison ).
+		small request data~\footnotemark.
 		Some text based protocol need to be used.
 		Binary protocols are evil, it is real hard to understand and debug them.
 		
@@ -248,16 +261,16 @@ service system was in progress.
 		Not like WS-*
 		\tabularnewline
 		\hline
-		TODO &
-		Some more features	
+		Modular architecture &
+		System should be divided into separate functional modules.
+		It should be easy to change the internal implementation of these modules, without a need for global refactoring.		
 		\tabularnewline
 		\hline	  
-	\end{tabularx} 
+
 	\caption{Ideas about embedded service}
 	\label{tbl:service_ideas}
-\end{table}
+\end{longtabu}
+
+\footnotetext{internet resource \url{http://www.simple-is-better.org/rpc/} contains a comparison of different message formats)}
 
 
-TODO
- In comparison to REST, where resource
-representations (documents) are transferred, XML-RPC is designed to call methods.

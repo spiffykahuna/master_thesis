@@ -1,3 +1,22 @@
+\clearpage\vspace*{\fill}
 \section*{Annotatsioon}
+Käesolevas töös kirjeldatakse kuidas rakendada teenusorienteritud klient server arhitektuuri sardmikrokontrolleril.
+See on üldotstarbeline transport ja riistvara sõltumatu rakendusserver,
+mis kasutab kaugprotseduuri väljakutseid kommunikatsiooni pidamiseks.
+Mikrokontrolleris jooksev programm näeb välja nagu serveri teenus,
+mis pakkub kasutajale ettenähtud funktsionaalsust.
 
-Annotatsioon eesti keeles
+Antud töö eesmärk on teha uuring teenus orienteeritud arhitektuuride ja tehnoloogiate kohta 
+ning analüsida nende kasutamist piiratud ressursidega sardsüsteemide realiseerimises.
+
+All on toodud realiseeritud teenusorienteritud sardsüsteemi kirjeldus ja sellele vastav kliendi rakendus.
+
+Serveri pool on tehtud STM32F1 pere ARM Cortex-M3 mikrokontrolleri baasil, kus jookseb FreeRTOS reaalaja operatsioonisüsteem.
+Kliendi rakendus on mobiilsel platformil kasutatav programm, mis kasutab Javas kirjutatud teegi kaugprotseduuride väljakutsemiseks.
+
+Klindi ja serveri vaheline kommunikatsioon toimub labi traadita Bluetooth kanali kasutades JSON-RPC protokolli.
+Süsteemis on tehtud mõned funktsioonid, selleks et näidata antud klient-serveri arhitektuurilisi omadusi.
+
+
+\vspace{\fill}
+\clearpage

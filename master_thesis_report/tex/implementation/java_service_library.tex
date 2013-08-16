@@ -1,5 +1,6 @@
 \newpage
 \subsection{General purpose client library implementation}
+\label{sec:java_library}
 
 \subsubsection{The technology used}
 This section will define a client side of embedded service application.
@@ -304,46 +305,13 @@ String jsonString = reqOut.toString();
 	\centering	
 	\begin{tabularx}{0.5\textwidth}{|X|X|}
 		\hline
-		\textbf{JSON} &
-		\textbf{Java} 		
-	    \tabularnewline
-		\hline
-		true or false 
-		&
-		java.lang.Boolean
-		
-	    \tabularnewline
-		\hline
-		number 
-		&
-		java.lang.Number
-		
-	    \tabularnewline
-		\hline
-		string 
-		&
-		java.lang.String
-		
-		\tabularnewline
-		\hline
-		array 
-		&
-		java.util.List
-		
-		\tabularnewline
-		\hline
-		object 
-		&
-		java.util.Map
-		
-		\tabularnewline
-		\hline
-		null 
-		&
-		null	
-		
-		\tabularnewline
-		\hline	  
+		\textbf{JSON} & \textbf{Java} 	 	\\ \hline	    
+		true or false & java.lang.Boolean 	\\ \hline	    
+		number & java.lang.Number		 	\\ \hline
+	   	string & java.lang.String		 	\\ \hline		
+		array & java.util.List		 	\\ \hline
+		object & java.util.Map			 	\\ \hline
+		null & null		 	\\ \hline			  
 	\end{tabularx} 
 	\caption{{JSON}\(\leftrightarrow\){Java} data type mapping in
 	\texttt{jsonrpc2-base} library \cite{jsonrpc2-base}}
@@ -358,7 +326,7 @@ objects, it does not provide any client functionality.
 We need to write a request handling logic to support the communication with
 hardware embedded service.
 
-When client of our library calls any method on \textt{CoffeeMachineService}
+When client of our library calls any method on \texttt{CoffeeMachineService}
 class this method starts to prepare a new request. Service interface
 implementation add necessary parameters to RPC request (name, method
 parameters, an id), and sends it to request processor.

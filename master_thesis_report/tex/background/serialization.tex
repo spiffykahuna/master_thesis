@@ -11,7 +11,7 @@ Architecture. These technologies use client-server communication and
 send information between client and server, that need to be understood at both
 destinations. No matter how this information is sent, using resource/object representation in case of REST or
 request/response message in case of RPC, it needs to be converted to format that
-can be decoded with the user of that information. Common transmission scenario
+can be decoded and understood with the user of that information. Common transmission scenario
 can look like:
 \begin{enumerate}
   \item Client wants to send a some information to a server. It has some data in
@@ -45,16 +45,31 @@ Most of them could be divided into two groups: human-readable text based formats
 and binary formats. Both groups have their own advantages and disadvantages.
 \autoref{tbl:data_ser_formats} shortly describes them. 
 
-\begin{table}[H]
-	\centering	
-	\begin{tabularx}{\textwidth}{|X|X|X|}
-		\hline
-		\textbf{Property} & 
-		\textbf{Binary formats}  	& 
-		\textbf{Human-readable formats}	
-	    
-	    \tabularnewline
-		\hline
+
+\begin{longtabu} to \textwidth {|L|X|X|}
+	
+\hline 
+\multicolumn{1}{|l|}{\textbf{Property}} & 
+\multicolumn{1}{l|}{\textbf{Binary formats}} & 
+\multicolumn{1}{l|}{\textbf{Human-readable formats}} \\ 
+\hline 
+\endfirsthead
+
+\multicolumn{3}{l}%
+{{\bfseries \tablename\ \thetable{} -- continued from previous page}} \\
+\hline 
+\multicolumn{1}{|l|}{\textbf{Property}} & 
+\multicolumn{1}{l|}{\textbf{Binary formats}} & 
+\multicolumn{1}{l|}{\textbf{Human-readable formats}} \\ 
+\hline 
+\endhead
+
+\hline \multicolumn{3}{|r|}{{Continued on next page}} \\ \hline
+\endfoot
+
+% \hline \hline
+\endlastfoot
+
 		Format examples &
 		Protocol Buffers from Google \newline 
 		{Apache Thrift(TBinaryProtocol)} \newline
@@ -71,7 +86,7 @@ and binary formats. Both groups have their own advantages and disadvantages.
 		Advantages & 
 		The two main reasons why binary formats are usually proposed
 		are for \textbf{size} and \textbf{speed}. \newline
-		Typically use fewer CPU cycles and requre less memory.
+		Typically use fewer CPU cycles and require less memory.
 		Binary data is transformed as is, no need to encode data bytes( image, video,
 		etc)
 		Better for larger datasets \newline
@@ -97,7 +112,7 @@ and binary formats. Both groups have their own advantages and disadvantages.
 		Disadvantages &
 		Not verbose. Hard to debug. \newline
 		Fixed data structures. Hard to extend. \newline
-		Not self-descriptive( it is hard to undestand for human where actual data
+		Not self-descriptive( it is hard to understand for human where actual data
 		starts in the array of bytes, ), has no data description( metadata, layout
 		of the data)\newline Require special software and  highly customized data
 		access algorithms.
@@ -115,10 +130,10 @@ and binary formats. Both groups have their own advantages and disadvantages.
 				
 		\tabularnewline
 		\hline
-	\end{tabularx} 
+	%\end{tabularx} 
 	\caption{Comparison of binary and human-readable serialization formats}
 	\label{tbl:data_ser_formats}
-\end{table}
+\end{longtabu}
 
 Text-based nature makes human-readable format a suitable choice
 for applications where humans are expected to see the data,
@@ -179,7 +194,7 @@ Simple data structure in XML looks like:
 	<mobile>1234567890</mobile>
 </person>
 \end{minted}
-\caption{XML structure decribing abstract person}
+\caption{XML structure describing abstract person}
 \label{lst:xml_person_example}
 \end{listing}
 
@@ -200,7 +215,7 @@ JSON is built on two structures\cite{json_org}:
   array, vector, list, or sequence.
 \end{itemize}
 
-The same sturucture from XML section looks in JSON encoding like:
+The same structure from XML section looks in JSON encoding like:
 \begin{listing}[H]
 \begin{minted}[frame=lines,
                framesep=2mm]{json}
@@ -213,7 +228,7 @@ The same sturucture from XML section looks in JSON encoding like:
 	}
 }
 \end{minted}
-\caption{JSON structure decribing abstract person}
+\caption{JSON structure describing abstract person}
 \label{lst:json_person_example}
 \end{listing}
 
@@ -250,7 +265,7 @@ tree-based. Stream based parsers (also known as Simple API for XML(SAX)) are
 event-based. They read input message sequentially and signals the application when a new component has
 been read. They raise notifications on reaching different document parts and
 programmer needs to decide what to do with this part of document( store or
-skip). Such parsers requre less resources than tree-based, because they do not
+skip). Such parsers require less resources than tree-based, because they do not
 need to keep whole document in memory.
 
 Tree-based parsers load whole message to memory and then parse it. They create a
@@ -269,10 +284,10 @@ Document serializers work using similar scheme.
 There is no direct answer for that question.
 The format and the parser used has to be chosen according your application
 constraints and requirements. Binary formats give you a small message size and
-reduce requred amount of CPU cycles for data processing, but there is a lack of
+reduce required amount of CPU cycles for data processing, but there is a lack of
 verbosity and it is hard to extract data without using additional tools. Text
 based formats reduce development and debugging time, but they have overhead
-because of their verbosity. There is a harware resources/ development
+because of their verbosity. There is a hardware resources/ development
 time tradeoff in this problem. Some calculations should be made before making a
 decision.
 
@@ -281,7 +296,7 @@ standard and open format.
 It means that this format should be supported by different software tools and programming
 languages,  you can read its specification and understand its features, your
 people can study it more quickly, system integration becomes more easy, because
-other system understand it too. If it is a production standart, there is a
+other system understand it too. If it is a production standard, there is a
 chance that it will not essentially change in near future.
 
 Text formats like XML and JSON are user all over the world and are good
