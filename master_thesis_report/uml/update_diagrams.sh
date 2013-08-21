@@ -1,1 +1,0 @@
-﻿#!/bin/bashtouch.exe diagrams.mdldate.exe >> diagrams.mdl.last_edited
