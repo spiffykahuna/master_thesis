@@ -14,7 +14,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-//@Ignore
+@Ignore
 public class CoffeeTest {
     private static final long DEFAULT_SERVER_TIMEOUT = 10000;
 

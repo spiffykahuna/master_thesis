@@ -90,9 +90,9 @@ public abstract class AbstractCoffeeMachineService implements CoffeeMachineServi
         this.requestProcessor = requestProcessor;
     }
 
-    public abstract void start();
-
-    public abstract boolean isRunning();
-
-    public abstract void stop();
+//    public abstract void start();
+//
+//    public abstract boolean isRunning();
+//
+//    public abstract void stop();
 }

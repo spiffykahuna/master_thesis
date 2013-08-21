@@ -112,8 +112,8 @@ void UART1_Init(void)
 	USART_InitStructure.USART_Mode = USART_Mode_Rx | USART_Mode_Tx;
 	USART_Init(USART1, &USART_InitStructure);
 
-	//  	USART1->BRR  = 0x00001D4C; // right 9600 baud rate constant
-	USART1->BRR = 0x00000271; //115200
+	  	USART1->BRR  = 0x00001D4C; // right 9600 baud rate constant
+//	USART1->BRR = 0x00000271; //115200
 
 	/* Available interrupts from USART1 */
 	USART1->CR1 |= (USART_CR1_RE | USART_CR1_TE /*| USART_CR1_RXNEIE */ | USART_CR1_IDLEIE);

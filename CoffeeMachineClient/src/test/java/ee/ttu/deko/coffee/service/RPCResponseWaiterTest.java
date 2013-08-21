@@ -37,6 +37,17 @@ public class RPCResponseWaiterTest {
         }
 
         @Override
+        public void start() {}
+
+        @Override
+        public void stop() {}
+
+        @Override
+        public boolean isRunning() {
+            return false;
+        }
+
+        @Override
         public boolean addListener(RPCServiceListener listener) {
             return listeners.add(listener);
         }
@@ -58,6 +69,11 @@ public class RPCResponseWaiterTest {
 
         @Override
         public void setRequestProcessor(RequestProcessor requestProcessor) {
+        }
+
+        @Override
+        public RequestProcessor getRequestProcessorByType(Class requestProcessorClass, Object... params) {
+            return null;  //To change body of implemented methods use File | Settings | File Templates.
         }
     }
 

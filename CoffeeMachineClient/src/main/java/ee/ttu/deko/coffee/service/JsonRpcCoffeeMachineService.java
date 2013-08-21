@@ -9,6 +9,7 @@ import ee.ttu.deko.coffee.service.domain.ServiceContract;
 import ee.ttu.deko.coffee.service.message.JsonRPCMessageHandler;
 import ee.ttu.deko.coffee.service.message.MessageReader;
 import ee.ttu.deko.coffee.service.message.MessageWriter;
+import ee.ttu.deko.coffee.service.request.RepeatedRPCRequest;
 import ee.ttu.deko.coffee.service.request.RequestProcessor;
 import ee.ttu.deko.coffee.service.request.SingleRPCRequest;
 
@@ -137,6 +138,7 @@ public class JsonRpcCoffeeMachineService extends AbstractCoffeeMachineService {
             info = response.getResult();
         } else {
             logger.warn("Cannot get response for service contract request");
+            return null;
         }
 
         return getStringObjectMap((Map) info);
@@ -216,6 +218,7 @@ public class JsonRpcCoffeeMachineService extends AbstractCoffeeMachineService {
     }
 
     private Map<String, Object> getStringObjectMap(Map productObj) {
+        if(productObj == null) throw new IllegalArgumentException("Received map object is null");
         Map<String, Object> newProductObj = new HashMap<String, Object>();
         Map temp =  (Map) productObj;
         Iterator props = temp.entrySet().iterator();
@@ -329,5 +332,40 @@ public class JsonRpcCoffeeMachineService extends AbstractCoffeeMachineService {
 
     private Long nextId() {
         return idCounter.incrementAndGet();
+    }
+
+
+    public RequestProcessor getRequestProcessorByType(Class requestProcessorClass, Object... params) {
+        RequestProcessor processor = null;
+
+        if(SingleRPCRequest.class.equals(requestProcessorClass)) {
+            processor = new SingleRPCRequest(messageHandler, this);
+            if(params[0] != null) {
+                processor.setTimeoutMs((Integer) params[0]);
+            } else {
+                processor.setTimeoutMs(this.timeoutMs);
+            }
+
+        }
+
+        if(RepeatedRPCRequest.class.equals(requestProcessorClass)) {
+            RepeatedRPCRequest repeatedRPCRequest =  new RepeatedRPCRequest(messageHandler, this);
+
+
+
+            if(params[0] != null) {
+                repeatedRPCRequest.setTimeoutMs((Integer) params[0]);
+            } else {
+                repeatedRPCRequest.setTimeoutMs(this.timeoutMs);
+            }
+
+            if(params[1] != null) {
+                repeatedRPCRequest.setRepeatCount((Integer) params[1]);
+            }
+
+            processor = repeatedRPCRequest;
+        }
+
+        return processor;
     }
 }

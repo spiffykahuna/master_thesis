@@ -86,7 +86,6 @@ public class MessageWriter implements  Runnable, RPCServiceListener{
         for (; !isClosed ;) {
             if (isNeededToStop()) break;
 
-            logger.debug("Waiting for new request to send...");
             if(requests.size() > 0) {
                 int itemsReceived = requests.drainTo(newMessages);
                 if(itemsReceived > 0) {
