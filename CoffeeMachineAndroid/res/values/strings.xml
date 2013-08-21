@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+     Copyright (C) 2009 The Android Open Source Project
+
+     Licensed under the Apache License, Version 2.0 (the "License");
+     you may not use this file except in compliance with the License.
+     You may obtain a copy of the License at
+
+          http://www.apache.org/licenses/LICENSE-2.0
+
+     Unless required by applicable law or agreed to in writing, software
+     distributed under the License is distributed on an "AS IS" BASIS,
+     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+     See the License for the specific language governing permissions and
+     limitations under the License.
+-->
+
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+
+    <string name="app_name">Coffee Machine Remote Control demo application</string>
+
+    <!-- BluetoothCoffeeControl -->
+    <string name="send">Send</string>
+    <string name="not_connected">You are not connected to remote device</string>
+    <string name="bt_not_enabled_leaving">Bluetooth was not enabled. Leaving Coffee control.</string>
+    <string name="title_connecting">connecting...</string>
+    <string name="title_connected_to">connected to <xliff:g id="device_name">%1$s</xliff:g></string>
+    <string name="title_not_connected">not connected</string>
+    <string name="nothing_to_send">There is nothing to send. Check the message...</string>
+
+    <!-- DeviceListActivity -->
+    <string name="scanning">scanning for devices...</string>
+    <string name="select_device">select a device to connect</string>
+    <string name="none_paired">No devices have been paired</string>
+    <string name="none_found">No devices found</string>
+    <string name="title_paired_devices">Paired Devices</string>
+    <string name="title_other_devices">Other Available Devices</string>
+    <string name="button_scan">Scan for devices</string>
+
+    <!-- Options Menu -->
+    <string name="secure_connect">Connect a device - Secure</string>
+    <string name="insecure_connect">Connect a device - Insecure</string>
+    <string name="discoverable">Make discoverable</string>
+
+    <!-- Command buttons -->
+    <string name="cmd1">TY:</string>
+    <string name="cmd2">TY$:</string>
+    <string name="cmd3">RT:0000</string>
+    <string name="cmd4">CMD4</string>
+    <string name="cmd5">CMD5</string>
+    <string name="cmd1_label">CMD1</string>
+    <string name="cmd2_label">CMD2</string>
+    <string name="cmd3_label">CMD3</string>
+    <string name="cmd4_label">CMD4</string>
+    <string name="cmd5_label">CMD5</string>
+    <string name="command_edit_dialog_title">Edit command: </string>
+    <string name="command_edit_dialog_yes">Yes</string>
+    <string name="command_edit_dialog_no">No, not now</string>
+    <string name="command_edit_dialog_hint">Enter new command</string>
+    <string name="command_edit_dialog_button_restore">Restore</string>
+    <string name="command_edit_dialog_button_clear">Clear</string>
+
+	<!-- Product Names -->
+    <string name="cappuccino_1">Cappuccino</string>
+    <string name="cappuccino_2">2 cappuccini</string>
+    <string name="coffee_1">Coffee</string>
+    <string name="coffee_2">2 coffees</string>
+    <string name="espresso_1">Espresso</string>
+    <string name="espresso_2">2 espressi</string>
+    <string name="espresso_macchiato_1">Macchiato</string>
+    <string name="espresso_macchiato_2">2 macchiati</string>
+    <string name="hotwater_1">Hot Water</string>
+    <string name="latte_macchiato_1">Latte Macchiato</string>
+    <string name="latte_macchiato_2">2 latte macchiati</string>
+    <string name="milk_1">1 portion milk</string>
+    <string name="milk_2">2 portions milk</string>
+    <string name="milk_foam_1">1 portion milk foam</string>
+    <string name="milk_foam_2">2 portions milk foam</string>
+    <string name="milkcoffee_1">Cafè latte</string>
+    <string name="milkcoffee_2">2 caffè latte</string>
+    <string name="pot_1">Jug of coffee</string>
+    <string name="ristretto_1">Ristretto</string>
+    <string name="ristretto_2">2 ristretti</string>
+	
+	
+	
+	<string name="title_activity_main">Coffee Machine Remote Control</string>
+    <string name="title_activity_static">Coffee Machine Remote Control Static</string>
+	<string name="confirm_dialog_title">Confirm selection</string>
+	<string name="confirm_dialog_text">Are you sure?</string>
+	<string name="confirm_dialog_formatted_text">Preparing product: %1$s\nPrice: %2$s\n\nAre you sure?</string>
+	<string name="confirm_dialog_yes">Yes</string>
+	<string name="confirm_dialog_no">No</string>
+	<string name="confirm_dialog_maybe">Maybe</string>
+	<string name="product_progress_dialog_title">Preparing product</string>
+	<string name="product_progress_dialog_text">Preparing %1$s, please wait</string>
+	<string name="product_progress_dialog_cancel">Cancel</string>
+	<string name="product_progress_dialog_cancel_message_text">Cancelling product...</string>
+	<string name="init_progress_dialog_title">Handshake</string>
+	<string name="init_progress_dialog_text">Establishing communication with coffee machine, please wait</string>
+	
+	<string name="pair_device">Pair device</string>
+	<string name="unpair_device">Unpair device</string>
+	<string name="bt_not_enabled">Bluetooth was not enabled. Turn bluetooth on.</string>
+	<string name="bt_is_now_enabled">Bluetooth is enabled. Reconnecting to CoffeMachine...</string>
+	
+	<string name="connect_tooltip_text">Press Bluetooth button above to connect to device</string>
+
+</resources>

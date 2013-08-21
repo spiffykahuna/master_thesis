@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+     Copyright (C) 2009 The Android Open Source Project
+
+     Licensed under the Apache License, Version 2.0 (the "License");
+     you may not use this file except in compliance with the License.
+     You may obtain a copy of the License at
+
+          http://www.apache.org/licenses/LICENSE-2.0
+
+     Unless required by applicable law or agreed to in writing, software
+     distributed under the License is distributed on an "AS IS" BASIS,
+     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+     See the License for the specific language governing permissions and
+     limitations under the License.
+-->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="ee.ttu.deko.android.coffee"
+    android:versionCode="0"
+    android:versionName="0.1" >
+
+    <uses-sdk android:minSdkVersion="12" />
+
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+    <uses-permission android:name="android.permission.BLUETOOTH" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    
+
+    <application
+        
+        android:icon="@drawable/app_icon"
+        android:label="@string/app_name" >
+<!--         <activity -->
+<!--             android:name="ee.ttu.deko.android.coffee.BluetoothCoffeeControl" -->
+<!--             android:configChanges="orientation|keyboardHidden" -->
+<!--             android:label="@string/app_name" > -->
+<!--             <intent-filter> -->
+<!--                 <action android:name="android.intent.action.MAIN" /> -->
+
+<!--                 <category android:name="android.intent.category.LAUNCHER" /> -->
+<!--             </intent-filter> -->
+<!--         </activity> -->
+        
+        <activity
+            android:name="ee.ttu.deko.android.coffee.ui.BluetoothProductsActivity"
+            android:label="@string/title_activity_main"
+            android:screenOrientation="landscape" >            
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        
+        <receiver android:name="ee.ttu.deko.android.coffee.bluetooth.BluetoothAdapterListener" 
+		    android:enabled="true">
+		    <intent-filter>
+		        <action android:name="android.bluetooth.adapter.action.STATE_CHANGED" />		        
+		    </intent-filter>
+		    
+		     <intent-filter>
+		        <action android:name="android.bluetooth.adapter.action.CONNECTION_STATE_CHANGED" />
+		    </intent-filter>
+		    
+		     <intent-filter> 
+	         	<action android:name="android.bluetooth.device.action.ACL_CONNECTED" />
+				<action android:name="android.bluetooth.device.action.ACL_DISCONNECT_REQUESTED" />
+		    	<action android:name="android.bluetooth.device.action.ACL_DISCONNECTED" />
+			</intent-filter>
+		</receiver>
+        
+        <activity
+            android:name="ee.ttu.deko.android.coffee.DeviceListActivity"
+            android:configChanges="orientation|keyboardHidden"
+            android:label="@string/select_device"
+            android:theme="@android:style/Theme.Holo.Dialog" />
+        <activity
+            android:name="ee.ttu.deko.android.coffee.SettingsActivity"
+            android:label="@string/title_activity_settings"
+            android:parentActivityName="ee.ttu.deko.android.coffee.BluetoothCoffeControl" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="ee.satron.jura.android.bluetooth.BluetoothCoffeControl" />
+        </activity>
+        <activity
+            android:name="ee.ttu.deko.android.coffee.MemoryDumpActivity"
+            android:label="@string/title_activity_memory_dump"
+            android:parentActivityName="ee.ttu.deko.android.coffee.BluetoothCoffeControl" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="ee.satron.jura.android.bluetooth.BluetoothCoffeControl" />
+        </activity>
+
+        <service
+            android:name="ee.ttu.deko.android.coffee.MemoryDumpService"
+            android:enabled="true"
+            android:exported="true" >
+        </service>
+    </application>
+
+</manifest>

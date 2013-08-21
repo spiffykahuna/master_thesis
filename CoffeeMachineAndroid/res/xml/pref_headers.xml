@@ -1,0 +1,13 @@
+<preference-headers xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <!-- These settings headers are only used on tablets. -->
+
+    <header
+        android:fragment="ee.satron.jura.android.bluetooth.SettingsActivity$GeneralPreferenceFragment"
+        android:title="@string/pref_header_general" />
+    <header
+        android:fragment="ee.satron.jura.android.bluetooth.SettingsActivity$MemoryDumpPreferenceFragment"
+        android:title="@string/pref_header_memory_dump" />
+   
+
+</preference-headers>
