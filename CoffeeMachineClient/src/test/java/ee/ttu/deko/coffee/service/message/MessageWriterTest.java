@@ -44,6 +44,17 @@ public class MessageWriterTest {
         }
 
         @Override
+        public void start() {}
+
+        @Override
+        public void stop() {}
+
+        @Override
+        public boolean isRunning() {
+            return false;
+        }
+
+        @Override
         public synchronized boolean addListener(RPCServiceListener listener) {
             return listeners.add(listener);
         }
@@ -64,6 +75,11 @@ public class MessageWriterTest {
 
         @Override
         public void setRequestProcessor(RequestProcessor requestProcessor) {
+        }
+
+        @Override
+        public RequestProcessor getRequestProcessorByType(Class requestProcessorClass, Object... params) {
+            return null;  //To change body of implemented methods use File | Settings | File Templates.
         }
 
         public int writeSomeMsg(String message) {
@@ -106,6 +122,21 @@ public class MessageWriterTest {
             }
 
             @Override
+            public void start() {
+
+            }
+
+            @Override
+            public void stop() {
+
+            }
+
+            @Override
+            public boolean isRunning() {
+                return false;
+            }
+
+            @Override
             public boolean addListener(RPCServiceListener listener) {
                 return false;
             }
@@ -127,6 +158,11 @@ public class MessageWriterTest {
             @Override
             public void setRequestProcessor(RequestProcessor requestProcessor) {
             }
+
+            @Override
+            public RequestProcessor getRequestProcessorByType(Class requestProcessorClass, Object... params) {
+                return null;
+            }
         });
         new MessageWriter(new StringWriter(), null);
     }
@@ -138,7 +174,7 @@ public class MessageWriterTest {
         messageWriter.start();
         assertTrue(messageWriter.isAlive());
 
-        for (int i = 0; i < 1000; i++) {
+        for (int i = 0; i < 10; i++) {
             messageWriter.start();
             assertTrue(messageWriter.isAlive());
             messageWriter.stop();

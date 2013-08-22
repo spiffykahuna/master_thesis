@@ -30,12 +30,14 @@ public class ServiceContract extends HashMap<String, Object> {
         if(!contractMap.containsKey("version")) throw new IllegalArgumentException("Unable to create service contract object. Provided constructor argument does not have member with key \"version\"");
         if(!contractMap.containsKey("operations")) throw new IllegalArgumentException("Unable to create service contract object. Provided constructor argument does not have member with key \"operations\"");
         if(!contractMap.containsKey("definitions")) throw new IllegalArgumentException("Unable to create service contract object. Provided constructor argument does not have member with key \"definitions\"");
+        if(!contractMap.containsKey("$schema")) throw new IllegalArgumentException("Unable to create service contract object. Provided constructor argument does not have member with key \"$schema\"");
 
         put("id", contractMap.get("id"));
         put("description", contractMap.get("description"));
         put("version", contractMap.get("version"));
         put("operations", contractMap.get("operations"));
         put("definitions", contractMap.get("definitions"));
+        put("$schema", contractMap.get("$schema"));
     }
 
     public String getId() {

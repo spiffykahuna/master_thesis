@@ -53,6 +53,16 @@ inline json_t* server_error(const json_t *requestJson) {
 	return responseJson;
 }
 
+inline json_t* invalid_params(const json_t *requestJson) {
+	json_t *responseJson = NULL;
+
+	json_t* errorObj = create_error(JSONRPC_INVALID_PARAMS, MSG_JSONRPC_ERRORS.invalid_params);
+
+	responseJson = jsonrpc_response(requestJson, errorObj, TRUE);
+
+	return responseJson;
+}
+
 
 
 

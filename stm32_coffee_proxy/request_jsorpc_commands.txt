@@ -1,0 +1,6 @@
+84:{"jsonrpc": "2.0", "method": "machine.orderProduct", "params": {"id": 3}, "id": 666},
+85:{"jsonrpc": "2.0", "method": "machine.cancelProduct", "params": {"id": 3}, "id": 666},
+88:{"jsonrpc": "2.0", "method": "machine.getProductStatus", "params": {"id": 3}, "id": 666},
+
+
+78:{"jsonrpc": "2.0", "method": "machine.getProducts", "params": null, "id": 666},

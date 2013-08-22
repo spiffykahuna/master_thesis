@@ -12,6 +12,10 @@ public interface Service {
     boolean isConnected();
     void disconnect();
 
+    public void start();
+    public void stop();
+    public boolean isRunning();
+
     boolean addListener(RPCServiceListener listener);
     boolean removeListener(RPCServiceListener listener);
 
@@ -19,4 +23,5 @@ public interface Service {
     long getTimeoutMs();
 
     void setRequestProcessor(RequestProcessor requestProcessor);
+    RequestProcessor getRequestProcessorByType(Class requestProcessorClass, Object... params);
 }

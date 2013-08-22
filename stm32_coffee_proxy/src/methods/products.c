@@ -1,4 +1,6 @@
-#include "get_products.h"
+#include "products.h"
+
+char * product_status_to_str(product_status_t status);
 
 inline
 void	delete_product_list(product_list_t *products) {
@@ -270,3 +272,153 @@ json_t * get_products(const json_t *requestJson, transport_type_t transport) {
 //
 //	return result;
 //}
+
+json_t * order_product(const json_t *requestJson, const transport_type_t transport) {
+	json_t *responseJson = NULL;
+	json_int_t requestId = json_integer_value(json_object_get(requestJson, "id"));
+
+	json_t *params = json_object_get(requestJson, "params");
+	json_t *productIdObj = json_object_get(params, "id");
+
+	if(!productIdObj || !json_is_integer(productIdObj)) {
+		logger(LEVEL_WARN, "Unable to extract productId");
+		return invalid_params(requestJson);
+	}
+
+	json_int_t productId = json_integer_value(productIdObj);
+
+	if(!productId ||  (productId < 0) ) {
+		logger(LEVEL_WARN, "Wrong productId");
+		return invalid_params(requestJson);
+	}
+
+	strbuffer_t *logMsg = strbuffer_new();
+	strbuffer_append(logMsg, "get_products : Requested product order. client_id = ");
+	strbuffer_append(logMsg, int_to_string((int) requestId));
+	strbuffer_append(logMsg, " from_transport=");
+	strbuffer_append(logMsg, int_to_string(transport));
+	strbuffer_append(logMsg, " product_id=");
+	strbuffer_append(logMsg, int_to_string(productId));
+	logger(LEVEL_INFO, logMsg->value);
+	strbuffer_destroy(&logMsg);
+
+
+	product_status_t status = orderProduct((int) productId);
+
+	char* statusStr = product_status_to_str(status);
+
+
+	json_t* result = json_string(statusStr);
+
+
+	responseJson = jsonrpc_response(requestJson, result, FALSE);
+
+	return responseJson;
+}
+
+json_t * cancel_product(const json_t *requestJson, const transport_type_t transport) {
+	json_t *responseJson = NULL;
+	json_int_t requestId = json_integer_value(json_object_get(requestJson, "id"));
+
+	json_t *params = json_object_get(requestJson, "params");
+	json_t *productIdObj = json_object_get(params, "id");
+
+	if(!productIdObj || !json_is_integer(productIdObj)) {
+		logger(LEVEL_WARN, "Unable to extract productId");
+		return invalid_params(requestJson);
+	}
+
+	json_int_t productId = json_integer_value(productIdObj);
+
+	if(!productId ||  (productId < 0) ) {
+		logger(LEVEL_WARN, "Wrong productId");
+		return invalid_params(requestJson);
+	}
+
+	strbuffer_t *logMsg = strbuffer_new();
+	strbuffer_append(logMsg, "get_products : Requested cancel product. client_id = ");
+	strbuffer_append(logMsg, int_to_string((int) requestId));
+	strbuffer_append(logMsg, " from_transport=");
+	strbuffer_append(logMsg, int_to_string(transport));
+	strbuffer_append(logMsg, " product_id=");
+	strbuffer_append(logMsg, int_to_string(productId));
+	logger(LEVEL_INFO, logMsg->value);
+	strbuffer_destroy(&logMsg);
+
+
+	product_status_t status = cancelProduct((int) productId);
+
+	char* statusStr = product_status_to_str(status);
+
+
+	json_t* result = json_string(statusStr);
+
+
+	responseJson = jsonrpc_response(requestJson, result, FALSE);
+
+	return responseJson;
+}
+
+
+char * product_status_to_str(product_status_t status) {
+	char* statusStr = NULL;
+
+	switch(status) {
+	case PRODUCT_STATUS_MISSING: 				statusStr = "PRODUCT_STATUS_MISSING"; break;
+	case PRODUCT_STATUS_READY_TO_START: 		statusStr = "PRODUCT_STATUS_READY_TO_START"; break;
+	case PRODUCT_STATUS_STARTED: 				statusStr = "PRODUCT_STATUS_STARTED"; break;
+	case PRODUCT_STATUS_IN_PROGRESS: 			statusStr = "PRODUCT_STATUS_IN_PROGRESS"; break;
+	case PRODUCT_STATUS_FINISHED: 					statusStr = "PRODUCT_STATUS_READY"; break;
+	case PRODUCT_STATUS_STOPPED: 				statusStr = "PRODUCT_STATUS_STOPPED"; break;
+	case PRODUCT_STATUS_CANCELLED: 				statusStr = "PRODUCT_STATUS_CANCELLED"; break;
+	case PRODUCT_STATUS_FAILED: 				statusStr = "PRODUCT_STATUS_FAILED"; break;
+	case PRODUCT_STATUS_BUSY: 					statusStr = "PRODUCT_STATUS_BUSY"; break;
+	default: 									statusStr = "PRODUCT_STATUS_FAILED"; break;
+
+	}
+	return statusStr;
+}
+
+
+json_t * get_product_status(const json_t *requestJson, const transport_type_t transport) {
+	json_t *responseJson = NULL;
+	json_int_t requestId = json_integer_value(json_object_get(requestJson, "id"));
+
+	json_t *params = json_object_get(requestJson, "params");
+	json_t *productIdObj = json_object_get(params, "id");
+
+	if(!productIdObj || !json_is_integer(productIdObj)) {
+		logger(LEVEL_WARN, "Unable to extract productId");
+		return invalid_params(requestJson);
+	}
+
+	json_int_t productId = json_integer_value(productIdObj);
+
+	if(!productId ||  (productId < 0) ) {
+		logger(LEVEL_WARN, "Wrong productId");
+		return invalid_params(requestJson);
+	}
+
+	strbuffer_t *logMsg = strbuffer_new();
+	strbuffer_append(logMsg, "get_products : Requested product status. client_id = ");
+	strbuffer_append(logMsg, int_to_string((int) requestId));
+	strbuffer_append(logMsg, " from_transport=");
+	strbuffer_append(logMsg, int_to_string(transport));
+	strbuffer_append(logMsg, " product_id=");
+	strbuffer_append(logMsg, int_to_string(productId));
+	logger(LEVEL_INFO, logMsg->value);
+	strbuffer_destroy(&logMsg);
+
+
+	product_status_t status = getProductStatus((int) productId);
+
+	char* statusStr = product_status_to_str(status);
+
+
+	json_t* result = json_string(statusStr);
+
+
+	responseJson = jsonrpc_response(requestJson, result, FALSE);
+
+	return responseJson;
+}

@@ -113,8 +113,8 @@ void UART4_Init(void)
 
 	//fck = 36 Mhz -> APB1 F_max
 //	  	UART4->BRR  = 0x00001D4C; // right 9600 baud rate constant
-	UART4->BRR = 0x00000138; // 36 Mhz/115200
-//	UART4->BRR  = 0x00000EA6; // 960
+//	UART4->BRR = 0x00000138; // 36 Mhz/115200
+	UART4->BRR  = 0x00000EA6; // 960
 	/* Available interrupts from UART4 */
 	UART4->CR1 |= (/*USART_CR1_RE | USART_CR1_TE */ /*| USART_CR1_RXNEIE */  USART_CR1_IDLEIE);
 

@@ -219,6 +219,11 @@ void handle_request(packet_t *requestPacket) {
 	if(METHOD_IS("system.help", methodName)) 	{ responseJson = getSystemHelp(rpcRequest, requestPacket->transport); methodFound = 1;}
 	if(METHOD_IS("machine.getInfo", methodName))		{ responseJson = getInfo(rpcRequest); methodFound = 1;}
 	if(METHOD_IS("machine.getProducts", methodName))	{ responseJson = get_products(rpcRequest,  requestPacket->transport); methodFound = 1;}
+	if(METHOD_IS("machine.orderProduct", methodName))	{ responseJson = order_product(rpcRequest,  requestPacket->transport); methodFound = 1;}
+	if(METHOD_IS("machine.cancelProduct", methodName))	{ responseJson = cancel_product(rpcRequest,  requestPacket->transport); methodFound = 1;}
+	if(METHOD_IS("machine.getProductStatus", methodName))	{ responseJson = get_product_status(rpcRequest,  requestPacket->transport); methodFound = 1;}
+
+
 
 
 	if(METHOD_IS("get_free_memory", methodName))		{ responseJson = get_free_memory(rpcRequest); methodFound = 1;}
@@ -264,6 +269,7 @@ void handle_request(packet_t *requestPacket) {
 			strbuffer_destroy(&logMsg);
 
 			errorObj = create_response_error(JSONRPC_METHOD_NOT_FOUND, MSG_JSONRPC_ERRORS.method_not_found);
+			json_object_set_new(errorObj, "id", json_integer(requestPacket->id));
 		}
 
 		packet_lock(requestPacket);

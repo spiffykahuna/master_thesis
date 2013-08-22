@@ -10,7 +10,7 @@
 
 #include "mainTasks.h"
 #include "get_info.h"
-#include "get_products.h"
+#include "products.h"
 #include "transport/transport.h"
 
 inline void delete_rpc_method(json_t *requestJson);
