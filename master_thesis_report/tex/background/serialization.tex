@@ -33,13 +33,13 @@ There are lots of different ways and formats that can
 be used. Which method and format to choose depends on the requirements set up on
 the object or data, and the use for the serialization (sending or storing). The choice
 may also affect the size of the serialized data as well as serialization/deserialization
-performance in terms of processing time and memory usage\cite{json_vs_yaml}.
+performance in terms of processing time and memory usage~\cite{json_vs_yaml}.
 Next section describes possible serialization solutions.
 
 \subsubsection{Serialization technologies}
 Serialization is supported by many programming languages, which provide tools
 and libraries for data serialization to different formats. Article
-\cite{wikipedia:comparison_of_data_serialization_formats}
+~\cite{wikipedia:comparison_of_data_serialization_formats}
 provides a summary of well known data serialization formats.
 Most of them could be divided into two groups: human-readable text based formats
 and binary formats. Both groups have their own advantages and disadvantages.
@@ -159,7 +159,7 @@ invention, claims it to be “the holy grail of computing, solving the problem o
 \end{quotation} 
 
 The fundamental design considerations of XML include
-simplicity and human readability\cite{NurseitovPRI09}.
+simplicity and human readability~\cite{NurseitovPRI09}.
 W3C\footnote{World Wide Web Consortium} specifies the design goals for XML
 like~\cite{w3c_xml}:
 \begin{enumerate}
@@ -202,12 +202,12 @@ Simple data structure in XML looks like:
 \paragraph{JSON} ~\\
 \label{sec:json_description}
 JSON (JavaScript Object Notation) is a lightweight data-interchange
-format\cite{json_org}.It is easy for humans to read and write and also is
+format~\cite{json_org}.It is easy for humans to read and write and also is
 easy for machines to parse and generate. JSON is based on JavaScript
 Programming Language and is directly supported inside JavaScript. It has library
 bindings for popular programming languages.
 
-JSON is built on two structures\cite{json_org}:
+JSON is built on two structures~\cite{json_org}:
 \begin{itemize}
   \item A collection of name/value pairs. In various languages, this is realized
   as an object, record, struct, dictionary, hash table, keyed list, or associative array.
@@ -239,7 +239,7 @@ JSON specification is quite easy and it is  described using only one
 page~\cite{json_org}. This page provides also a list of programming languages
 and libraries that support JSON. 
 
-Research in different documents \cite{5931189,NurseitovPRI09} showed that
+Research in different documents ~\cite{5931189,NurseitovPRI09} showed that
 that JSON is faster and uses fewer resources than its XML
 counterpart.
 Transferring data in the form of JSON instead of XML can speed up the server
@@ -249,7 +249,7 @@ This is because XML is characterised by its rich verbosity,
 meaning that it requires a separate start-tag and end-tag for describing the content.
 As JSON does not use end-tags at all for the description of the content, the
 resulting number of bytes is smaller.
-Paper \cite{5931189} contains performance analysis of mobile device(Apple
+Paper ~\cite{5931189} contains performance analysis of mobile device(Apple
 iPhone), which executes different tests working with XML, JSON and SOAP.
 Research results prove that SOAP and XML have overhead over JSON.
 
@@ -299,7 +299,7 @@ people can study it more quickly, system integration becomes more easy, because
 other system understand it too. If it is a production standard, there is a
 chance that it will not essentially change in near future.
 
-Text formats like XML and JSON are user all over the world and are good
+Text formats like XML and JSON are used in various production systems all over the world and are good
 candidates to be in your system.
 
 

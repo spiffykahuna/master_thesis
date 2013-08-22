@@ -5,7 +5,7 @@ Resent topics had a review of available tools and technologies for implementing 
 Related publications \cite{5470528, dguinard-rest-vs-ws} claim that SOA
 tools need to be adapted to a constrained hardware by using more lightweight approaches.
 Common possibilities are: use of more resource friendly protocols, use of
-existing service protocols in a contstrained manner( low request per second
+existing service protocols in a constrained manner( low request per second
 ratio or smaller payload/packet size), use of special constrained protocols,
 which are designed specially for interaction between small devices.
 
@@ -13,12 +13,12 @@ This section will describe two possibilities of implementing SOA on an embedded
 device, that are based on different research
 papers\cite{coap_survey,4221180}.
 \nameref{sec:DPWS} section will introduce a
-Web Services based device mmcounication framework. \nameref{sec:CoAP} section
+Web Services based device communication framework. \nameref{sec:CoAP} section
 will cover RESTful device interactions.
 \subsubsection{Devices Profile for Web Services}
 \label{sec:DPWS}
 The Devices Profile for Web Services (DPWS) was developed to enable secure Web
-service capabilities on resource-constrained devices\cite{ws4d_dpws}.
+service capabilities on resource-constrained devices~\cite{ws4d_dpws}.
 DPWS was mainly developed by Microsoft and some printer device manufacturers.
 DPWS allows sending secure messages to and from Web services, discovering a Web service dynamically, describing a Web service, subscribing to, and receiving events from a Web service.
 
@@ -34,13 +34,13 @@ DPWS allows sending secure messages to and from Web services, discovering a Web 
 
 
 \autoref{fig:dpws_protocol_stack} shows DPWS protocol stack. It is based on  
-several Web Services specifications\cite{ws4d_dpws}:
+several Web Services specifications~\cite{ws4d_dpws}:
 \begin{itemize}
   \item WS-Addressing for advanced endpoint and message addressing
   \item WS-Policy for policy exchange
   \item WS-Security for managing security
   \item WS-Discovery and SOAP-over-UDP for device discovery
-  \item WS-Transfer / WS- Metadataexchange for device and service description
+  \item WS-Transfer / WS-Metadata exchange for device and service description
   \item WS-Eventing for managing subscriptions for event channels   
 \end{itemize}
     
@@ -111,19 +111,19 @@ of communications security~\cite{wikipedia:coap}.
 
 Web services implementations on embedded
 devices have quite big overhead. Web service messages are at least 5 times
-larger than conventional messages(messages using usual data stuctures, not XML),
+larger than conventional messages(messages using usual data structures, not XML),
 messages take at least 2.5 to 2 times longer than conventional
-messages, consume more 2 times more energy\cite{5470528}.
+messages, consume more 2 times more energy~\cite{5470528}.
 Therefore this technology can be only used on hardware with high computational and power
-posibilities, not for deeply embedded devices like low-cost microcontrollers for wireless sensors and actuators. 
+possibilities, not for deeply embedded devices like low-cost microcontrollers for wireless sensors and actuators. 
 
-The second techology, CoAP and RESTful services requires less resources. Its
+The second technology, CoAP and RESTful services requires less resources. Its
 highly optimized implementation could be executed on a device with 8.5 kB of ROM
 and 1.5 kB of RAM \cite{6076698}. It uses Contiki OS and TCP/IP
 implementations. This architecture could be a great candidate for  a remote
 embedded service.
 
 CoAP was specially designed for constrained devices, while DPWS is a profile
-(may be also called a port) of Web services techology to devices, with
+(may be also called a port) of Web services technology to devices, with
 complexity of all WS-* technologies. DPWS require more powerful hardware and is
 not suitable for the devices where CoAP was designed to run.

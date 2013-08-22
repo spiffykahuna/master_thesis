@@ -2,11 +2,11 @@
 \subsubsection{Web Services Model}
 The Web Services architecture is based on the interactions between three
 roles \cite{Kreger2001-WSC}:
-service provider, service registry and service requestor. 
+service provider, service registry and service requester. 
 This integration has of three operations: publish, find and
 bind. The service provider has an implementation of service. Provider defines a
-service description and publishes it to a service requestor or service registry.
-The service requestor uses a find operation to retrieve the service
+service description and publishes it to a service requester or service registry.
+The service requester uses a find operation to retrieve the service
 description locally or from the service registry and uses the service description to bind with the
 service provider and invoke or interact with the Web service implementation.
 \autoref{fig:ws_model} illustrates these service roles and their operations.
@@ -21,7 +21,7 @@ service provider and invoke or interact with the Web service implementation.
 \end{center}
 
 Service registry is a place where service providers can publish
-descriptions of their services. Service requestors can find service descriptions
+descriptions of their services. Service requesters can find service descriptions
 and get binding information from them. Binding can be static and dynamic.
 Registry is needed more for dynamic binding where client can get service info at
 the runtime, extract necessary functional methods and execute them on the
@@ -109,7 +109,7 @@ Web services architecture uses WS-Security\footnote{WS-Security (Web Services
 Security, short WSS) is an extension to SOAP to apply security to web services.
 It is a member of the WS-* family of web service specifications and was
 published by OASIS(Organization for the Advancement of Structured Information
-Standards, https://www.oasis-open.org/). \cite{wikipedia:WS-Security}}
+Standards, \url{https://www.oasis-open.org/}). \cite{wikipedia:WS-Security}}
 ~protocol to solve security problems.
 This protocol specifies how \gls{SOAP} messages may be secured.
  
@@ -122,13 +122,13 @@ reporting of service state information.
 Web services architecture uses WS-Management~\cite{ws_security_promo} protocol
 for management of entities such as PCs, servers, devices, Web services and other
 applications. WS-Management has ability to discover the presence of management resources,
-control of individual management resources, subsrcibe to events on resources,
+control of individual management resources, subscribe to events on resources,
 execute specific management methods.
 
 WS-Management was created by DMTF( Distributed Management Task Forse, Inc.,
-http://www.dmtf.org/) organization, which is creating stantards for managing
+http://www.dmtf.org/) organization, which is creating standards for managing
 the enterprise level systems. Organisation members are largest hardware and
-sortware corporations like Broadcom, Cisco, Fujitsu, Hewlett-Packard, IBM, Intel,
+software corporations like Broadcom, Cisco, Fujitsu, Hewlett-Packard, IBM, Intel,
 Microsoft, Oracle. DTMF standards promote multi-vendor interoperability, which
 is great for the integration between different IT systems. 
 
@@ -225,7 +225,7 @@ service, where you can book you a room in a fictional hotel named GreatH. For si
 only one method - the \textit{opCheckAvailability} operation. This description
 is quite verbose to understand what it is about. There is input and output
 object type declaration. It also has an output error response declaration and
-if some error occures during client request processing, server should send a
+if some error occurs during client request processing, server should send a
 message of specified kind.
 These \gls{XML} object types are declared in different \textit{namespaces} ( see
 xmlns:*	declarations at the start of \gls{WSDL} document). This gives an ability
@@ -288,7 +288,7 @@ benefits~\cite{ws_technologies_state_of_the_art}:
 \end{itemize}
 
 WS-* uses the \gls{HTTP} protocol as transport medium for exchanging messages
-between web services. \gls{SOAP} messages can be transfered using another
+between web services. \gls{SOAP} messages can be transferred using another
 protocol (\gls{SMTP}, \gls{TCP}, or \gls{JMS}), which can be more suitable to
 your system environment than \gls{HTTP}.
 
@@ -328,10 +328,10 @@ applications, with atomic functionality.
 
 WS-* standards rely on each other and to implement a small web service with
 few features you will need to dive into all WS standards. This is at least 783
-pages of not just text, but a techical specifications~\cite{ws_pagecount}.
+pages of not just text, but a technical specifications~\cite{ws_pagecount}.
 Surely, Web services have good ideas, but this technology is promoted and
 developed by large corporations like Microsoft, IBM, Oracle, who are not
-intrested in simple and lightweight solutions, because they need to utilize
+interested in simple and lightweight solutions, because they need to utilize
 their thousands of developers and earn money( document ~\cite{ws_pagecount} says
 that most of WS-* specifications are hosted by Microsoft and  OASIS
 organisation. The foundational sponsors of OASIS are IBM and Microsoft).

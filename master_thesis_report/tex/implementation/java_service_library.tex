@@ -67,7 +67,7 @@ class}, \textit{duck typing}.
 The Python example above uses this approach and
 you can retrieve list of available methods from server by calling
 \texttt{listMethods()} on a \texttt{ServerProxy} object. 
-This techniquie is more suitable for dynamically typed programming languages. 
+This technique is more suitable for dynamically typed programming languages. 
 
 I preferred to make more robust and simple solution. I created a Java
 interface class with all methods that server has. 
@@ -83,6 +83,10 @@ public interface Service {
     boolean isConnected();
     void disconnect();
 
+    public void start();
+    public void stop();
+    public boolean isRunning();
+
     boolean addListener(RPCServiceListener listener);
     boolean removeListener(RPCServiceListener listener);
 
@@ -90,6 +94,9 @@ public interface Service {
     long getTimeoutMs();
 
     void setRequestProcessor(RequestProcessor requestProcessor);
+    RequestProcessor getRequestProcessorByType(
+	    Class requestProcessorClass,
+	    Object... params);
 }               
                
 public interface CoffeeMachineService extends Service {

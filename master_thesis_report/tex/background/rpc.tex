@@ -11,7 +11,7 @@ to call mathods and receive results.
 
 \subsubsection{RPC in details}
 Remote procedure calls have become a de facto standard for communication
-in distributed systems\cite{tanenbaum07}. The popularity of the model is due to
+in distributed systems~\cite{tanenbaum07}. The popularity of the model is due to
 its apparent simplicity.
 This section gives a brief introduction to RPC and the problems in there.
 
@@ -53,7 +53,7 @@ with method calls.
 The idea behind RPC is to make a remote procedure call look as much as possible
 like a local one. In other words, we want RPC to be transparent—the calling
 procedure should not be aware that the called procedure is executing on a different
-machine or vice versa\cite{tanenbaum07}. To achieve this transparency special
+machine or vice versa~\cite{tanenbaum07}. To achieve this transparency special
 software modules are used. They are called \textbf{stubs}. The main purpose
 of a stub is to handle network messages between client and server. 
 
@@ -74,7 +74,7 @@ network and underlying OS.
 
 Modern software tools help to make this process very easy. Here
 is the real world example of the small RPC system(written using Python
-programming language) that proves this\cite{xmlrpclib_python_example}:
+programming language) that proves this~\cite{xmlrpclib_python_example}:
 
 \begin{listing}[H]
 \begin{minted}[frame=lines,
@@ -142,7 +142,7 @@ works fine.
 However, in a large distributed system, it is common that multiple
 machine types are present.
 Each machine often has its own representation for
-numbers, characters, and other data items\cite{tanenbaum07}.
+numbers, characters, and other data items~\cite{tanenbaum07}.
 
 There are several representations of character data used in computer systems:
 one byte characters(ASCII\footnote{ American Standard Code for Information
@@ -177,7 +177,7 @@ communication between software components that do not share same language and
 platform.
 An interface is firstly specified in an IDL and then compiled into a
 client stub and a server stub. RPC-based middleware systems
-offer an IDL to support application development\cite{tanenbaum07}.
+offer an IDL to support application development~\cite{tanenbaum07}.
 
 In most cases communication scheme is well known and some standard
 message protocol is used. Previous example of RPC system, that was written using
@@ -204,11 +204,11 @@ JSON-RPC version 2.0 will be used in this work as primary RPC solution in the im
 It is based on \gls{JSON} object serialization (see \ref{sec:json_description} section to see information about JSON or visit \url{http://www.json.org/})
 and uses JSON format for  transferring messages between client and the server.
 
-JSON-RPC is a lightweight RPC solution that is designed to be simple \cite{jsonrpc_spec}.
+JSON-RPC is a lightweight RPC solution that is designed to be simple ~\cite{jsonrpc_spec}.
 It defines how client and server should communicate between each other. 
 To make a RPC call client needs to send Request object, server need to response with a Response object.
 
-The specification \cite{jsonrpc_spec} defines Request object like a stucture with following members:
+The specification ~\cite{jsonrpc_spec} defines Request object like a stucture with following members:
 \begin{itemize}
 \item \textbf{jsonrpc} -- A String specifying the version of the JSON-RPC protocol. This must be exactly "2.0".
 \item \textbf{method} -- A String containing the name of the method to be invoked.
@@ -287,7 +287,7 @@ rpc call with invalid Request object:
      "id": null}
 
 \end{minted}
-\caption{JSON-RPC examples of client-server communication \cite{jsonrpc_spec}}
+\caption{JSON-RPC examples of client-server communication ~\cite{jsonrpc_spec}}
 \label{lst:jsonrpc_example}
 \end{listing}                                                                                                             
 
@@ -300,8 +300,8 @@ main transport}.
 XML
 
 \subsubsection{RPC summary}
-This section described one another posible way of \gls{IPC}. RPC is used in many
-distributed systems in obvious or imlicit way. It provides mechanism for calling 
+This section described one another possible way of \gls{IPC}. RPC is used in many
+distributed systems in obvious or implicit way. It provides mechanism for calling 
 subroutines or procedures on another computer or system. 
 Communication in RPC is based on message passing.
 The Client sends to the server a message containing request for method call.

@@ -25,8 +25,16 @@ system prototype.
 I have implemented this using collected features from literature and web
 resources.
 
+This design is not based on any specific transport protocol.
+Any physical protocol, that is able to deliver characters or bytes, can be used with this application.
+There were no any physical and logical protocol requirements set for this prototype solution and the technologies, that company will use in future, are not specified.
+Therefore, it is designed as portable as possible and operates only with character data.
+It contains an simple example of data link layer protocol, that encapsulates RPC messages. 
+Whole communication is transferred over serial line.
+
+
 First section below covers the general architecture of implemented service.
-Next come details about embedded server, which contatain the description about
+Next come details about embedded server, which contain the description about
 hardware and software platform used, program architecture and data flow.
 There is also an implementation of the client side application library (also
 called client stub) below.

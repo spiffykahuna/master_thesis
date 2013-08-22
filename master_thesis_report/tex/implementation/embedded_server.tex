@@ -260,7 +260,7 @@ These tasks could have priorities, which allows to execute essential tasks befor
 At the moment of the task context switch scheduled decides which task will be next according to the priority of available tasks.
 Task with a higher priority will be triggered next. 
 Scheduler should also be able to give the execution time to tasks with lower priorities, otherwise the will be never triggered because tasks with higher priorities will be launched instead.
-Tasks with the same priorities are executed one by one in the loop\cite{barry2010using}.
+Tasks with the same priorities are executed one by one in the loop~\cite{barry2010using}.
 Such scheduling algorithm gives the illusion that tasks are running in parallel.
 Parallel task execution requires protection of common and global hardware resources. 
 For example, the situation when some task can change a global variable, while another task is reading it and makes some decision.
@@ -291,7 +291,7 @@ This operating system was chosen for the embedded service application implementa
 The reason is that this operating system has low entry level for the beginners and good documentation.
 In addition to that i have found and read a book \cite{barry2010using}, which is a great introduction to FreeRTOS and embedded multitask systems programming. 
 
-FreeRTOS has several features described below\cite{FreeRTOS_website}:
+FreeRTOS has several features described below~\cite{FreeRTOS_website}:
 \begin{itemize}
 \item Pre-emptive scheduling option 
 \item Co-operative scheduling option
@@ -719,7 +719,7 @@ or not. Message gets splitted into two message packets.
 I started to improve this solution and the next step was usage of ASCII control
 characters like EOT(end of transmission, value \texttt{0x04}), ETB (end of
 transmission block, value \texttt{0x17}) and similar. Using these  control
-characters you can detect messages in incoming stream, but this does not help in case of transfering data
+characters you can detect messages in incoming stream, but this does not help in case of transferring data
 bytes, which can be any value between \texttt{0x00} and \texttt{0xFF}.
 
 

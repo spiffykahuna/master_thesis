@@ -32,7 +32,7 @@ top of HTTPS (secure sockets)\cite{ws_technologies_state_of_the_art}.
 REST is a set of principles that define how Web standards, such as HTTP and
 \gls{URI}s, are supposed to be used.
 
-The  five key principles of REST are\cite{rest_brief_intro}:
+The  five key principles of REST are~\cite{rest_brief_intro}:
 \begin{itemize}
   
  \item Give every “thing” an ID
@@ -47,7 +47,7 @@ The  five key principles of REST are\cite{rest_brief_intro}:
 
 Every resource need to be reachable and identifiable. You need to access it
 somehow, therefore you need an identificator for the resource. World Wide Web
-uses \gls{URI} identificators for that purpuse. Resource \gls{URI} could look like:
+uses \gls{URI} identificators for that purpose. Resource \gls{URI} could look like:
 
 \begin{listing}[H]
 \begin{minted}[frame=lines,
@@ -59,7 +59,7 @@ http://example.com/processes/salary-increase-234
 http://example.com/orders/2007/11
 http://example.com/products?color=green
 \end{minted}
-\caption{Resource identificator examples \cite{rest_brief_intro}}
+\caption{Resource identificator examples ~\cite{rest_brief_intro}}
 \label{lst:uri_example}
 \end{listing}
 
@@ -90,7 +90,7 @@ choice: to get product information or to fetch customer details.
    <customer ref='http://example.com/customers/1234' /> 
 </order> 
 \end{minted}
-\caption{Example of linked resources\cite{rest_brief_intro}}
+\caption{Example of linked resources~\cite{rest_brief_intro}}
 \label{lst:linked_uri_example}
 \end{listing}
  
@@ -100,7 +100,7 @@ interlinked hypertext documents accessed via the Internet.\cite{wikipedia:WWW}}
 
 \paragraph{Use standard methods} ~\\
 
-There should be a standard inteface for accessing the resource object.
+There should be a standard interface for accessing the resource object.
 REST relies on HTTP protocol, which has definitions of some standard request
 methods:
 GET, PUT, POST and DELETE.
@@ -143,7 +143,7 @@ GET, PUT, POST and DELETE.
 	    \tabularnewline
 		\hline	  
 	\end{tabularx} 
-	\caption{RESTful web API HTTP methods \cite{wikipedia:REST}}
+	\caption{RESTful web API HTTP methods ~\cite{wikipedia:REST}}
 	\label{tbl:rest_http_api}
 \end{table}
 
@@ -198,7 +198,7 @@ clients to the system.
 Stateless communication helps to design more scalable systems.
 RESTful server does not  keep any communication context. Each incoming  request
 is new for the server and there should be enough information to necessary to
-understand the request\cite{Fielding2000}.
+understand the request~\cite{Fielding2000}.
 
 Server could contain all the information about each connected client, but it
 requires a meaningful amount of resources. Server need to keep and control the
@@ -210,16 +210,16 @@ is on the client side. Client controls the flow of the application and
 changes its state by making requests to server. Server does not make any work
 while clients are not sending requests, it starts to work only on demand.
 
-You can easilly switch between different servers if there is no any client
+You can easily switch between different servers if there is no any client
 context on the server side. Imagine a system with some amount of application
 servers and load balancer server in it. All application servers run the same
 application. While some servers are making hard work, another servers may be
 idle.
-Load balancer have a posibility to route new incoming requests to a server,
+Load balancer have a possibility to route new incoming requests to a server,
 which has a smallest workload, because of the absence of application context
 between client and server. Even parallel request of the same client could be
 handled by different servers. Such system become more scalable and new server
-nodes can be easilly added or removed.
+nodes can be easily added or removed.
 
 The main disadvantage of such approach is the decrease of network performance.
 Client needs to repeat sending the same session data on every new request,
@@ -229,7 +229,7 @@ because that context data cannot be stored on the server.
 \subsubsection{Implementation constraints}
 
 The REST architectural style can be described by the following six constraints
-applied to the elements in this architecture\cite{Fielding2000}:
+applied to the elements in this architecture~\cite{Fielding2000}:
 \begin{enumerate}
   \item \textbf{Client-Server}
   Separation of concerns is the principle behind the client-server constraints.
@@ -242,7 +242,7 @@ applied to the elements in this architecture\cite{Fielding2000}:
   any application context on the server and allows to build more scalable server
   components. Each new request contains enough information to process it, but
   such technique increases network traffic by sending repeating session
-  invormation over the network again and again.
+  information over the network again and again.
   \item \textbf{Cache}
   This constraint improves network efficiency. The data in the server response
   may be marked as cacheable or non-cacheable. Client is able to store cachable
@@ -251,7 +251,7 @@ applied to the elements in this architecture\cite{Fielding2000}:
   data integrity.
   \item \textbf{Uniform Interface}
   System becomes more universal if the interface of all components is the same.
-  You can add new and replace existing componens more easilly. Component
+  You can add new and replace existing components more easily. Component
   implementations are decoupled from the services they provide, system
   components are more independent. 
   \item \textbf{Layered System} style allows an architecture to be composed of hierarchical
@@ -270,7 +270,7 @@ applied to the elements in this architecture\cite{Fielding2000}:
   separated and they don't) and reduce communication performance by introducing
   new bottleneck at the layer boundaries.
   \item \textbf{Code-On-Demand}
-  This is an optiona constraint. REST allows client functionality to be extended
+  This is an optional constraint. REST allows client functionality to be extended
   by downloading and executing code in the form of applets or scripts. Not all
   features on a client side may be implemented. Your system could download
   execution instructions from the server. This is how JavaScript and Java
@@ -284,7 +284,7 @@ applied to the elements in this architecture\cite{Fielding2000}:
 \begin{center}
  \begin{figure}[h]
 	\includegraphics[width=\textwidth]{../images/background/Uniform-Layered-Client-Cache-Stateless-Server.png}
-	\caption{Uniform-Layered-Client-Cache-Stateless-Server \cite{Fielding2000} }
+	\caption{Uniform-Layered-Client-Cache-Stateless-Server ~\cite{Fielding2000} }
 	\label{fig:Uniform-Layered-Client-Cache-Stateless-Server}
  \end{figure}
 \end{center}
@@ -298,7 +298,7 @@ You can use all your creativity in a system design and you are only limited with
  RESTful applications maximize the use of the existing, well-defined interface
 and other built-in capabilities provided by the chosen network protocol,
 and minimize the addition of new application-specific features on top of
-it\cite{rest_brief_intro}. Therefore RESTful Web services seamlessly integrate with the
+it~\cite{rest_brief_intro}. Therefore RESTful Web services seamlessly integrate with the
 Web and are straightforward and simple way of achieving a global network of
 smart things.
 
