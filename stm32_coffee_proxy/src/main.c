@@ -24,6 +24,7 @@
 #include "strbuffer.h"
 
 #include "transport/transport.h"
+#include "coffee_machine_lib/coffee_machine_lib.h"
 
 
 
@@ -87,7 +88,7 @@ int main(void)
 		logger(LEVEL_ERR, "Unable to create USB reader and writer. System has stopped.\n\r");
 		return 1;
 	}
-
+	init_coffee_machine();
       /* Start the scheduler. */
   	vTaskStartScheduler();
 
