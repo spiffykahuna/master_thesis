@@ -1,4 +1,9 @@
 \subsection{Web Services architecture}
+Web Services are the most popular technology for implementing
+service-oriented software nowadays. 
+Next section will focus on this framework
+and on the main features that any SOA implementation should have.
+
 \subsubsection{Web Services Model}
 The Web Services architecture is based on the interactions between three
 roles \cite{Kreger2001-WSC}:
@@ -26,12 +31,12 @@ and get binding information from them. Binding can be static and dynamic.
 Registry is needed more for dynamic binding where client can get service info at
 the runtime, extract necessary functional methods and execute them on the
 server. During static binding service description may be directly delivered to
-the client at the development phase, for example using usual file, \gls{FTP}
+the client at the development phase, for example using usual file, FTP
 server, Web site, email or any other file transfer protocol.
 There are also available special protocols, named Service discovery protocols
 (SDP), that allow automatic detection of devices and services on a network. One
 of them is the \gls{UDDI} protocol, which is also was mentioned on
-\autoref{fig:ws_model}. \gls{UDDI} is shortly described in
+\autoref{fig:ws_model}. UDDI is shortly described in
 \nameref{sec:ws_protocol_stack} section.
 
 \paragraph{\textbf{Artifacts of a Web Service}}
@@ -72,23 +77,23 @@ We can describe these different layers as follows:
 \begin{itemize}
   \item \textbf{Communications} - This layer represents a transport between
   communication parties( service provider, client, service registry). This layer
-  can be any network protocol like: \gls{HTTP}, \gls{FTP}, \gls{SMTP} or any
+  can be any network protocol like: HTTP, FTP, SMTP or any
   other suitable transport protocol. If Web service is used in the Internet, the
-  transport protocol in most cases will be \gls{HTTP}. In internal networks there is the opportunity to agree upon the use of alternative
+  transport protocol in most cases will be HTTP. In internal networks there is the opportunity to agree upon the use of alternative
 network technologies.
 
 \item \textbf{Messages} - In order to communicate with a service, client should
-send a message. Messages are \gls{XML} documents with different structure.
-\gls{SOAP} protocol defines how these messages should be structured.
-\gls{SOAP} is implementation independent and may be composed using any
+send a message. Messages are XML documents with different structure.
+SOAP protocol defines how these messages should be structured.
+SOAP is implementation independent and may be composed using any
 programming language. Protocol specification and message descriptions can be
 found in document SOAP Version 1.2 Part 1: Messaging Framework (Second
 Edition)\cite{soap_protocol_spec}.
 
 \item \textbf{Descriptions} - This layer contains the definition of service
 interface (see also \autoref{itm:service_description_artifact}). Web Services
-use \gls{WSDL} language for describing the functionality offered by a service.
-\gls{WSDL} file is the contract of service, which contains information about how
+use WSDL language for describing the functionality offered by a service.
+WSDL file is the contract of service, which contains information about how
 the service can be called, what parameters it expects, and what data structures it returns.
 It is similar to method signatures in different programming languages.
 
@@ -96,8 +101,8 @@ It is similar to method signatures in different programming languages.
 about how service could be published and discovered. Web services are meaningful
 only if potential users may find information sufficient to permit their execution.
 Service as a software module has its own lifecycle, it needs to be deployed and deleted somehow.
-Traditional Web Services use \gls{UDDI}  mechanism to register and locate web
-service applications. \gls{UDDI} was originally proposed as a core Web service
+Traditional Web Services use UDDI  mechanism to register and locate web
+service applications. UDDI was originally proposed as a core Web service
 standard.
 
 \item \textbf{Security} - Threats to Web services include threats to the host
@@ -111,7 +116,7 @@ It is a member of the WS-* family of web service specifications and was
 published by OASIS(Organization for the Advancement of Structured Information
 Standards, \url{https://www.oasis-open.org/}). \cite{wikipedia:WS-Security}}
 ~protocol to solve security problems.
-This protocol specifies how \gls{SOAP} messages may be secured.
+This protocol specifies how SOAP messages may be secured.
  
 
 
@@ -135,13 +140,13 @@ is great for the integration between different IT systems.
 \end{itemize}
 
 Most of mentioned protocols are recommended by W3C Consortium and are production
-standards. Lots of \gls{SOA} information systems use WS-* protocols for
-enterprise level services. Mostly these protocols are based on \gls{XML} and
-\gls{SOAP}. One example of such protocol is the \gls{WSDL} service description.
+standards. Lots of SOA information systems use WS-* protocols for
+enterprise level services. Mostly these protocols are based on XML and
+SOAP. One example of such protocol is the WSDL service description.
 
 \subsubsection{Service Description and Service Contract}
 \label{sec:ws_service_contract}
-\gls{WSDL} file is an \gls{XML} document which has specification of  service contract.
+WSDL file is an XML document which has specification of  service contract.
 As it was mentioned earlier(\autoref{itm:service_description_artifact}) contract should be shipped with a component and should  tell the
 client what input does service expect, and what output it will produce if specified input conditions are met. 
 Contract may be a primary specification and it should be enough for a client to start using a service.
@@ -152,7 +157,7 @@ If header file is verbose enough, there is no need to use the documentation. You
 
 
 
-Regular \gls{WSDL} document contains some necessary elements
+Regular WSDL document contains some necessary elements
 ~\cite{wsdl_language_spec, wikipedia:WSDL}: Service, Endpoint, Binding,
 Interface and Message Types. \autoref{tbl:wdsl_members} describes them in
 details.
@@ -160,6 +165,8 @@ details.
 
 \begin{table}[h]
 	\centering	
+	\caption{Objects in WSDL 2.0~\cite{wsdl_language_spec, wikipedia:WSDL} }
+	\label{tbl:wdsl_members}
 	\begin{tabular}[h]{|l|p{10cm}|}
 		\hline
 		\textbf{WSDL 2.0 Term} & 
@@ -204,8 +211,6 @@ details.
 	    	\tabularnewline
 		\hline	  
 	\end{tabular} 
-	\caption{Objects in WSDL 2.0~\cite{wsdl_language_spec, wikipedia:WSDL} }
-	\label{tbl:wdsl_members}
 \end{table}
  
 \footnotetext{XML schema is the XML document, that
@@ -220,30 +225,30 @@ To be documentation more complete, you may specify an external link to any addit
 
 You can see the example of WSDL service contract in the appendix 
 \autoref{sec:appendix_service_contracts}. This example is from the official
-\gls{WSDL} standard ~\cite{wsdl_language_spec}. It describes a hotel reservation
+WSDL standard ~\cite{wsdl_language_spec}. It describes a hotel reservation
 service, where you can book you a room in a fictional hotel named GreatH. For simplicity it describes
 only one method - the \textit{opCheckAvailability} operation. This description
 is quite verbose to understand what it is about. There is input and output
 object type declaration. It also has an output error response declaration and
 if some error occurs during client request processing, server should send a
 message of specified kind.
-These \gls{XML} object types are declared in different \textit{namespaces} ( see
-xmlns:*	declarations at the start of \gls{WSDL} document). This gives an ability
+These XML object types are declared in different \textit{namespaces} ( see
+xmlns:*	declarations at the start of WSDL document). This gives an ability
 to group domain types into one separate file and your main description
 file would not be overcrowded.
 
 
-\gls{WSDL} definition of the service does not contain any additional
+WSDL definition of the service does not contain any additional
 information about service hosting company and its products. At the moment when
 you get a service contract, you already know what company provides this service and what
 for this service was made. There is assumption that service provider somehow
 gave you this service contract. Another possibility to get the service
 description is to use a special \textit{directory} or catalog, where you can
 find all information about company you are dealing with. Web Services
-architecture include \gls{UDDI} mechanism for that particular purpose.
+architecture include UDDI mechanism for that particular purpose.
 
-Official \gls{UDDI} Version 3.0.2 Technical Specification draft~\cite{uddi_spec}
-defines \gls{UDDI} as follows:
+Official UDDI Version 3.0.2 Technical Specification draft~\cite{uddi_spec}
+defines UDDI as follows:
 \begin{quotation}
 \textit{
  The focus of Universal Description Discovery & Integration (UDDI) is the
@@ -257,17 +262,17 @@ organizations, and other Web services providers,
 }
 \end{quotation}
 
-\gls{UDDI} mechanism uses \gls{SOAP} messages for client-server communication. 
-Service provider publishes the \gls{WSDL} to \gls{UDDI} registry and client can
+UDDI mechanism uses SOAP messages for client-server communication. 
+Service provider publishes the WSDL to UDDI registry and client can
 find this service by sending messages to the registry ( see also 
-\autoref{fig:ws_model}). \gls{UDDI} specification defines the communication
-protocol between \gls{UDDI} registry and other parties.
+\autoref{fig:ws_model}). UDDI specification defines the communication
+protocol between UDDI registry and other parties.
 
 
-\gls{UDDI} registry is a storage directory for various service contracts, where
-lots of companies hold their service descriptions. \gls{WSDL} contracts may 
-also be published on a company website using direct link to the \gls{WSDL} file,
-but \gls{UDDI} contains them all in one place with the ability to search and
+UDDI registry is a storage directory for various service contracts, where
+lots of companies hold their service descriptions. WSDL contracts may 
+also be published on a company website using direct link to the WSDL file,
+but UDDI contains them all in one place with the ability to search and
 filter.
 You have a choice and there is a possibility to find most suitable service
 from all provided companies and services.
@@ -287,16 +292,16 @@ benefits~\cite{ws_technologies_state_of_the_art}:
   \item Security
 \end{itemize}
 
-WS-* uses the \gls{HTTP} protocol as transport medium for exchanging messages
-between web services. \gls{SOAP} messages can be transferred using another
-protocol (\gls{SMTP}, \gls{TCP}, or \gls{JMS}), which can be more suitable to
-your system environment than \gls{HTTP}.
+WS-* uses the HTTP protocol as transport medium for exchanging messages
+between web services. SOAP messages can be transferred using another
+protocol (\gls{SMTP}, TCP, or \gls{JMS}), which can be more suitable to
+your system environment than HTTP.
 
 One another fundamental characteristic of web services is the service
 description and contract design. Contract specification gives you the ability to
 reuse service functionality in many different and separate applications.
 Contract in Web Services is general standardized description of a service in
-universal data format (\gls{XML} and \gls{WSDL}), that is platform and programming language
+universal data format (XML and WSDL), that is platform and programming language
 independent. Service description is only the interface and the implementation
 of that interface may be unknown by the service client. There is possibility to
 transparently change (totally or partially) implementation details of a service.
@@ -305,23 +310,23 @@ transparently change (totally or partially) implementation details of a service.
 The main reason why Web Services standards are bad in context of embedded
 systems is the performance.
 Web services impose additional overhead on the server since they require the
-server to parse the \gls{XML} data in the request. Web Services use \gls{SOAP}
-messages, which are structured \gls{XML} data, for client-server communication.
+server to parse the XML data in the request. Web Services use SOAP
+messages, which are structured XML data, for client-server communication.
 Some experiments~\cite{1182978, 5470528} show that performance of SOAP transfer
-is more than 5 times slower compared to others \gls{SOA} implementations, like
+is more than 5 times slower compared to others SOA implementations, like
 CORBA~\footnote{The Common Object Request Broker Architecture (CORBA) is a
 standard defined by the Object Management Group (OMG) that enables software
 components written in multiple computer languages and running on multiple
 computers to work together (i.e., it supports multiple
 platforms).\cite{wikipedia:CORBA}} or custom made protocol messages. If you
 start reading WS-* standards one by one, you will ensure that all they are
-interconnected using idea of \gls{XML}, \gls{SOAP} and \gls{HTTP}. 
+interconnected using idea of XML, SOAP and HTTP. 
 
 
 Another statement against Web Services is that these standards are too
 complicated and their documentation is hard to
 understand. Document ~\cite{dguinard-rest-vs-ws} contains a use case survey
-about two most common implementations of SOA: Web Services and \gls{REST}. Most of people
+about two most common implementations of SOA: Web Services and REST. Most of people
 in the survey agreed that WS-* standards is not easy to learn and adapt. WS-*
 suits better for highly integrated business solutions, but not for simple
 applications, with atomic functionality.
@@ -341,12 +346,8 @@ is a \textit{"WS-problem"} standard for it.
 
 This topic described Web Service architecture features. There are lots of
 useful principles like portability, interface description and message exchange
-patterns, but the WS-* implementation is not suitable for resource-constrained
-hardware.
-
-
-The \gls{REST} has some advantages over WS-*. Next section will shortly
-describe the main principles of \gls{REST} approach. 
+patterns, but the WS-* implementation is not very suitable for resource-constrained
+hardware, because of implementation overhead.
 
 
 

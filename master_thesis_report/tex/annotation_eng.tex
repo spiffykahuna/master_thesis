@@ -11,10 +11,17 @@ This paper has a research about available service oriented architecture technolo
 
 There is also an implementation of a small embedded service and corresponding client.
 Service part is implemented on STM32F1 family ARM Cortex-M3 microcontroller and runs FreeRTOS operating system.
-Client part is realized as Java library RPC stub and Android demo application.
+It controls a remote object, that is connected over serial line and uses some closed protocol. 
+This server device is a bridge between client and controlled remote object. 
+It translates all communication between them and can be used to integrate proprietary or legacy system into existing environment. 
+
+Client part is realized as Java RPC stub library  and Android demo application, which is capable to execute some functions on the remote object.
+An example of controlled device here is the coffee machine, which can prepare a cup of coffee for remote client.
 
 Client and server are communicating using lightweight JSON-RPC protocol over Bluetooth wireless communication line.
 Some few RPC call functions are implemented to show the capabilities of such client-server architecture.
+
+This work contains several possibilities how to organize communication between different embedded systems.
 
 \vspace{\fill}
 \clearpage

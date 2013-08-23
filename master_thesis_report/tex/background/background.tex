@@ -45,7 +45,7 @@ application development.}
 ~\cite {lws_milanovic.pdf}
 \end{quote} 
 
-The purpose of \gls{SOA} is to allow easy cooperation of a large number of
+The purpose of SOA is to allow easy cooperation of a large number of
 computers that are connected over a network.
 Every computer can run one or more services, each of them implements one
 separate action. This may be a simple business task. Clients can make calls
@@ -69,14 +69,14 @@ Google, Bing, Yandex provide lots of alternatives how to retrieve data without
 using regular browser( search , geolocation and maps,  spell check \gls{API}s )
 
 There are available many technologies which can be used to implement
-\gls{SOA}~\cite{wikipedia:SOA}:
+SOA~\cite{wikipedia:SOA}:
 
 \begin{itemize}
   \item \label{itm:soa_technologies} \textbf{Web Services}
   \item{\textbf{SOAP}} Simple Object Access Protocol, is a protocol specification for exchanging structured information in the implementation of Web Services in computer networks.
   \item{\textbf{RPC}} Remote procedure call is an inter-process communication that allows
   a computer program to cause a subroutine or procedure to execute in another address space (commonly on another computer on a shared network) without the programmer explicitly coding the details for this remote interaction. 
-  \item{\textbf{REST}} Representational state transfer is a style of software architecture for distributed systems such as the World Wide Web. REST has emerged as a predominant web API design model.
+  \item{\textbf{REST}} Representational state transfer is a style of software architecture for distributed systems such as the World Wide Web. \gls{REST} has emerged as a predominant web API design model.
   \item{\textbf{DCOM}} Distributed Component Object Model is a proprietary Microsoft technology for communication among software components distributed across networked computers. 
   \item{\textbf{CORBA}}  Common Object Request Broker Architecture enables separate pieces of software written in different
     languages and running on different computers to work with each other like a single application or set of services. Web services
@@ -95,16 +95,13 @@ There are available many technologies which can be used to implement
 \end{itemize}
 
 This list can be continued. Most of these technologies are inspired by idea
-of \gls{RPC}. An \gls{RPC} is initiated by the client, which sends a request
+of \gls{RPC}. An RPC is initiated by the client, which sends a request
 message to a known remote server to execute a specified procedure with specified
 parameters. The remote server sends a response to the client, and the application continues its process.
 This idea is described in details in \autoref{sec:rpc}.
 
-
-
-Web Services are the most popular technology for implementing
-service-oriented software nowadays. Next section will focus on this framework
-and on the main features that any \gls{SOA} implementation should have.
+Some of these technologies will be described below. 
+There are lots of great ideas how to organize communication between different systems.
 
 \input{background/ws_arch.tex}
 \input{background/rest.tex}
@@ -179,7 +176,7 @@ and scalable.
 REST and Web services have different ideas. REST is based on resources and their
 representation, while Web Services use messages to send data and call remote
 methods between server and client. This technology is based on very simple idea
-of \gls{RPC}. RPC has some essential benefits over REST and
+of RPC. RPC has some essential benefits over REST and
 WS-* technologies: it does not require traditional transport like HTTP, TCP,
 Ethernet or Wi-fi. It can be implemented using any radio link, serial line or
 any other suitable transport, that is able to deliver response and request
@@ -198,7 +195,8 @@ work. These are ideas that were kept in mind while developing of embedded
 service system was in progress.
 
 \begin{longtabu} to \textwidth {|X|X|}
-	
+	\caption{Ideas about embedded service}
+	\label{tbl:service_ideas}	
 \hline 
 \multicolumn{1}{|l|}{\textbf{Feature}} & 
 \multicolumn{1}{l|}{\textbf{Description}} \\ 
@@ -222,7 +220,7 @@ service system was in progress.
 		Transport independent solution
 		&
 		Company did not defined final communication yet.
-		This may be one of these: UART, Bluetooth, RF, HTTP.
+		This may be one of these: UART, Bluetooth, \gls{RF}, HTTP.
 		In this work i implement only first prototype of such system and 
 		requirements are about to be changed in future. 
 		Therefore i need to implement a portable solution that could be quickly ported
@@ -267,8 +265,7 @@ service system was in progress.
 		\tabularnewline
 		\hline	  
 
-	\caption{Ideas about embedded service}
-	\label{tbl:service_ideas}
+
 \end{longtabu}
 
 \footnotetext{internet resource \url{http://www.simple-is-better.org/rpc/} contains a comparison of different message formats)}

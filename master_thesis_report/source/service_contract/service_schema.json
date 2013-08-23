@@ -1,126 +1,141 @@
 {
-	"$schema": "http://json-schema.org/draft-04/schema#",
-	"id" : "http://ttu.ee/denis_konstantinov/embedded_service.schema",
-	"description" : "This is a embedded service of a coffee machine.",
-	"version" : "0.1",
-	"operations" : {
-		"system.getLimits" : {
-			"description" : "Get limits of physical capabilities of a sistem.",
-			"type" : "method",
-			"params" : null,
-			"returns" : {
-				"description" : "Limits of JSON-RPC server",
-				"type" : "object",
-				"properties": {
-					"jsonMaxDocLength": {
-						"description" : "Maximum length of a JSON document string that could be sent to the server",
-						"type": "number",
-						"minimum" : 0
-					},
-					"maxIncomeMessages": {
-						"description" : "Maximum simultaneous messages that server could process",
-						"type": "number",
-						"minimum" : 1
-					}
-				},
-				"required": ["jsonMaxDocLength", "maxIncomeMessages"]
-			}
-		},
-		"system.help": {
-			"description" : "Prints this help document.",
-			"type" : "method",
-			"params" : null,
-			"returns" : {
-				"description" : "Full service description",
-				"type" : "string"               
-			}
-		},
-		"machine.getInfo" : {
-			"description" : "Get information about current coffee machine. This returns some machine parameters",
-			"type" : "method",
-			"params" : null,
-			"returns" : {
-				"description" : "Coffee machine version info",
-				"type" : "object",
-				"properties": {
-					"machineName": { "type": "string" },
-					"machineFirmvareVersion": {
-						"type": "string"
-					}
-				},
-				"required": ["machineName", "machineFirmvareVersion"]
-			}
-		},
-		"machine.getProducts" : {
-			"description" : "Get list of products that current machine can prepare.",
-			"type" : "method",
-			"params" : null,
-			"returns" : {
-				"description" : "Coffee machine version info",              
-				"type": "array",
-				"minItems": 0,
-				"items": { "$ref": "#/definitions/Product" },
-				"uniqueItems": true                 
-			}
-		},
-		"machine.orderProduct": {
-			"description" : "Order product of your interest. Specify product identificator",
-			"type" : "method",
-			"params" : [ { "name": "id", "type": {"$ref": "#/definitions/positiveInteger"}, "required": true} ],
-			"returns" : {
-				"description" : "Product order status status of product",               
-				"enum": [ "PRODUCT_STATUS_STARTED", "PRODUCT_STATUS_FAILED", "PRODUCT_STATUS_BUSY" ]                
-			}
-		},
-		"machine.getProductStatus": {
-			"description" : "Get status of ordered product. Specify product identificator",
-			"type" : "method",
-			"params" : [ { "name": "id", "type": {"$ref": "#/definitions/positiveInteger"}, "required": true} ],
-			"returns" : {
-				"description" : "Current status of product",                
-				"enum": [ "PRODUCT_STATUS_STARTED", "PRODUCT_STATUS_IN_PROGRESS", "PRODUCT_STATUS_FINISHED", "PRODUCT_STATUS_FAILED" ]              
-			}
-		}
-		"machine.cancelProduct": {
-			"description" : "Order product of your interest. Specify product identificator",
-			"type" : "method",
-			"params" : [ { "name": "id", "type": {"$ref": "#/definitions/positiveInteger"}, "required": true} ],
-			"returns" : {
-				"description" : "Status of cancel operation",               
-				"enum": [ "PRODUCT_STATUS_STARTED", "PRODUCT_STATUS_FAILED", "PRODUCT_STATUS_FINISHED" ]                
-			}
-		}
-	},
-	"definitions": {
-		"Product": {
-			"description": "The product of current coffee machine.",
+"$schema": "http://json-schema.org/draft-04/schema#",
+"id" : "http://ttu.ee/denis_konstantinov/embedded_service.schema",
+"description" : "This is a embedded service of a coffee machine.",
+"version" : "0.1",
+"operations" : {
+	"system.getLimits" : {
+		"description" : "Get limits of physical capabilities of a sistem.",
+		"type" : "method",
+		"params" : null,
+		"returns" : {
+			"description" : "Limits of JSON-RPC server",
 			"type" : "object",
 			"properties": {
-				"id": { "$ref": "#/definitions/positiveInteger" },
-				"name": { "type": "string" },
-				"price": { "$ref": "#/definitions/Price" },
-				"image": {
-					"description": "Base64 encoded image of a product",
+				"jsonMaxDocLength": {
+					"description" : "Maximum length of a JSON document string 
+									that could be sent to the server",
+					"type": "number",
+					"minimum" : 0
+				},
+				"maxIncomeMessages": {
+					"description" : "Maximum simultaneous messages that server 
+									could process",
+					"type": "number",
+					"minimum" : 1
+				}
+			},
+			"required": ["jsonMaxDocLength", "maxIncomeMessages"]
+		}
+	},
+	"system.help": {
+		"description" : "Prints this help document.",
+		"type" : "method",
+		"params" : null,
+		"returns" : {
+			"description" : "Full service description",
+			"type" : "string"               
+		}
+	},
+	"machine.getInfo" : {
+		"description" : "Get information about current coffee machine. 
+						This returns some machine parameters",
+		"type" : "method",
+		"params" : null,
+		"returns" : {
+			"description" : "Coffee machine version info",
+			"type" : "object",
+			"properties": {
+				"machineName": { "type": "string" },
+				"machineFirmvareVersion": {
 					"type": "string"
 				}
 			},
-			"required": ["id", "name"]          
-		},
-		"Price": {
-			"type" : "object",
-			"properties": {
-				"amount": { "$ref": "#/definitions/positiveNumber" },
-				"currency":  { "enum": [ "EUR", "USD", "LTL", "LVL", "RUB", "SEK" ] }               
-			},
-			"required": ["amount", "currency"]
-		},
-		"positiveInteger": {
-			"type": "integer",
-			"minimum": 0
-		},
-		"positiveNumber": {
-			"type": "number",
-			"minimum": 0.0
+			"required": ["machineName", "machineFirmvareVersion"]
+		}
+	},
+	"machine.getProducts" : {
+		"description" : "Get list of products that current machine can prepare.",
+		"type" : "method",
+		"params" : null,
+		"returns" : {
+			"description" : "Coffee machine version info",              
+			"type": "array",
+			"minItems": 0,
+			"items": { "$ref": "#/definitions/Product" },
+			"uniqueItems": true                 
+		}
+	},
+	"machine.orderProduct": {
+		"description" : "Order product of your interest.
+						Specify product identificator",
+		"type" : "method",
+		"params" : [ { 	"name": "id", 
+						"type": {"$ref": "#/definitions/positiveInteger"},
+						"required": true} ],
+		"returns" : {
+			"description" : "Product order status status of product",               
+			"enum": [ "PRODUCT_STATUS_STARTED",
+					  "PRODUCT_STATUS_FAILED", 
+					  "PRODUCT_STATUS_BUSY" ]                
+		}
+	},
+	"machine.getProductStatus": {
+		"description" : "Get status of ordered product.
+						Specify product identificator",
+		"type" : "method",
+		"params" : [ { "name": "id",
+						"type": {"$ref": "#/definitions/positiveInteger"},
+						"required": true} ],
+		"returns" : {
+			"description" : "Current status of product",                
+			"enum": [ "PRODUCT_STATUS_STARTED", "PRODUCT_STATUS_IN_PROGRESS", 
+					 "PRODUCT_STATUS_FINISHED", "PRODUCT_STATUS_FAILED" ]              
 		}
 	}
+	"machine.cancelProduct": {
+		"description" : "Order product of your interest.
+						Specify product identificator",
+		"type" : "method",
+		"params" : [ { "name": "id", 
+						"type": {"$ref": "#/definitions/positiveInteger"},
+						"required": true} ],
+		"returns" : {
+			"description" : "Status of cancel operation",               
+			"enum": [ "PRODUCT_STATUS_CANCELLED", "PRODUCT_STATUS_FAILED" ]                
+		}
+	}
+},
+"definitions": {
+	"Product": {
+		"description": "The product of current coffee machine.",
+		"type" : "object",
+		"properties": {
+			"id": { "$ref": "#/definitions/positiveInteger" },
+			"name": { "type": "string" },
+			"price": { "$ref": "#/definitions/Price" },
+			"image": {
+				"description": "Base64 encoded image of a product",
+				"type": "string"
+			}
+		},
+		"required": ["id", "name"]          
+	},
+	"Price": {
+		"type" : "object",
+		"properties": {
+			"amount": { "$ref": "#/definitions/positiveNumber" },
+			"currency":  { "enum": [ "EUR", "USD", "LTL", "LVL", "RUB", "SEK" ] }               
+		},
+		"required": ["amount", "currency"]
+	},
+	"positiveInteger": {
+		"type": "integer",
+		"minimum": 0
+	},
+	"positiveNumber": {
+		"type": "number",
+		"minimum": 0.0
+	}
+}
 }

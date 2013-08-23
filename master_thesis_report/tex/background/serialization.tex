@@ -47,7 +47,8 @@ and binary formats. Both groups have their own advantages and disadvantages.
 
 
 \begin{longtabu} to \textwidth {|L|X|X|}
-	
+	\caption{Comparison of binary and human-readable serialization formats}
+	\label{tbl:data_ser_formats}	
 \hline 
 \multicolumn{1}{|l|}{\textbf{Property}} & 
 \multicolumn{1}{l|}{\textbf{Binary formats}} & 
@@ -78,7 +79,7 @@ and binary formats. Both groups have their own advantages and disadvantages.
 		and most of native serialization
 		mechanisms in various programming languages(Java, Python, .NET framework,
 		C++ BOOST serialization) &
-		\gls{XML} \newline \gls{JSON} \newline \gls{YAML}
+		XML \newline JSON \newline \gls{YAML}
 	
 	    \tabularnewline
 		\hline	  
@@ -131,8 +132,7 @@ and binary formats. Both groups have their own advantages and disadvantages.
 		\tabularnewline
 		\hline
 	%\end{tabularx} 
-	\caption{Comparison of binary and human-readable serialization formats}
-	\label{tbl:data_ser_formats}
+
 \end{longtabu}
 
 Text-based nature makes human-readable format a suitable choice

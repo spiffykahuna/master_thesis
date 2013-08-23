@@ -183,7 +183,8 @@ responses.
 
 
 \begin{longtabu} to \linewidth {|p{1cm}|p{1.5cm}|X|p{8cm}|}
- 	 	 	
+ 	\caption{jsonrpc2-base library RPC methods \cite{jsonrpc2-base}}
+	\label{tbl:jsonrpc2-base_methods} 	 	
 \hline 
 \multicolumn{1}{|l|}{\textbf{Step}} & 
 \multicolumn{1}{l|}{\textbf{Side}} &
@@ -272,8 +273,7 @@ responses.
 		\tabularnewline
 		\hline
 	%\end{tabularx} 
-	\caption{jsonrpc2-base library RPC methods \cite{jsonrpc2-base}}
-	\label{tbl:jsonrpc2-base_methods}
+
 \end{longtabu}
 
 \texttt{jsonrpc2-base} is able to serialize Java data types to JSON objects
@@ -310,6 +310,9 @@ String jsonString = reqOut.toString();
 
 \begin{table}[h]
 	\centering	
+	\caption{{JSON} \ding{214} {Java} data type mapping in
+	\texttt{jsonrpc2-base} library \cite{jsonrpc2-base}}
+	\label{tbl:json_java_mapping}
 	\begin{tabularx}{0.5\textwidth}{|X|X|}
 		\hline
 		\textbf{JSON} & \textbf{Java} 	 	\\ \hline	    
@@ -320,9 +323,7 @@ String jsonString = reqOut.toString();
 		object & java.util.Map			 	\\ \hline
 		null & null		 	\\ \hline			  
 	\end{tabularx} 
-	\caption{{JSON}\(\leftrightarrow\){Java} data type mapping in
-	\texttt{jsonrpc2-base} library \cite{jsonrpc2-base}}
-	\label{tbl:json_java_mapping}
+
 \end{table}
 
 \paragraph{Data flow} ~\\

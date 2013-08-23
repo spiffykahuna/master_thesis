@@ -22,7 +22,7 @@ a embedded system.
  \end{figure}
 \end{center}
 
-The hardware used in this work are the two ARM Cortex M3 microcontrollers from
+The hardware used in this work are the two \gls{ARM} Cortex M3 microcontrollers from
 STMicroelectronics(\url{http://www.st.com/}). They were chosen because the
 company already has a development board  and some other products from that
 manufacturer. There is nothing special in that hardware and similar
@@ -60,7 +60,7 @@ These are features that this board has \cite{stm_eval_board_manual}:
 
 As you see there are lots of opportunities to apply your creativity.
 The amount of features is quite big, but we do not need most of them.
-Required are only connectivity(RS232, USB) and debug(JTAG, SWD) interfaces.
+Required are only connectivity(RS232, USB) and debug(\gls{JTAG}, \gls{SWD}) interfaces.
 
 This development board is made for evaluation of STM32F10x family
 microcontrollers. These are ARM Cortex-M3 core-based mainstream microcontrollers
@@ -503,7 +503,7 @@ input frequency by a given factor of two to sixteen.
 Using the PLL, you can generate clocks up to 72MHz.
 
 Next comes initialization of USART communication interfaces. USART are configured
-to use \gls{DMA} controller. \gls{DMA} works in both directions: receive and
+to use DMA controller. DMA works in both directions: receive and
 transmit. The usage of DMA requires initialization of DMA controller, assigning
 destination/transmitting memory buffer and buffer length, and other configuration
 parameters. DMA may be configured to use memory increment and data direction (
@@ -587,7 +587,7 @@ together.
 \begin{center}
  \begin{figure}[h]
 	\includegraphics[width=\textwidth]{../images/implementation/embedded_server/system_tasks_and_data_flow.png}
-	\caption{System tasks architecture and  the data flow}
+	\caption{System tasks architecture and data flow}
 	\label{fig:server_components_and_data_flow}
  \end{figure}
 \end{center}
@@ -928,6 +928,8 @@ I have developed several demo methods to demonstrate coffee machine service func
 
 
 \begin{longtabu} to \linewidth {|p{3cm}|p{1.5cm}|X|p{7cm}|}
+	\caption{Embedded service remote methods}
+	\label{tbl:service_remote_methods}
 %\hline
 %\rowfont\bfseries H1 & H2 & H3 & H4 
 %\endhead
@@ -1042,8 +1044,7 @@ I have developed several demo methods to demonstrate coffee machine service func
 		\tabularnewline
 		\hline
 	%\end{tabularx} 
-	\caption{Embedded service remote methods}
-	\label{tbl:service_remote_methods}
+
 \end{longtabu}
 
 
@@ -1084,7 +1085,7 @@ As you already know, the whole system i based on the JSON-RPC specification.
 Service description contract is also made using similar technologies.
 \autoref{sec:appendix_service_contracts} provides an examples of service contracts.
 JSON version of contract is inspired from JSON Schema Service Descriptor Draft at \url{http://www.simple-is-better.org/}.
-There is a specification of service interface description, which is similar to the \gls{WSDL} from WS-* technologies. 
+There is a specification of service interface description, which is similar to the WSDL from WS-* technologies. 
 Service contract of coffee machine service is made according to that specification.
 
 It uses a JSON-Schema\footnote{\url{http://json-schema.org/}} specification to describe the JSON data format. 

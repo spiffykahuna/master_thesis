@@ -7,16 +7,47 @@ Mikrokontrolleris jooksev programm näeb välja nagu serveri teenus,
 mis pakkub kasutajale ettenähtud funktsionaalsust.
 
 Antud töö eesmärk on teha uuring teenus orienteeritud arhitektuuride ja tehnoloogiate kohta 
-ning analüsida nende kasutamist piiratud ressursidega sardsüsteemide realiseerimises.
+ning analüsida nende kasutamist piiratud ressursidega sardsüsteemide realiseerimises. 
+Teenus orienteeritud arhitektuur võib olla realiseeritud kasutades erinevaid tehnoloogiaid: 
+Kaugprotseduuride väljakutsed (RPC),
+Web Services,
+REST,
+Microsoft DCOM(Distributed Component Object Model),
+CORBA,
+Java RMI ja teised.
+Töö sisaldab kirjedust kõige levinumate teenus orienteeritud tehnologiate kohta: Web Services ja REST.
+
+Web Services on sõnumitel baseeruv tehnoloogia, mis kasutab XML(SOAP) andmestruktuure sõnumite edastamiseks. 
+Nende sõnumite abil on võimalik kutsuda programmi funktsioone, mis paiknevad kaugjuhtivas süsteemis.
+Samuti neid sõnumeid kasutatakse andmete edastamiseks. 
+Web Services arhitektuur on erinevate WS-* standartide kogum, mis sisaldab protokolle ja spetsifikatsioone veebiteenuste haldamiseks.
+
+
+REST on tarkvara disaini mudel hajutatud süsteemide projekteerimiseks. 
+REST kasutab standardseid veebi protokolle andmete edastamiseks ning baseerub HTTP protokollil. 
+Kuna Web Services tehnoloogia kasutab sõnumeid, REST on tehtud ressurside esindamise baasil. 
+Ressurss on informatsioon suvalise objekti kohta ning ressursi representatsioon või esindus on formaat, kuidas saab objekte kirjeldada.
+Igal objektil peab olema temaga seotud link ning süsteemid opereevad sellega, selleks, et saada või muuta ressurside olekuid, kasutades standartseid HTTP sõnumeid: GET, PUT, POST, DELETE.
+REST võimaldab ehitada väga sõltumatu veebi teenuseid ning nende realiseerimisel (nii serveril kui ka kliendil) saab kasutada igasuguseid tarkvara lahendusi ning programmeerimiskeele.
+
+Paljud teenus orienteeritud tehnoloogiad kasutavad kaugprotseduuride väljakutsete mõisteid ning on ehitatud nende baasil. 
+Antud töö ka sisaldab sarnast realisatsiooni ning kasutab JSON-RPC kaugprotseduurikutse protokolli side pidamiseks kliendi ja serveri vahel.
+JSON-RPC on veel üks võimalus, kuidas saab projekteerida teenusorienteeritud süsteemi.
 
 All on toodud realiseeritud teenusorienteritud sardsüsteemi kirjeldus ja sellele vastav kliendi rakendus.
 
 Serveri pool on tehtud STM32F1 pere ARM Cortex-M3 mikrokontrolleri baasil, kus jookseb FreeRTOS reaalaja operatsioonisüsteem.
-Kliendi rakendus on mobiilsel platformil kasutatav programm, mis kasutab Javas kirjutatud teegi kaugprotseduuride väljakutsemiseks.
+Antud sardsüsteemis töötab programm, mis saab kommunikatsiooni liinist sõnumeid ning kutsub tarkvara funktsioone sõltuvalt sõnumite sisust.
+Server on ühendatud kontrollitava objektiga ja juhib seda. 
+Juhitav objekti näidis on traadita liidesega varustatud kohvimasin, mis on võimeline teha kohvi antud süsteemi kliendi jaoks. 
 
-Klindi ja serveri vaheline kommunikatsioon toimub labi traadita Bluetooth kanali kasutades JSON-RPC protokolli.
+Kliendi rakendus on mobiilsel seadmel olev programm, mis kasutab Javas kirjutatud teegi kaugprotseduuride väljakutsemiseks.
+See on väike Android rakendus, mis laadib serverist erinevate kohvimasina produktide kirjeldust ning saab alustada nende valmistamise.
+
+Kliendi ja serveri vaheline kommunikatsioon toimub labi traadita Bluetooth kanali kasutades JSON-RPC protokolli.
 Süsteemis on tehtud mõned funktsioonid, selleks et näidata antud klient-serveri arhitektuurilisi omadusi.
 
+Siin töös on toodud erinevad viisid, kuidas saab organiseerida andmete edastust sardsüsteemide vahel.
 
 \vspace{\fill}
 \clearpage

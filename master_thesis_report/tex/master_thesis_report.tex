@@ -24,6 +24,8 @@
 \usepackage{setspace}
 \usepackage{needspace} % line skipping
 
+\usepackage{pifont} % for <-->  arrow
+
 % images
 \usepackage{graphicx}
 \usepackage{wrapfig}
@@ -32,17 +34,20 @@
 
 %\usepackage[printonlyused,withpage]{acronym}
 
-
+%\usepackage{hyperref}
 \usepackage[bookmarks=true,
 bookmarksnumbered=true,
+backref=none,
 bookmarksopen=false,
-backref=page,
-,colorlinks=true]{hyperref}
+colorlinks=true,
+linkcolor=blue]{hyperref}
+
+%
 %\hypersetup{backref=true}
 %\usepackage{backref}
 %\usepackage{hyperref}
 %\usepackage[colorlinks,bookmarks=false]{hyperref}
-\usepackage{url}
+%\usepackage{url}
 \usepackage{makeidx}
 % bibliography to table of contents
 %\usepackage[nottoc,numbib]{tocbibind}
@@ -77,7 +82,7 @@ backref=page,
 \usepackage{tabu}
 
 	
-
+\usepackage{appendix}
 \usepackage{lscape}
 \usepackage{pdflscape}
 
@@ -88,7 +93,7 @@ backref=page,
 %\input{macros/tables.tex}
 %\usepackage{../resource/python}
 
-\usepackage[acronym,footnote,toc]{glossaries}
+\usepackage[acronym,footnote,toc,nonumberlist]{glossaries}
 
 
 \makeglossaries
@@ -208,6 +213,11 @@ backref=page,
 	\newpage
 	\printglossaries
 	
+	\newpage
+	\listoffigures
+	%\newpage
+	\listoftables
+	
 	
 	\input{intro.tex}
 	\input{background/background.tex}	
@@ -216,12 +226,14 @@ backref=page,
 	
 	\input{conclusion.tex}
 	
+	\newpage  
+  
+	\appendix
 	\input{appendices/service_contracts.tex}
+	\input{appendices/licence.tex}
+	\input{appendices/source.tex}
 	
-	\newpage
-	\listoffigures
-	%\newpage
-	\listoftables
+
 	
 	\newpage
 	\bibliographystyle{ieeetr}

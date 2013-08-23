@@ -1,10 +1,12 @@
 \subsection{REST and RESTful services}
+The REST has some advantages over WS-*. Next section will shortly
+describe the main principles of REST approach. 
 
 \subsubsection{What is the REST?}
 Representational state transfer (REST) is a software design model for
 distributed systems~\cite{Fielding2000}. This term was introduced in 2000 in the doctoral dissertation of
 Roy Fielding, one of the principal authors of the Hypertext Transfer Protocol
-(\gls{HTTP}) specification.
+(HTTP) specification.
 REST uses a stateless, client-server, cacheable communications over HTTP protocol. Its original
 feature is to work by using simple HTTP to make calls between machines instead
 of choosing more complex mechanisms such as CORBA, RPC or SOAP.
@@ -47,7 +49,7 @@ The  five key principles of REST are~\cite{rest_brief_intro}:
 
 Every resource need to be reachable and identifiable. You need to access it
 somehow, therefore you need an identificator for the resource. World Wide Web
-uses \gls{URI} identificators for that purpose. Resource \gls{URI} could look like:
+uses URI identificators for that purpose. Resource URI could look like:
 
 \begin{listing}[H]
 \begin{minted}[frame=lines,
@@ -95,7 +97,7 @@ choice: to get product information or to fetch customer details.
 \end{listing}
  
 The idea of links is a core principle of the Web~\footnote{The World Wide Web
-(abbreviated as WWW or W3,[3] commonly known as the web), is a system of
+(abbreviated as WWW or W3, commonly known as the web), is a system of
 interlinked hypertext documents accessed via the Internet.\cite{wikipedia:WWW}}
 
 \paragraph{Use standard methods} ~\\
@@ -108,6 +110,8 @@ GET, PUT, POST and DELETE.
 
 \begin{table}[h]
 	\centering	
+	\caption{RESTful web API HTTP methods ~\cite{wikipedia:REST}}
+	\label{tbl:rest_http_api}
 	\begin{tabularx}{\textwidth}{|X|X|X|X|X|}
 		\hline
 		\textbf{Resource} & 
@@ -143,8 +147,7 @@ GET, PUT, POST and DELETE.
 	    \tabularnewline
 		\hline	  
 	\end{tabularx} 
-	\caption{RESTful web API HTTP methods ~\cite{wikipedia:REST}}
-	\label{tbl:rest_http_api}
+	
 \end{table}
 
 All four \gls{CRUD} operations may be done with these HTTP methods. It is
@@ -182,7 +185,7 @@ This means that client expects that representation of a resource having
 identificator \url{http://www.example.com/images/567} should be in
 \textit{image/jpeg} format. Both client and server should be aware of such
 format, whole system may be designed around any special format. 
-There could be also an another representation of same resouce( the same image),
+There could be also an another representation of same resource( the same image),
 for example \textit{image/png} or \textit{image/bmp} formats, that server could
 send according to received request. 
 
@@ -245,7 +248,7 @@ applied to the elements in this architecture~\cite{Fielding2000}:
   information over the network again and again.
   \item \textbf{Cache}
   This constraint improves network efficiency. The data in the server response
-  may be marked as cacheable or non-cacheable. Client is able to store cachable
+  may be marked as cacheable or non-cacheable. Client is able to store cacheable
   data on its side and reuse it, if it needs to send the same request again.
   Frequently changed data should not be marked as cacheable in order to provide
   data integrity.
