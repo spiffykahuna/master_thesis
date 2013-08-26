@@ -15,7 +15,7 @@ in distributed systems~\cite{tanenbaum07}. The popularity of the model is due to
 its apparent simplicity.
 This section gives a brief introduction to RPC and the problems in there.
 
-Only one figure is enough to describe RPC(see \autoref{fig:rpc_call}).
+Only one figure is enough to describe RPC (see \autoref{fig:rpc_call}).
 
 % \begin{center}
 %  \begin{figure}[h!]
@@ -160,7 +160,7 @@ precision, half precision, double precision). Some machines have different
 endianness\footnote{The terms little-endian and big-endian refer to the way in which a word of data is stored into sequential bytes of
 memory. The first byte of a sequence may store either the least significant byte of a word (little-endian) or the most
 significant byte of a word (big-endian). Endianness refers to how bytes and
-16-bit half-words map to 32-bit words in the system memory. \cite{arm_endian}}.
+16-bit half-words map to 32-bit words in the system memory~\cite{arm_endian}.}.
 If two different machines, one little-endian and other big-endian, are
 communicating to each other, they should use common endianness, otherwise they
 will accept bytes in wrong order and data will be invalid.
@@ -287,7 +287,7 @@ rpc call with invalid Request object:
      "id": null}
 
 \end{minted}
-\caption{JSON-RPC examples of client-server communication ~\cite{jsonrpc_spec}}
+\caption{JSON-RPC examples of client-server communication ~\cite{jsonrpc_spec}.}
 \label{lst:jsonrpc_example}
 \end{listing}                                                                                                             
 

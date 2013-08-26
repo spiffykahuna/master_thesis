@@ -28,7 +28,7 @@ delete data to delete existing resource.
 REST does not offer security features, encryption, session management, QoS
 guarantees, etc. But these can be added by building on top of HTTP, for example
 username/password tokens are often used for encryption, REST can be used on
-top of HTTPS (secure sockets)\cite{ws_technologies_state_of_the_art}.
+top of HTTPS (secure sockets)~\cite{ws_technologies_state_of_the_art}.
 
 \subsubsection{Key principles of REST}
 REST is a set of principles that define how Web standards, such as HTTP and
@@ -98,7 +98,7 @@ choice: to get product information or to fetch customer details.
  
 The idea of links is a core principle of the Web~\footnote{The World Wide Web
 (abbreviated as WWW or W3, commonly known as the web), is a system of
-interlinked hypertext documents accessed via the Internet.\cite{wikipedia:WWW}}
+interlinked hypertext documents accessed via the Internet~\cite{wikipedia:WWW}.}
 
 \paragraph{Use standard methods} ~\\
 
@@ -234,25 +234,25 @@ because that context data cannot be stored on the server.
 The REST architectural style can be described by the following six constraints
 applied to the elements in this architecture~\cite{Fielding2000}:
 \begin{enumerate}
-  \item \textbf{Client-Server}
+  \item \textbf{Client-Server} --
   Separation of concerns is the principle behind the client-server constraints.
   User interface is separated from data storage and has improved portability.
   Server side does not aware of client application logic and server tasks may be
   more optimized and independent.
-  \item \textbf{Stateless}
+  \item \textbf{Stateless} --
   This constraint reflects a design trade-off of keeping session
   information about each client on the server. Stateless method does not keep
   any application context on the server and allows to build more scalable server
   components. Each new request contains enough information to process it, but
   such technique increases network traffic by sending repeating session
   information over the network again and again.
-  \item \textbf{Cache}
+  \item \textbf{Cache} --
   This constraint improves network efficiency. The data in the server response
   may be marked as cacheable or non-cacheable. Client is able to store cacheable
   data on its side and reuse it, if it needs to send the same request again.
   Frequently changed data should not be marked as cacheable in order to provide
   data integrity.
-  \item \textbf{Uniform Interface}
+  \item \textbf{Uniform Interface} --
   System becomes more universal if the interface of all components is the same.
   You can add new and replace existing components more easily. Component
   implementations are decoupled from the services they provide, system
@@ -272,7 +272,7 @@ applied to the elements in this architecture~\cite{Fielding2000}:
   resources (which could be shared using common access, but layers are
   separated and they don't) and reduce communication performance by introducing
   new bottleneck at the layer boundaries.
-  \item \textbf{Code-On-Demand}
+  \item \textbf{Code-On-Demand} --
   This is an optional constraint. REST allows client functionality to be extended
   by downloading and executing code in the form of applets or scripts. Not all
   features on a client side may be implemented. Your system could download

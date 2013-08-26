@@ -11,7 +11,7 @@ which are designed specially for interaction between small devices.
 
 This section will describe two possibilities of implementing SOA on an embedded
 device, that are based on different research
-papers\cite{coap_survey,4221180}.
+papers~\cite{coap_survey,4221180}.
 \nameref{sec:DPWS} section will introduce a
 Web Services based device communication framework. \nameref{sec:CoAP} section
 will cover RESTful device interactions.
@@ -44,7 +44,7 @@ several Web Services specifications~\cite{ws4d_dpws}:
   \item WS-Eventing for managing subscriptions for event channels   
 \end{itemize}
     
-Like Web Services, DPWS uses SOAP, WSDL, XML-Schema. 
+Like Web Services, DPWS uses SOAP, WSDL and XML-Schema. 
 
 
 DPWS has been ported to several target software
@@ -55,7 +55,7 @@ TDMI and associated memory (but no cache memory), running
 ThreadX. The static memory footprint of the device software including
 the OS, the TCP/IP protocol stack and the DPWS software is
 less than 500 KB, while the dynamic memory requirements are
-below 100 KB.\cite{4221180}.    
+below 100 KB ~\cite{4221180}.    
 Another research \cite{5470528} reports that system disk space
 requirements are between 61 and 478 Kbytes. 
 
@@ -119,7 +119,7 @@ possibilities, not for deeply embedded devices like low-cost microcontrollers fo
 
 The second technology, CoAP and RESTful services requires less resources. Its
 highly optimized implementation could be executed on a device with 8.5 kB of ROM
-and 1.5 kB of RAM \cite{6076698}. It uses Contiki OS and TCP/IP
+and 1.5 kB of RAM ~\cite{6076698}. It uses Contiki OS and TCP/IP
 implementations. This architecture could be a great candidate for  a remote
 embedded service.
 
