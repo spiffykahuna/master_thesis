@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_weight="1"
+    android:orientation="horizontal" 
+    >
+    
+    <Button android:id="@+id/button_cmd1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/cmd1_label"
+            android:layout_weight="1"
+            style="@style/FunctionButtonStyle"
+        />
+    <Button android:id="@+id/button_cmd2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/cmd2_label"
+            android:layout_weight="1"
+            style="@style/FunctionButtonStyle"
+        />
+    <Button android:id="@+id/button_cmd3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/cmd3_label"
+             android:layout_weight="1"
+            style="@style/FunctionButtonStyle"
+        />
+    <Button android:id="@+id/button_cmd4"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/cmd4_label"
+             android:layout_weight="1"
+            style="@style/FunctionButtonStyle"
+        />
+    <Button android:id="@+id/button_cmd5"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/cmd5_label"
+            android:layout_weight="1"
+            style="@style/FunctionButtonStyle"
+        />
+    
+
+</LinearLayout>

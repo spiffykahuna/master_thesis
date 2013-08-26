@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
+ xmlns:android="http://schemas.android.com/apk/res/android"
+ xmlns:tools="http://schemas.android.com/tools"
+ android:id="@+id/cont"
+ android:layout_width="match_parent"
+ android:layout_height="match_parent">
+
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/memory_dump"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="horizontal" >
+	<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+		android:id="@+id/memory_dump_left"
+		android:layout_width="fill_parent"
+		android:layout_height="fill_parent"
+		android:orientation="vertical"
+		android:layout_weight="1"		>
+
+		<ProgressBar
+			android:id="@+id/memory_dump_progress_dummy"
+			style="?android:attr/progressBarStyleLarge"
+			android:indeterminateDrawable="@drawable/loader4_progress"
+			android:indeterminate="true"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:layout_weight="1"/>
+		<ProgressBar
+			android:id="@+id/memory_dump_progress"
+			style="?android:attr/progressBarStyleHorizontal"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:layout_weight="1" />
+
+		<LinearLayout
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:orientation="horizontal" 
+			android:layout_weight="1" >
+
+			<Button
+				android:id="@+id/memory_dump_btn_stop"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:layout_weight="1"
+				android:text="@string/memory_dump_btn_stop" />
+
+			<Button
+				android:id="@+id/memory_dump_btn_start"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:layout_weight="1"
+				android:text="@string/memory_dump_btn_start" />
+		</LinearLayout>
+	   
+		
+	</LinearLayout>
+    
+
+	<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+		android:id="@+id/memory_dump_right"
+		android:layout_width="fill_parent"
+		android:layout_height="fill_parent"
+		android:orientation="vertical"
+		android:layout_weight="1"		>
+
+		<ScrollView
+				android:id="@+id/dump_log_scroller"
+				android:layout_width="fill_parent"
+				android:layout_height="0dip"
+				android:layout_weight="6"
+				android:stackFromBottom="true"
+				android:transcriptMode="alwaysScroll"
+				>
+				<LinearLayout
+					android:orientation="vertical"
+					android:layout_width="fill_parent"
+					android:layout_height="wrap_content">
+					<TextView
+						android:layout_width="fill_parent"
+						android:layout_height="wrap_content"
+						android:id="@+id/editText1"
+						 />
+				   
+				</LinearLayout>
+		</ScrollView>
+	</LinearLayout>
+	
+</LinearLayout>
+</FrameLayout>

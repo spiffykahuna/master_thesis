@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="title_activity_memory_dump">Memory dump</string>
+    <string name="memory_dump_btn_start">Start</string>
+    <string name="memory_dump_btn_stop">Stop</string>
+</resources>

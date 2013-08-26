@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory 
+        android:title="@string/pref_memory_dump_category_title"
+        android:key="pref_key_storage_settings">
+    <CheckBoxPreference
+            android:key="pref_send_dump_report_key"
+            android:summary="@string/pref_send_dump_report_summary"
+            android:title="@string/pref_send_dump_report_title"
+            android:defaultValue="true" />
+
+    
+    <EditTextPreference        
+	        android:defaultValue="@string/pref_dump_file_name_default"
+	        android:inputType="text"
+	        android:key="pref_dump_file_name"
+	        android:maxLines="1"
+	        android:selectAllOnFocus="true"
+	        android:singleLine="true"
+	        android:title="@string/pref_dump_file_name" />
+        
+   	<EditTextPreference        
+	        android:defaultValue="@string/pref_memory_dump_start_address_default"
+	        android:inputType="text"
+	        android:key="pref_memory_dump_start_address"
+	        android:maxLines="1"
+	        android:selectAllOnFocus="true"
+	        android:singleLine="true"
+	        android:title="@string/pref_memory_dump_start_address" />
+        
+    <EditTextPreference        
+	        android:defaultValue="@string/pref_memory_dump_stop_address_default"
+	        android:inputType="text"
+	        android:key="pref_memory_dump_stop_address"
+	        android:maxLines="1"
+	        android:selectAllOnFocus="true"
+	        android:singleLine="true"
+	        android:title="@string/pref_memory_dump_stop_address" />
+
+    <EditTextPreference        
+	        android:defaultValue="@string/pref_memory_dump_address_step_increment_default"
+	        android:inputType="text"
+	        android:key="pref_memory_dump_address_step_increment"
+	        android:maxLines="1"
+	        android:selectAllOnFocus="true"
+	        android:singleLine="true"
+	        android:title="@string/pref_memory_dump_address_step_increment" />
+         
+    </PreferenceCategory>
+    
+</PreferenceScreen>

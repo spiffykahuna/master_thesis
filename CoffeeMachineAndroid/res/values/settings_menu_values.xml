@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+ 	<!-- Settings menu -->
+    <string name="settings_menu">Settings</string>
+    <string name="exit_application_label">Exit</string>
+    <string name="memory_dump_activity_link_label">Memory dump</string>
+    
+    <string name="settings_user_email_label">User E-mail</string>
+    <string name="pref_user_default_email">satronrd@gmail.com</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="menu_settings">Settings</string>
+    
+    <string name="pref_header_general">General options</string>
+    <string name="pref_header_memory_dump">Memory dump options</string>
+    
+    <string name="pref_dump_file_name">Dump file name</string>
+    <string name="pref_dump_file_name_summary">Dump file name</string>
+    <string name="pref_dump_file_name_default">dump_file.txt</string>
+    
+    
+    <string name="pref_memory_dump_category_title">Memory dump settings</string>
+    <string name="pref_send_dump_report_summary">Do you want to send dump report by e-mail?</string>
+    <string name="pref_send_dump_report_title">Send dump report by e-mail</string>
+    
+    <string name="pref_memory_dump_start_address_default">0x0000</string>
+    <string name="pref_memory_dump_start_address">Memory dump start address</string>
+    <string name="pref_memory_dump_stop_address_default">0x03F0</string>
+    <string name="pref_memory_dump_stop_address">Memory dump stop address</string>
+    <string name="pref_memory_dump_address_step_increment_default">0x0010</string>    
+    <string name="pref_memory_dump_address_step_increment">Memory dump address step increment</string>
+	
+    
+         
+    
+</resources>

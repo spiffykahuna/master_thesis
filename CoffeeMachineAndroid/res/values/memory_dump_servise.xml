@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="memory_dump_service_started">Memory dump service started</string>
+    <string name="memory_dump_service_stopped">Memory dump service stopped</string>
+    <string name="memory_dump_service_connected">Memory dump service connected</string>
+    <string name="memory_dump_service_disconnected">Memory dump service disconnected</string>  
+    
+</resources>

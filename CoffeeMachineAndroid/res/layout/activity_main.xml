@@ -1,0 +1,100 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"    
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:weightSum=".70"
+    tools:context=".MainActivity">
+    
+   <TextView
+       android:id="@+id/status_text"
+       android:layout_width="wrap_content"
+       android:layout_height="0dp"
+       android:layout_weight=".20"
+       android:paddingLeft="50dp"
+       android:paddingTop="50dp"
+       android:text="@+string/connect_tooltip_text"
+       android:textAppearance="?android:attr/textAppearanceSmall"
+       android:textSize="20sp" />
+	
+<!--         <TextView android:id="@+id/receivedBytes"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+        
+        <Button android:id="@+id/clear"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="clear" /> 
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" >
+        </LinearLayout> -->
+
+        <HorizontalScrollView
+            android:id="@+id/scroller"    
+	        android:layout_width="match_parent"
+	        android:layout_height="0dp"
+	   		android:layout_weight=".30"
+	        >
+        
+	        <LinearLayout
+	            android:id="@+id/container"
+	            android:layout_width="wrap_content"
+	            android:layout_height="wrap_content"
+	            android:orientation="horizontal"
+	            android:visibility="gone" >
+	
+	        </LinearLayout>
+    	</HorizontalScrollView>
+
+        <RelativeLayout
+            	android:id="@+id/tutorialLayout"
+	        	android:layout_width="match_parent"	            
+            	android:layout_height="0dp"
+	            android:layout_weight=".20"
+	            android:orientation="horizontal">  
+	          		 <LinearLayout
+				            android:id="@+id/filler"
+				            android:layout_width="wrap_content"
+				            android:layout_height="match_parent"
+				            android:layout_centerHorizontal="true"
+				            android:orientation="vertical"
+				            android:visibility="invisible" >	
+	        		</LinearLayout>   
+
+		            <ImageButton
+		                android:id="@+id/sourceButton"
+		                android:layout_width="wrap_content"
+		                android:layout_height="match_parent"		              
+		                android:adjustViewBounds="true"
+		                android:layout_centerHorizontal="true"
+		     			android:layout_toLeftOf="@+id/filler"
+		                android:contentDescription="Tutorial"
+		                android:cropToPadding="false"
+		                android:scaleType="fitCenter"
+		                android:src="@drawable/coffee_machine_android_icon"
+		                android:text="@+string/app_name"
+		                android:textSize="60sp" />
+		            
+
+	        		
+		            <ImageButton
+		                android:id="@+id/thesisTextButton"
+		                android:layout_width="wrap_content"
+		                android:layout_height="match_parent"
+		     			android:layout_centerHorizontal="true"
+		     			android:layout_toRightOf="@+id/filler"
+		                android:adjustViewBounds="true"
+		                android:contentDescription="Tutorial"
+		                android:cropToPadding="false"
+		                android:scaleType="fitCenter"
+		                android:src="@drawable/pdf_text_icon"
+		                android:text="@+string/app_name"
+		                android:textSize="60sp" />
+
+				
+		 </RelativeLayout>
+
+</LinearLayout>
